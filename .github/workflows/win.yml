@@ -1,27 +1,107 @@
 name: Windows
+
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
+
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.config.name }} [${{ matrix.build_type }}]
+    runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2025, windows-11-arm]
-        build_type: [Debug, Release]
+        build_type: [Release, Debug]
+        config:
+          - { name: "Windows 2025 x86 MSVC", os: windows-2025, arch: x64 }
+          - { name: "Windows 11 arm MSVC", os: windows-11-arm, arch: arm64 }
+
+    env:
+      SCCACHE_GHA_ENABLED: "true"
+
     steps:
-      - name: Enable long Git paths
-        shell: pwsh
-        run: git config --system core.longpaths true
-      - uses: actions/checkout@v7
-      - uses: ilammy/msvc-dev-cmd@v1.13.0
-        with:
-          arch: ${{ matrix.os == 'windows-11-arm' && 'arm64' || 'x64' }}
-      - name: Configure
-        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DWARNINGS_AS_ERRORS=ON
-      - name: Build
-        run: cmake --build build --parallel 2 --target everything
-      - name: Test
-        run: ctest --test-dir build --output-on-failure
+    - name: Enable long paths in Git
+      shell: pwsh
+      run: git config --system core.longpaths true
+
+    - uses: actions/checkout@v7
+
+    - name: Set up MSVC environment
+      uses: ilammy/msvc-dev-cmd@v1.13.0
+      with:
+        arch: ${{ matrix.config.arch }}
+
+    - name: Set up sccache
+      uses: mozilla-actions/sccache-action@v0.0.11
+      with:
+        version: "v0.18.0"
+
+    - uses: actions/setup-python@v7
+      with:
+        python-version: "3.13"
+
+    - name: Install Python Test Dependencies
+      if: matrix.build_type == 'Debug'
+      run: python -m pip install pytest
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{ runner.workspace }}/build
+
+    - name: Configure CMake
+      working-directory: ${{ runner.workspace }}/build
+      run: cmake $env:GITHUB_WORKSPACE -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_FLAGS_DEBUG="/Z7 /Ob0 /Od /RTC1" -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache  -DWARNINGS_AS_ERRORS=ON -DPYTHON_ENFORCE_TESTS=${{ matrix.build_type == 'Debug' && 'ON' || 'OFF' }}
+
+    - name: Build
+      working-directory: ${{ runner.workspace }}/build
+      run: cmake --build . --parallel --target everything
+
+    - name: Test C++
+      if: matrix.build_type == 'Debug'
+      working-directory: ${{ runner.workspace }}/build
+      run: ctest -LE python --output-on-failure
+
+
+    - name: Test Python
+      if: matrix.build_type == 'Debug'
+      working-directory: ${{ runner.workspace }}/build
+      run: ctest -L python --output-on-failure
+
+    - name: Install Ariadne Hybrid
+      if: matrix.build_type == 'Release'
+      working-directory: ${{ runner.workspace }}/build
+      run: cmake --install . --prefix "${{ runner.workspace }}/install"
+
+    - name: Check Python Hybrid Tutorial
+      if: matrix.build_type == 'Release'
+      shell: pwsh
+      working-directory: ${{ github.workspace }}/tutorial
+      run: |
+        $env:PYTHONPATH = "${{ runner.workspace }}\install\Lib\site-packages"
+        $env:PATH = "${{ runner.workspace }}\install\bin;$env:PATH"
+        python -c "import pyariadne; print(pyariadne.__file__)"
+        python tutorial_hybrid.py
+
+
+    - name: Prepare C++ Hybrid Tutorial
+      if: matrix.build_type == 'Release'
+      shell: pwsh
+      run: cmake -E copy_directory "$env:GITHUB_WORKSPACE/tutorial" "${{ runner.workspace }}/tutorial_hybrid"
+
+    - name: Check C++ Hybrid Tutorial
+      if: matrix.build_type == 'Release'
+      shell: pwsh
+      working-directory: ${{ runner.workspace }}/tutorial_hybrid
+      run: |
+        cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ runner.workspace }}/install" -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache 
+        cmake --build build --parallel
+        $env:PATH = "${{ runner.workspace }}\install\bin;$env:PATH"
+        & ".\build\tutorial_hybrid.exe"
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+
+    - name: Verify Uninstallation
+      if: matrix.build_type == 'Release'
+      working-directory: ${{ runner.workspace }}/build
+      run: cmake --build . --target uninstall

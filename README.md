@@ -11,7 +11,7 @@ Ariadne Hybrid is the standalone C++20 hybrid-space representation layer used by
 
 ## Layout
 
-Public headers live under `include/hybrid`, implementations under `src`, and C++ tests under `tests`. The repository uses `ss` for its pinned Git submodules. Python bindings and smoke tests live under `python`. Standalone tutorials have not yet been added.
+Public headers live under `include/hybrid`, implementations under `src`, and C++ tests under `tests`. The repository uses `ss` for its pinned Git submodules. Python bindings and smoke tests live under `python`. The C++ and Python tutorial programs live together in the top-level `tutorial/` directory.
 
 The umbrella header is `include/ariadne-hybrid.hpp`.
 
@@ -33,6 +33,8 @@ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --parallel --target everything
 ctest --test-dir build --output-on-failure
 ```
+
+The C++ and Python examples are available in [the Hybrid tutorial](tutorial/README.md), which includes standalone build and run instructions.
 
 ## Python bindings
 
