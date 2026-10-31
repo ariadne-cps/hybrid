@@ -1,0 +1,23 @@
+name: Ubuntu
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+        build_type: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Dependencies
+        run: sudo apt-get update && sudo apt-get install -y cmake ninja-build pkg-config
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DWARNINGS_AS_ERRORS=ON
+      - name: Build
+        run: cmake --build build --parallel 2 --target everything
+      - name: Test
+        run: ctest --test-dir build --output-on-failure

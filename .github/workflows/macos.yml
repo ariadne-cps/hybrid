@@ -1,0 +1,22 @@
+name: macOS
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  build:
+    runs-on: macos-26
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Dependencies
+        run: brew install ninja pkg-config
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DWARNINGS_AS_ERRORS=ON
+      - name: Build
+        run: cmake --build build --parallel 2 --target everything
+      - name: Test
+        run: ctest --test-dir build --output-on-failure

@@ -1,0 +1,6 @@
+[submodule "cfg"]
+	path = ss/cfg
+	url = https://github.com/ariadne-cps/configuration
+[submodule "lab"]
+	path = ss/lab
+	url = https://github.com/ariadne-cps/labelled
