@@ -94,10 +94,10 @@ class HybridBoxSet
     using HybridVariablesBox<RealInterval>::variables;
     using HybridVariablesBox<RealInterval>::euclidean_set;
 
-    inline RealBox euclidean_set(DiscreteLocation, RealSpace) const;
+    RealBox euclidean_set(DiscreteLocation, RealSpace) const;
     virtual Set<DiscreteLocation> locations() const override;
     virtual Set<RealVariable> variables(DiscreteLocation) const override;
-    inline RealSpace space() const;
+    RealSpace space() const;
     virtual RealSpace space(DiscreteLocation) const;
     virtual LowerKleenean is_empty() const;
 

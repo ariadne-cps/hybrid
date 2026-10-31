@@ -30,6 +30,9 @@ public:
         ARIADNE_TEST_EQUALS(hybrid_box.space().dimension(),2u);
         ARIADNE_TEST_EQUALS(hybrid_box.space(location).dimension(),2u);
         ARIADNE_TEST_EQUALS(hybrid_box.euclidean_set(space).dimension(),2u);
+        // Exercise the location-indexed overload, which preserves the
+        // underlying real box when the requested location matches.
+        ARIADNE_TEST_EQUALS(hybrid_box.euclidean_set(location,space).dimension(),2u);
         ARIADNE_TEST_ASSERT(!definitely(hybrid_box.is_empty()));
 
         // clone() is private on HybridBoxSet, but public on its polymorphic

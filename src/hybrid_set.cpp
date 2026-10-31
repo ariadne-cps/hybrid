@@ -86,6 +86,10 @@ Set<DiscreteLocation> HybridBoxSet::locations() const {
 Set<RealVariable> HybridBoxSet::variables(DiscreteLocation) const {
     return this->HybridVariablesBox<RealInterval>::variables();
 }
+RealBox HybridBoxSet::euclidean_set(DiscreteLocation loc, RealSpace spc) const {
+    ARIADNE_ASSERT(this->location()==loc);
+    return this->HybridVariablesBox<RealInterval>::euclidean_set(spc);
+}
 RealSpace HybridBoxSet::space() const {
     return RealSpace( make_list(this->HybridVariablesBox<RealInterval>::variables()) );
 }
