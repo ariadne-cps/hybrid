@@ -76,7 +76,7 @@ jobs:
     - name: Check Python Hybrid Tutorial
       if: matrix.build_type == 'Release'
       shell: pwsh
-      working-directory: ${{ github.workspace }}/tutorial
+      working-directory: ${{ github.workspace }}/python/tutorial
       run: |
         $env:PYTHONPATH = "${{ runner.workspace }}\install\Lib\site-packages"
         $env:PATH = "${{ runner.workspace }}\install\bin;$env:PATH"

@@ -80,7 +80,7 @@ jobs:
 
     - name: Check Python Hybrid Tutorial
       if: matrix.build_type == 'Release'
-      working-directory: ${{ github.workspace }}/tutorial
+      working-directory: ${{ github.workspace }}/python/tutorial
       env:
         PYTHONPATH: ${{ runner.workspace }}/install/lib/python3.13/site-packages
         LD_LIBRARY_PATH: ${{ runner.workspace }}/install/lib

@@ -1,7 +1,7 @@
 # Ariadne Hybrid tutorial
 
-These short, standalone programs show what the **Hybrid** representation
-layer provides, without constructing a dynamical system or running evolution
+The C++ program in `tutorial/` and Python program in `python/tutorial/`
+show what the **Hybrid** representation layer provides, without constructing a dynamical system or running evolution
 or reachability algorithms.
 
 The two programs cover the same basic ideas: discrete locations, continuous
@@ -44,7 +44,7 @@ Run the installed `pyariadne` extension. For a non-system install, add
 library loader can locate the installed shared libraries, then run:
 
 ```bash
-python tutorial/tutorial_hybrid.py
+python python/tutorial/tutorial_hybrid.py
 ```
 
 This program is executable as an ordinary script; it doesn't rely on pytest.
