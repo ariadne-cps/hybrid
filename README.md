@@ -11,7 +11,7 @@ Ariadne Hybrid is the standalone C++20 hybrid-space representation layer used by
 
 ## Layout
 
-Public headers live under `include/hybrid`, implementations under `src`, and C++ tests under `tests`. The repository uses `ss` for its pinned Git submodules. Python bindings and standalone tutorials have not yet been added.
+Public headers live under `include/hybrid`, implementations under `src`, and C++ tests under `tests`. The repository uses `ss` for its pinned Git submodules. Python bindings and smoke tests live under `python`. Standalone tutorials have not yet been added.
 
 The umbrella header is `include/ariadne-hybrid.hpp`.
 
@@ -36,7 +36,7 @@ ctest --test-dir build --output-on-failure
 
 ## Python bindings
 
-Standalone Python bindings for Hybrid have not yet been migrated. The current repository builds the C++ library and its representation tests only.
+When a compatible Python development environment is available, the standalone build produces the combined `pyariadne` extension from the Labelled dependency and Hybrid bindings. The smoke test `python/tests/test_hybrid.py` checks discrete locations, hybrid spaces, grids, paving, and boxes.
 
 ## Contribution guidelines
 

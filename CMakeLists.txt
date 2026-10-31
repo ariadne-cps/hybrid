@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 project(Hybrid VERSION 1.0)
 
 option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
+option(BUILD_PYTHON_BINDINGS "Build Python bindings" ON)
 
 if(NOT TARGET ariadne-configuration)
     find_package(Git REQUIRED)
@@ -69,4 +70,8 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
         TARGET hybrid
         DESTINATION include/ariadne-hybrid
     )
+endif()
+
+if(BUILD_PYTHON_BINDINGS)
+    add_subdirectory(python)
 endif()
