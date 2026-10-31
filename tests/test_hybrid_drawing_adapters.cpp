@@ -57,16 +57,16 @@ public:
     Void set_line_width(double width) override {
         static_cast<void>(width); ++styles;
     }
-    Void set_line_colour(double red, double green, double blue) override {
-        static_cast<void>(red); static_cast<void>(green);
-        static_cast<void>(blue); ++styles;
+    Void set_line_colour(double red_component, double green_component, double blue_component) override {
+        static_cast<void>(red_component); static_cast<void>(green_component);
+        static_cast<void>(blue_component); ++styles;
     }
     Void set_fill_opacity(double opacity) override {
         static_cast<void>(opacity); ++styles;
     }
-    Void set_fill_colour(double red, double green, double blue) override {
-        static_cast<void>(red); static_cast<void>(green);
-        static_cast<void>(blue); ++styles;
+    Void set_fill_colour(double red_component, double green_component, double blue_component) override {
+        static_cast<void>(red_component); static_cast<void>(green_component);
+        static_cast<void>(blue_component); ++styles;
     }
 };
 

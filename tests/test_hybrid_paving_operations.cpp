@@ -46,7 +46,7 @@ public:
         HybridListSet<ExactBoxType> exported=paving.boxes();
         ARIADNE_TEST_EQUALS(exported.size(),paving.size());
         ARIADNE_TEST_ASSERT(exported.begin()!=exported.end());
-        ARIADNE_TEST_EQUALS(exported.begin()->space().dimension(),1u);
+        ARIADNE_TEST_EQUALS((*exported.begin()).space().dimension(),1u);
 
         // The empty paving is contained even in an empty box collection.
         HybridGridTreePaving empty_paving(grid);
