@@ -1,49 +1,49 @@
 # Ariadne Hybrid
 
-Ariadne Hybrid is the standalone C++20 hybrid-space representation layer.
-It defines discrete locations, hybrid spaces, mathematical hybrid sets and
-constraints, hybrid grids and pavings, and their drawing interfaces/adapters.
+[![macOS Status](https://github.com/ariadne-cps/hybrid/actions/workflows/macos.yml/badge.svg)](https://github.com/ariadne-cps/hybrid/actions/workflows/macos.yml)
+[![Ubuntu Status](https://github.com/ariadne-cps/hybrid/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/ariadne-cps/hybrid/actions/workflows/ubuntu.yml)
+[![Windows Status](https://github.com/ariadne-cps/hybrid/actions/workflows/win.yml/badge.svg)](https://github.com/ariadne-cps/hybrid/actions/workflows/win.yml)
+[![Sanitizers Status](https://github.com/ariadne-cps/hybrid/actions/workflows/sanitizers.yml/badge.svg)](https://github.com/ariadne-cps/hybrid/actions/workflows/sanitizers.yml)
+[![Coverage Status](https://github.com/ariadne-cps/hybrid/actions/workflows/coverage.yml/badge.svg)](https://github.com/ariadne-cps/hybrid/actions/workflows/coverage.yml)
+[![codecov](https://codecov.io/gh/ariadne-cps/hybrid/branch/main/graph/badge.svg)](https://codecov.io/gh/ariadne-cps/hybrid)
 
-It deliberately does **not** define dynamical systems or hybrid automata,
-simulation and evolution algorithms, orbit/enclosure trajectories, or
-reachability analysis. Those are owned by the downstream repositories
-`system`, `evolution`, and `analysis` respectively.
+Ariadne Hybrid is the standalone C++20 hybrid-space representation layer used by Ariadne. It provides discrete locations, hybrid spaces, sets, constraints, grids, pavings, and graphical representations on top of Ariadne Labelled. Dynamical systems, hybrid automata, simulation, evolution, and reachability analysis belong to the separate System, Evolution, and Analysis layers.
 
 ## Layout
 
-- `include/hybrid/`: public headers.
-- `include/ariadne-hybrid.hpp`: umbrella header.
-- `src/`: C++ implementations.
-- `ss/`: pinned Git submodules.
-- `tests/`: standalone C++ representation tests.
-- `.github/workflows/`: standalone CI.
+Public headers live under `include/hybrid`, implementations under `src`, and C++ tests under `tests`. The repository uses `ss` for its pinned Git submodules. Python bindings and standalone tutorials have not yet been added.
 
-The public target is `hybrid`; the standalone library is `ariadne-hybrid`.
+The umbrella header is `include/ariadne-hybrid.hpp`.
 
 ## Dependencies
 
-Direct dependencies: [labelled](https://github.com/ariadne-cps/labelled) for
-named sets, drawing and expressions; and
-[configuration](https://github.com/ariadne-cps/configuration) for shared
-build infrastructure. All other dependencies are provided transitively.
+Hybrid depends directly on:
 
-## Build and test
+- [ariadne-cps/labelled](https://github.com/ariadne-cps/labelled), included as a Git submodule.
+- [ariadne-cps/configuration](https://github.com/ariadne-cps/configuration), used for shared build configuration.
 
-```sh
-git clone https://github.com/ariadne-cps/hybrid.git
+Labelled supplies the lower Ariadne layers and their external dependencies.
+
+## Build
+
+```bash
+git clone --recurse-submodules https://github.com/ariadne-cps/hybrid.git
 cd hybrid
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --parallel --target everything
 ctest --test-dir build --output-on-failure
 ```
 
-CMake initializes the necessary pinned submodules. The source checkout can
-also be initialized with `git submodule update --init` (recursive checkout
-is not required by the Ariadne build machinery).
+## Python bindings
 
-The graphical smoke source `tests/test_hybrid_graphics.cpp` is retained but
-not automatically run, matching its previous test registration.
+Standalone Python bindings for Hybrid have not yet been migrated. The current repository builds the C++ library and its representation tests only.
+
+## Contribution guidelines
+
+If you would like to contribute to Ariadne Hybrid, please contact the developer:
+
+- Luca Geretti <luca.geretti@univr.it>
 
 ## License
 
-GPL-3.0-or-later; see LICENSE.
+Ariadne Hybrid is released under the GNU General Public License v3.0.
