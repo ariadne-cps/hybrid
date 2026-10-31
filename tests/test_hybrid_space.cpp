@@ -18,11 +18,11 @@ public:
     Void test_location_spaces() {
         DiscreteLocation first(1), second(2), missing(3);
         RealVariable x("x"), y("y");
-        RealSpace one({x}), two({x,y});
+        RealSpace one({x}), two_dimensions({x,y});
 
         MonolithicHybridSpace m;
         m.new_location(first,one);
-        m.new_location(second,two);
+        m.new_location(second,two_dimensions);
         ARIADNE_TEST_ASSERT(m.has_location(first));
         ARIADNE_TEST_ASSERT(m.has_location(second));
         ARIADNE_TEST_ASSERT(!m.has_location(missing));
@@ -34,15 +34,15 @@ public:
 
         MonolithicHybridSpace same;
         same.new_location(first,one);
-        same.new_location(second,two);
+        same.new_location(second,two_dimensions);
         MonolithicHybridSpace altered;
-        altered.new_location(first,two);
-        altered.new_location(second,two);
+        altered.new_location(first,two_dimensions);
+        altered.new_location(second,two_dimensions);
         MonolithicHybridSpace partial;
         partial.new_location(first,one);
-        ARIADNE_TEST_ASSERT(definitely(m==same));
-        ARIADNE_TEST_ASSERT(!definitely(m==altered));
-        ARIADNE_TEST_ASSERT(!definitely(m==partial));
+        ARIADNE_TEST_ASSERT(definitely(m.operator==(static_cast<const HybridSpaceInterface&>(same))));
+        ARIADNE_TEST_ASSERT(!definitely(m.operator==(static_cast<const HybridSpaceInterface&>(altered))));
+        ARIADNE_TEST_ASSERT(!definitely(m.operator==(static_cast<const HybridSpaceInterface&>(partial))));
 
         HybridSpace polymorphic(m);
         ARIADNE_TEST_ASSERT(polymorphic.has_location(second));

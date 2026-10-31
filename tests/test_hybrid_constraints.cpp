@@ -124,12 +124,12 @@ public:
 
         List<ContinuousPredicate> predicates({x>=0});
         HybridConstraintSet restrictions(constrained,predicates);
-        HybridBoundedConstraintSet result=intersection(bounds,restrictions);
-        ARIADNE_TEST_EQUALS(result.locations().size(),2u);
-        ARIADNE_TEST_ASSERT(result.locations().contains(constrained));
-        ARIADNE_TEST_ASSERT(result.locations().contains(unconstrained));
-        ARIADNE_TEST_EQUALS(result.euclidean_set(unconstrained,space).dimension(),1u);
-        ARIADNE_TEST_ASSERT(result.bounding_box().has_location(unconstrained));
+        HybridBoundedConstraintSet intersected=intersection(bounds,restrictions);
+        ARIADNE_TEST_EQUALS(intersected.locations().size(),2u);
+        ARIADNE_TEST_ASSERT(intersected.locations().contains(constrained));
+        ARIADNE_TEST_ASSERT(intersected.locations().contains(unconstrained));
+        ARIADNE_TEST_EQUALS(intersected.euclidean_set(unconstrained,space).dimension(),1u);
+        ARIADNE_TEST_ASSERT(intersected.bounding_box().has_location(unconstrained));
     }
 };
 
