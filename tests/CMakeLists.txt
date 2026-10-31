@@ -6,6 +6,8 @@ set(UNIT_TESTS
     test_hybrid_space
     test_hybrid_constraints
     test_hybrid_paving_operations
+    test_hybrid_graphics_configuration
+    test_hybrid_box_set
 )
 foreach(TEST IN LISTS UNIT_TESTS)
     add_executable(${TEST} ${TEST}.cpp)
