@@ -113,7 +113,9 @@ class HybridBoxSet
     virtual OutputStream& _write(OutputStream& os) const override;
     virtual Void draw(CanvasInterface&, const Set<DiscreteLocation>&, const Variables2d&) const override;
   private:
-    virtual HybridBoxSet* clone() const override;
+    // Return the exact interface pointer type to avoid covariant-return
+    // adjustment across the virtual-inheritance hierarchy on MSVC.
+    virtual EffectiveHybridSetInterface* clone() const override;
     virtual EuclideanSetInterfaceBase* _euclidean_set(DiscreteLocation, RealSpace) const override;
 };
 

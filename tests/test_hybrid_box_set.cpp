@@ -35,11 +35,15 @@ public:
         ARIADNE_TEST_EQUALS(hybrid_box.euclidean_set(location,space).dimension(),2u);
         ARIADNE_TEST_ASSERT(!definitely(hybrid_box.is_empty()));
 
-        // clone() is private on HybridBoxSet, but public on its polymorphic
-        // interface; test the intended API and the concrete override.
+        // The virtual clone must return a correctly adjusted base pointer
+        // even when its implementation has virtual/multiple base classes.
+        HybridBoxSet copied_box(hybrid_box);
+        ARIADNE_TEST_ASSERT(copied_box.locations().contains(location));
         const EffectiveHybridSetInterface& abstract_box=hybrid_box;
         std::unique_ptr<EffectiveHybridSetInterface> cloned(abstract_box.clone());
+        ARIADNE_TEST_ASSERT(cloned.get()!=nullptr);
         ARIADNE_TEST_ASSERT(cloned.get()!=&abstract_box);
+        ARIADNE_TEST_ASSERT(dynamic_cast<HybridBoxSet*>(cloned.get())!=nullptr);
         ARIADNE_TEST_EQUALS(cloned->locations().size(),1u);
         ARIADNE_TEST_ASSERT(cloned->locations().contains(location));
         ARIADNE_TEST_ASSERT(hybrid_box.bounding_box().has_location(location));
