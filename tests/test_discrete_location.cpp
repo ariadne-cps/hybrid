@@ -82,9 +82,10 @@ public:
 
         // Distinct or partially specified valuations with no value conflict
         // cannot be compared for equality: the API explicitly throws.
-        ARIADNE_TEST_FAIL(a0==b0);
-        ARIADNE_TEST_FAIL(a0==a0b0);
-        ARIADNE_TEST_FAIL(a0b0==a0);
+        ARIADNE_TEST_FAIL(static_cast<void>(a0==b0));
+        ARIADNE_TEST_FAIL(static_cast<void>(b0==a0));
+        ARIADNE_TEST_FAIL(static_cast<void>(a0==a0b0));
+        ARIADNE_TEST_FAIL(static_cast<void>(a0b0==a0));
     }
 
     Void test_distinguishability_and_restriction() {
