@@ -115,7 +115,7 @@ class HybridBoxSet
   private:
     // Return the exact interface pointer type to avoid covariant-return
     // adjustment across the virtual-inheritance hierarchy on MSVC.
-    virtual EffectiveHybridSetInterface* clone() const override;
+    virtual HybridSetInterfaceBase* _clone() const override;
     virtual EuclideanSetInterfaceBase* _euclidean_set(DiscreteLocation, RealSpace) const override;
 };
 

@@ -86,13 +86,21 @@ class HybridSetInterfaceBase
 {
   public:
     virtual ~HybridSetInterfaceBase() = default;
-    virtual HybridSetInterfaceBase* clone() const = 0;
+    HybridSetInterfaceBase* clone() const { return this->_clone(); }
     virtual Set<RealVariable> variables(DiscreteLocation) const = 0;
     inline EuclideanSetBase euclidean_set(DiscreteLocation loc, RealSpace spc) const {
         return EuclideanSetBase(this->_euclidean_set(loc,spc)); }
     virtual OutputStream& _write(OutputStream& os) const = 0;
     friend OutputStream& operator<<(OutputStream& os, const HybridSetInterfaceBase& hs);
   protected:
+    virtual HybridSetInterfaceBase* _clone() const = 0;
+    template<class Interface> Interface* _clone_as() const {
+        std::unique_ptr<HybridSetInterfaceBase> result(this->_clone());
+        Interface* typed=dynamic_cast<Interface*>(result.get());
+        if(typed==nullptr) { throw std::bad_cast(); }
+        result.release();
+        return typed;
+    }
     // One virtual conversion point: typed views use checked cross-casts.
     // In particular, do not introduce covariant _euclidean_set overrides
     // along the multiply virtually inherited hybrid interface hierarchy.
@@ -113,7 +121,7 @@ template<> class HybridBoundedSetInterface<EffectiveTag>
     : public virtual HybridSetInterfaceBase
 {
   public:
-    virtual HybridBoundedSetInterface<EffectiveTag>* clone() const = 0;
+    HybridBoundedSetInterface<EffectiveTag>* clone() const { return this->_clone_as<HybridBoundedSetInterface<EffectiveTag>>(); }
     virtual Set<DiscreteLocation> locations() const = 0;
     inline EffectiveEuclideanBoundedSet euclidean_set(DiscreteLocation loc, RealSpace spc) const {
         return EffectiveEuclideanBoundedSet(this->_euclidean_set_as<EuclideanBoundedSetInterface<EffectiveTag>>(loc,spc)); }
@@ -128,7 +136,7 @@ template<> class HybridOvertSetInterface<EffectiveTag>
     : public virtual HybridSetInterfaceBase
 {
   public:
-    virtual HybridOvertSetInterface* clone() const = 0;
+    HybridOvertSetInterface* clone() const { return this->_clone_as<HybridOvertSetInterface>(); }
     inline EffectiveEuclideanOvertSet euclidean_set(DiscreteLocation loc, RealSpace spc) const {
         return EffectiveEuclideanOvertSet(this->_euclidean_set_as<EuclideanOvertSetInterface<EffectiveTag>>(loc,spc)); }
     virtual LowerKleenean overlaps(const HybridExactBox& bx) const = 0;
@@ -141,7 +149,7 @@ template<> class HybridOpenSetInterface<EffectiveTag>
     : public virtual HybridOvertSetInterface<EffectiveTag>
 {
   public:
-    virtual HybridOpenSetInterface* clone() const = 0;
+    HybridOpenSetInterface* clone() const { return this->_clone_as<HybridOpenSetInterface>(); }
     inline EffectiveEuclideanOpenSet euclidean_set(DiscreteLocation loc, RealSpace spc) const {
         return EffectiveEuclideanOpenSet(this->_euclidean_set_as<EuclideanOpenSetInterface<EffectiveTag>>(loc,spc)); }
     virtual LowerKleenean covers(const HybridExactBox& bx) const = 0;
@@ -154,7 +162,7 @@ template<> class HybridClosedSetInterface<EffectiveTag>
     : public virtual HybridSetInterfaceBase
 {
   public:
-    virtual HybridClosedSetInterface* clone() const = 0;
+    HybridClosedSetInterface* clone() const { return this->_clone_as<HybridClosedSetInterface>(); }
     inline EffectiveEuclideanClosedSet euclidean_set(DiscreteLocation loc, RealSpace spc) const {
         return EffectiveEuclideanClosedSet(this->_euclidean_set_as<EuclideanClosedSetInterface<EffectiveTag>>(loc,spc)); }
     virtual LowerKleenean separated(const HybridExactBox& bx) const = 0;
@@ -169,7 +177,7 @@ template<> class HybridCompactSetInterface<EffectiveTag>
     , public virtual HybridClosedSetInterface<EffectiveTag>
 {
   public:
-    virtual HybridCompactSetInterface* clone() const = 0;
+    HybridCompactSetInterface* clone() const { return this->_clone_as<HybridCompactSetInterface>(); }
     inline EffectiveEuclideanCompactSet euclidean_set(DiscreteLocation loc, RealSpace spc) const {
         return EffectiveEuclideanCompactSet(this->_euclidean_set_as<EuclideanCompactSetInterface<EffectiveTag>>(loc,spc)); }
   protected:
@@ -183,7 +191,7 @@ template<> class HybridRegularSetInterface<EffectiveTag>
     , public virtual HybridClosedSetInterface<EffectiveTag>
 {
   public:
-    virtual HybridRegularSetInterface* clone() const = 0;
+    HybridRegularSetInterface* clone() const { return this->_clone_as<HybridRegularSetInterface>(); }
     inline EffectiveEuclideanRegularSet euclidean_set(DiscreteLocation loc, RealSpace spc) const {
         return EffectiveEuclideanRegularSet(this->_euclidean_set_as<EuclideanRegularSetInterface<EffectiveTag>>(loc,spc)); }
   protected:
@@ -197,7 +205,7 @@ template<> class HybridLocatedSetInterface<EffectiveTag>
     , public virtual HybridCompactSetInterface<EffectiveTag>
 {
   public:
-    virtual HybridLocatedSetInterface* clone() const = 0;
+    HybridLocatedSetInterface* clone() const { return this->_clone_as<HybridLocatedSetInterface>(); }
     inline EffectiveEuclideanLocatedSet euclidean_set(DiscreteLocation loc, RealSpace spc) const {
         return EffectiveEuclideanLocatedSet(this->_euclidean_set_as<EuclideanLocatedSetInterface<EffectiveTag>>(loc,spc)); }
   protected:
@@ -211,7 +219,7 @@ template<> class HybridRegularLocatedSetInterface<EffectiveTag>
     , public virtual HybridLocatedSetInterface<EffectiveTag>
 {
   public:
-    virtual HybridRegularLocatedSetInterface* clone() const = 0;
+    HybridRegularLocatedSetInterface* clone() const { return this->_clone_as<HybridRegularLocatedSetInterface>(); }
     inline EffectiveEuclideanRegularLocatedSet euclidean_set(DiscreteLocation loc, RealSpace spc) const {
         return EffectiveEuclideanRegularLocatedSet(this->_euclidean_set_as<EuclideanRegularLocatedSetInterface<EffectiveTag>>(loc,spc)); }
   protected:
@@ -229,7 +237,7 @@ inline OutputStream& operator<<(OutputStream& os, const HybridSetInterfaceBase& 
 template<> class HybridBoundedSetInterface<ValidatedTag>
     : public virtual HybridSetInterfaceBase {
   public:
-    virtual HybridBoundedSetInterface<ValidatedTag>* clone() const = 0;
+    HybridBoundedSetInterface<ValidatedTag>* clone() const { return this->_clone_as<HybridBoundedSetInterface<ValidatedTag>>(); }
     virtual Set<DiscreteLocation> locations() const = 0;
 //    inline ValidatedEuclideanBoundedSet euclidean_set(DiscreteLocation loc, RealSpace spc) const { return this->_euclidean_set(loc,spc); }
     virtual ValidatedLowerKleenean inside(const HybridExactBoxes& bx) const = 0;
@@ -243,7 +251,7 @@ template<> class HybridOvertSetInterface<ValidatedTag>
     : public virtual HybridSetInterfaceBase
 {
   public:
-    virtual HybridOvertSetInterface<ValidatedTag>* clone() const = 0;
+    HybridOvertSetInterface<ValidatedTag>* clone() const { return this->_clone_as<HybridOvertSetInterface<ValidatedTag>>(); }
 //    inline ValidatedEuclideanOvertSet euclidean_set(DiscreteLocation loc, RealSpace spc) const { return this->_euclidean_set(loc,spc); }
     virtual ValidatedLowerKleenean overlaps(const HybridExactBox& bx) const = 0;
   protected:
@@ -256,7 +264,7 @@ template<> class HybridOpenSetInterface<ValidatedTag>
     : public virtual HybridOvertSetInterface<ValidatedTag>
 {
   public:
-    virtual HybridOpenSetInterface<ValidatedTag>* clone() const = 0;
+    HybridOpenSetInterface<ValidatedTag>* clone() const { return this->_clone_as<HybridOpenSetInterface<ValidatedTag>>(); }
 //    inline EuclideanOpenSet euclidean_set(DiscreteLocation loc, RealSpace spc) const { return this->_euclidean_set(loc,spc); }
     virtual ValidatedLowerKleenean covers(const ExactBoxType& bx) const = 0;
   protected:
@@ -269,7 +277,7 @@ template<> class HybridClosedSetInterface<ValidatedTag>
     : public virtual HybridSetInterfaceBase
 {
   public:
-    virtual HybridClosedSetInterface<ValidatedTag>* clone() const = 0;
+    HybridClosedSetInterface<ValidatedTag>* clone() const { return this->_clone_as<HybridClosedSetInterface<ValidatedTag>>(); }
 //    inline ValidatedEuclideanClosedSet euclidean_set(DiscreteLocation loc, RealSpace spc) const { return this->_euclidean_set(loc,spc); }
     virtual ValidatedLowerKleenean separated(const HybridExactBox& bx) const = 0;
   protected:
@@ -284,7 +292,7 @@ template<> class HybridCompactSetInterface<ValidatedTag>
       public virtual HybridClosedSetInterface<ValidatedTag>
 {
   public:
-    virtual HybridCompactSetInterface<ValidatedTag>* clone() const = 0;
+    HybridCompactSetInterface<ValidatedTag>* clone() const { return this->_clone_as<HybridCompactSetInterface<ValidatedTag>>(); }
 //    inline ValidatedEuclideanCompactSet euclidean_set(DiscreteLocation loc, RealSpace spc) const { return this->_euclidean_set(loc,spc); }
   protected:
     // The single conversion virtual lives in HybridSetInterfaceBase.
@@ -297,7 +305,7 @@ template<> class HybridRegularSetInterface<ValidatedTag>
     , public virtual HybridOpenSetInterface<ValidatedTag>,
       public virtual HybridClosedSetInterface<ValidatedTag>
 {
-    virtual HybridRegularSetInterface<ValidatedTag>* clone() const = 0;
+    HybridRegularSetInterface<ValidatedTag>* clone() const { return this->_clone_as<HybridRegularSetInterface<ValidatedTag>>(); }
 //    inline ValidatedEuclideanRegularSet euclidean_set(DiscreteLocation loc, RealSpace spc) const { return this->_euclidean_set(loc,spc); }
   protected:
     // The single conversion virtual lives in HybridSetInterfaceBase.
@@ -310,7 +318,7 @@ template<> class HybridLocatedSetInterface<ValidatedTag>
     , public virtual HybridOvertSetInterface<ValidatedTag>,
       public virtual HybridCompactSetInterface<ValidatedTag>
 {
-    virtual HybridLocatedSetInterface<ValidatedTag>* clone() const = 0;
+    HybridLocatedSetInterface<ValidatedTag>* clone() const { return this->_clone_as<HybridLocatedSetInterface<ValidatedTag>>(); }
 //    inline ValidatedEuclideanLocatedSet euclidean_set(DiscreteLocation loc, RealSpace spc) const { return this->_euclidean_set(loc,spc); }
   protected:
     // The single conversion virtual lives in HybridSetInterfaceBase.
@@ -324,7 +332,7 @@ template<> class HybridRegularLocatedSetInterface<ValidatedTag>
       public virtual HybridLocatedSetInterface<ValidatedTag>
 {
   public:
-    virtual HybridRegularLocatedSetInterface<ValidatedTag>* clone() const = 0;
+    HybridRegularLocatedSetInterface<ValidatedTag>* clone() const { return this->_clone_as<HybridRegularLocatedSetInterface<ValidatedTag>>(); }
 //    inline ValidatedEuclideanRegularLocatedSet euclidean_set(DiscreteLocation loc, RealSpace spc) const { return this->_euclidean_set(loc,spc); }
   protected:
     // The single conversion virtual lives in HybridSetInterfaceBase.

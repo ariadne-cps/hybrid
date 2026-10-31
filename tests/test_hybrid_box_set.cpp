@@ -43,9 +43,17 @@ public:
         std::unique_ptr<EffectiveHybridSetInterface> cloned(abstract_box.clone());
         ARIADNE_TEST_ASSERT(cloned.get()!=nullptr);
         ARIADNE_TEST_ASSERT(cloned.get()!=&abstract_box);
-        ARIADNE_TEST_ASSERT(dynamic_cast<HybridBoxSet*>(cloned.get())!=nullptr);
+        HybridBoxSet* concrete=dynamic_cast<HybridBoxSet*>(cloned.get());
+        ARIADNE_TEST_ASSERT(concrete!=nullptr);
+        if(concrete==nullptr) { return; }
         ARIADNE_TEST_EQUALS(cloned->locations().size(),1u);
         ARIADNE_TEST_ASSERT(cloned->locations().contains(location));
+        const HybridSetInterfaceBase& root=hybrid_box;
+        std::unique_ptr<HybridSetInterfaceBase> root_copy(root.clone());
+        ARIADNE_TEST_ASSERT(dynamic_cast<HybridBoxSet*>(root_copy.get())!=nullptr);
+        const EffectiveHybridBoundedSetInterface& bounded=hybrid_box;
+        std::unique_ptr<EffectiveHybridBoundedSetInterface> bounded_copy(bounded.clone());
+        ARIADNE_TEST_ASSERT(dynamic_cast<HybridBoxSet*>(bounded_copy.get())!=nullptr);
         ARIADNE_TEST_ASSERT(hybrid_box.bounding_box().has_location(location));
 
         std::ostringstream output;

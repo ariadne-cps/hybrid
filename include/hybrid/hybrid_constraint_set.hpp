@@ -41,7 +41,7 @@ class HybridConstraintSet
     //! \brief Intersect with a set of boxes, one in each location, to form a bounded set.
     friend HybridBoundedConstraintSet intersection(const HybridBoxesSet& bounds, HybridConstraintSet const& constraints);
 
-    virtual HybridConstraintSet* clone() const override;
+    HybridConstraintSet* clone() const;
 
 
     //! \brief The set of locations in which the set is nonempty.
@@ -60,6 +60,7 @@ class HybridConstraintSet
 
     virtual OutputStream& _write(OutputStream& os) const override;
   protected:
+    HybridSetInterfaceBase* _clone() const override { return this->clone(); }
     virtual EuclideanSetInterfaceBase* _euclidean_set(DiscreteLocation loc, RealSpace spc) const override;
 };
 

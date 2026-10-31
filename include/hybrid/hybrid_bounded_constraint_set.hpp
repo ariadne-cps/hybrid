@@ -34,7 +34,7 @@ class HybridBoundedConstraintSet
 
     HybridBoundedConstraintSet& adjoin(const DiscreteLocation& loc, const RealExpressionBoundedConstraintSet& set);
 
-    virtual HybridBoundedConstraintSet* clone() const override;
+    HybridBoundedConstraintSet* clone() const;
 
     //! \brief If the set only has a single location, returns this, otherwise fails. DEPRECATED
     DiscreteLocation location() const;
@@ -58,6 +58,7 @@ class HybridBoundedConstraintSet
     virtual OutputStream& _write(OutputStream& os) const override;
     virtual Void draw(CanvasInterface&, const Set<DiscreteLocation>&, const Variables2d&) const override;
   protected:
+    HybridSetInterfaceBase* _clone() const override { return this->clone(); }
     virtual EuclideanSetInterfaceBase* _euclidean_set(DiscreteLocation loc, RealSpace spc) const override;
 };
 

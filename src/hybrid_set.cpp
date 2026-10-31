@@ -77,11 +77,8 @@ template<class X> Map<RealVariable,X> HybridPoint<X>::values() const {
 
 
 
-EffectiveHybridSetInterface* HybridBoxSet::clone() const {
-    // Perform the conversion inside the implementation, rather than relying
-    // on a covariant-return thunk at the virtual dispatch call site.
-    auto* copy = new HybridBoxSet(*this);
-    return static_cast<EffectiveHybridSetInterface*>(copy);
+HybridSetInterfaceBase* HybridBoxSet::_clone() const {
+    return new HybridBoxSet(*this);
 }
 Set<DiscreteLocation> HybridBoxSet::locations() const {
     return { this->HybridVariablesBox<RealInterval>::location() };
