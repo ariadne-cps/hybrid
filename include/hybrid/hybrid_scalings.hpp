@@ -31,11 +31,15 @@
 
 #include <iostream>
 #include <map>
+#include <memory>
 
 #include "utility/container.hpp"
 #include "utility/stlio.hpp"
 
 #include "symbolic/variable.hpp"
+#include "symbolic/space.hpp"
+#include "hybrid/discrete_location.hpp"
+#include "paving/grid.hpp"
 
 namespace Ariadne {
 

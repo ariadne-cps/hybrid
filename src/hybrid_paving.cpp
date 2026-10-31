@@ -23,7 +23,6 @@
  */
 
 #include "function/functional.hpp"
-#include "config.hpp"
 
 #include "hybrid/hybrid_expression_set.hpp"
 #include "hybrid/hybrid_set.hpp"

@@ -25,7 +25,6 @@
 #include <iostream>
 #include <fstream>
 
-#include "config.hpp"
 #include "macro/testing.hpp"
 
 #include "numeric/rational.hpp"

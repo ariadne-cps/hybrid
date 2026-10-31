@@ -25,13 +25,6 @@ endif()
 
 setup_project()
 include_directories("${PROJECT_SOURCE_DIR}/include")
-# The legacy hybrid translation units still include config.hpp.
-# Generate it in the build directory, not under the public include tree.
-file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/generated")
-configure_file("${PROJECT_SOURCE_DIR}/cmake/config.hpp.cmake"
-               "${PROJECT_BINARY_DIR}/generated/config.hpp")
-include_directories(BEFORE "${PROJECT_BINARY_DIR}/generated")
-
 add_subdirectory(ss)
 
 add_library(hybrid INTERFACE)
