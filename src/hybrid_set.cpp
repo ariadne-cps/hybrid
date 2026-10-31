@@ -218,10 +218,8 @@ HybridUpperBoxes HybridBoundedConstraintSet::bounding_box() const {
 HybridBoundedConstraintSet intersection(const HybridBoxesSet& hbxs, const HybridConstraintSet& hcs) {
     HybridBoundedConstraintSet res;
     for(auto loc : hbxs.locations()) {
-        RealVariablesBox bx=hbxs.continuous_set(loc);
-        RealExpressionConstraintSet cs=hcs.continuous_set(loc);
-        res.adjoin(loc,intersection(bx,cs));
-        //res.adjoin(loc,intersection(hbxs.continuous_set(loc),hcs.continuous_set(loc));
+        // A location without constraints retains its box. Do not query
+        // a non-existent constraint set before checking has_location().
         if(hcs.has_location(loc)) { res.adjoin(loc,intersection(hbxs.continuous_set(loc),hcs.continuous_set(loc))); }
         else { res.adjoin(loc,hbxs.continuous_set(loc)); }
     }

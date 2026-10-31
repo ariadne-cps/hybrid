@@ -101,7 +101,7 @@ Bool is_restriction(const DiscreteLocation& partial_location, const DiscreteLoca
 }
 
 DiscreteLocation restrict(const DiscreteLocation& location, const Set<Identifier>& variables) {
-    ARIADNE_ASSERT_MSG(subset(location._values.keys(),variables)," location "<<location<<" variables not a subset of "<<variables);
+    // Restriction selects the requested keys; asking for a strict subset is valid.
     return restrict_keys(location._values,variables);
 }
 

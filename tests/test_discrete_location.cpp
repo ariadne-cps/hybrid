@@ -54,6 +54,11 @@ public:
         Set<Identifier> keys={Identifier("a"),Identifier("b")};
         DiscreteLocation retained=restrict(combined,keys);
         ARIADNE_TEST_ASSERT(are_same(retained,combined));
+        Set<Identifier> only_a={Identifier("a")};
+        DiscreteLocation projected=restrict(combined,only_a);
+        ARIADNE_TEST_ASSERT(are_same(projected,left));
+        Set<Identifier> none;
+        ARIADNE_TEST_ASSERT(are_same(restrict(combined,none),empty));
     }
 
     Void test_equality_and_order() {

@@ -1,5 +1,12 @@
 include(CTest)
-set(UNIT_TESTS test_hybrid_set test_hybrid_scalings_header test_discrete_location)
+set(UNIT_TESTS
+    test_hybrid_set
+    test_hybrid_scalings_header
+    test_discrete_location
+    test_hybrid_space
+    test_hybrid_constraints
+    test_hybrid_paving_operations
+)
 foreach(TEST IN LISTS UNIT_TESTS)
     add_executable(${TEST} ${TEST}.cpp)
     target_link_libraries(${TEST} ariadne-hybrid hybrid)
