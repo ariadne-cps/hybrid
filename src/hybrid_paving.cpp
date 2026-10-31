@@ -172,7 +172,7 @@ SizeType HybridGridTreePaving::size() const {
 HybridListSet<ExactBoxType> HybridGridTreePaving::boxes() const {
     HybridListSet<ExactBoxType> result;
     for(ConstIterator iter=this->begin(); iter!=this->end(); ++iter) {
-        result.adjoin(iter->location(),iter->euclidean_set().box());
+        result.adjoin(iter->location(),iter->space(),iter->euclidean_set().box());
     }
     return result;
 }
@@ -212,14 +212,18 @@ ValidatedLowerKleenean HybridGridTreePaving::covers(const HybridExactBox& hbx) c
 }
 
 ValidatedLowerKleenean HybridGridTreePaving::inside(const HybridExactBoxes& hbx) const  {
-    for( LocationsConstIterator _loc_iter = this->locations_begin(); _loc_iter != this->locations_end(); ++_loc_iter ) {
-        if( !_loc_iter->second.is_empty() ) {
-            DiscreteLocation const& loc = _loc_iter->first;
+    // All nonempty locations must be included. A box collection missing
+    // a nonempty location cannot contain the whole hybrid paving.
+    ValidatedLowerKleenean included=true;
+    for(LocationsConstIterator loc_iter=this->locations_begin(); loc_iter!=this->locations_end(); ++loc_iter) {
+        if(!loc_iter->second.is_empty()) {
+            DiscreteLocation const& loc=loc_iter->first;
+            if(!hbx.has_location(loc)) { return false; }
             RealSpace spc=this->space(loc);
-            return this->euclidean_set(loc).inside(hbx.euclidean_set(loc,spc));
+            included = included && loc_iter->second.inside(hbx.euclidean_set(loc,spc));
         }
     }
-    return true;
+    return included;
 }
 
 HybridUpperBoxes HybridGridTreePaving::bounding_box() const {
