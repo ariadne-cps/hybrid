@@ -32,9 +32,13 @@ public:
         ARIADNE_TEST_EQUALS(hybrid_box.euclidean_set(space).dimension(),2u);
         ARIADNE_TEST_ASSERT(!definitely(hybrid_box.is_empty()));
 
-        std::unique_ptr<HybridBoxSet> clone(hybrid_box.clone());
-        ARIADNE_TEST_EQUALS(clone->space().dimension(),2u);
-        ARIADNE_TEST_ASSERT(clone->locations().contains(location));
+        // clone() is private on HybridBoxSet, but public on its polymorphic
+        // interface; test the intended API and the concrete override.
+        const EffectiveHybridSetInterface& abstract_box=hybrid_box;
+        std::unique_ptr<EffectiveHybridSetInterface> cloned(abstract_box.clone());
+        ARIADNE_TEST_ASSERT(cloned.get()!=&abstract_box);
+        ARIADNE_TEST_EQUALS(cloned->locations().size(),1u);
+        ARIADNE_TEST_ASSERT(cloned->locations().contains(location));
         ARIADNE_TEST_ASSERT(hybrid_box.bounding_box().has_location(location));
 
         std::ostringstream output;
