@@ -43,15 +43,6 @@ namespace Ariadne {
 static const Nat HYBRID_DEFAULT_WIDTH = 800;
 static const Nat HYBRID_DEFAULT_HEIGHT = 800;
 
-// Margins are only referenced by the Cairo rendering path.
-#if defined(HAVE_CAIRO_H)
-static const Nat HYBRID_LEFT_MARGIN = 0;
-static const Nat HYBRID_BOTTOM_MARGIN = 0;
-static const Nat HYBRID_TOP_MARGIN = 0;
-static const Nat HYBRID_RIGHT_MARGIN = 0;
-#endif
-
-
 HybridFigure::~HybridFigure() {
 }
 
@@ -71,21 +62,12 @@ HybridFigure::write(const char* cfilename) const
 Void
 HybridFigure::write(const char* cfilename, Nat drawing_width, Nat drawing_height) const
 {
-    #if not(defined(HAVE_CAIRO_H))
-        // The arguments are used by the Cairo branch below.
-        static_cast<void>(cfilename);
-        static_cast<void>(drawing_width);
-        static_cast<void>(drawing_height);
-        ARIADNE_ERROR("No facilities for displaying graphics are available.");
-    #else
-        const Nat canvas_width = drawing_width+HYBRID_LEFT_MARGIN+HYBRID_RIGHT_MARGIN;
-        const Nat canvas_height = drawing_height+HYBRID_BOTTOM_MARGIN+HYBRID_TOP_MARGIN;
-
-        SharedPointer<CanvasInterface> canvas=RenderingManager::instance().backend().make_canvas(cfilename, canvas_width, canvas_height, this->properties.is_animated);
-
-        this->_paint_all(*canvas);
-        canvas->write(cfilename);
-    #endif
+    // RenderingManager owns the configured backend, including the portable
+    // raster backend. No Cairo-specific capability is needed at this layer.
+    SharedPointer<CanvasInterface> canvas=RenderingManager::instance().backend().make_canvas(
+        cfilename,drawing_width,drawing_height,this->properties.is_animated);
+    this->_paint_all(*canvas);
+    canvas->write(cfilename);
 }
 
 Void HybridFigure::_paint_all(CanvasInterface& canvas) const
