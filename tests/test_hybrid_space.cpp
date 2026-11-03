@@ -44,6 +44,10 @@ public:
         ARIADNE_TEST_ASSERT(!definitely(m.operator==(static_cast<const HybridSpaceInterface&>(altered))));
         ARIADNE_TEST_ASSERT(!definitely(m.operator==(static_cast<const HybridSpaceInterface&>(partial))));
 
+        Map<DiscreteLocation,RealSpace> entries{{first,one},{second,two_dimensions}};
+        MonolithicHybridSpace from_map(entries);
+        ARIADNE_TEST_EQUALS(from_map[second].dimension(),2u);
+        ARIADNE_TEST_ASSERT(definitely(from_map.operator==(static_cast<const HybridSpaceInterface&>(m))));
         HybridSpace polymorphic(m);
         ARIADNE_TEST_ASSERT(polymorphic.has_location(second));
         ARIADNE_TEST_EQUALS(polymorphic[second].dimension(),2u);
@@ -67,7 +71,9 @@ public:
         HybridGrid unit(hspc);
         ARIADNE_TEST_ASSERT(unit.has_location(q));
         ARIADNE_TEST_ASSERT(!unit.has_location(missing));
+        ARIADNE_TEST_ASSERT(unit.space().has_location(q));
         ARIADNE_TEST_EQUALS(unit.space(q).dimension(),2u);
+        ARIADNE_TEST_EQUALS(unit.scalings().scaling(q,x),1.0_x);
         ARIADNE_TEST_EQUALS(unit[q].dimension(),2u);
         ARIADNE_TEST_EQUALS(unit.grid(q).dimension(),2u);
 

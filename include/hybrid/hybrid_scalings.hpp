@@ -88,7 +88,7 @@ class SimpleHybridScalings
         : _default_scaling(default_scaling), _scalings(scalings) { }
     SimpleHybridScalings(const InitializerList<Pair<RealVariable,ApproximateDouble>>& scalings);
     Void set_scaling(const RealVariable& var, ApproximateDouble scal) {
-        ARIADNE_ASSERT(decide(scal>0)); _scalings[var.name()]=cast_exact(scal); }
+        ARIADNE_PRECONDITION(decide(scal>0)); _scalings[var.name()]=cast_exact(scal); }
     virtual SimpleHybridScalings* clone() const { return new SimpleHybridScalings(*this); }
     virtual ExactDouble scaling(const DiscreteLocation&, const RealVariable& var) const {
         return (this->_scalings.has_key(var.name())) ? this->_scalings[var.name()] : this->_default_scaling; }
@@ -104,7 +104,9 @@ inline HybridScalings::HybridScalings(const Map<Identifier,ExactDouble>& scaling
 inline HybridScalings::HybridScalings(const InitializerList<Pair<RealVariable,ApproximateDouble>>& scalings)
     : _ptr(new SimpleHybridScalings(scalings)) { }
 
-inline SimpleHybridScalings::SimpleHybridScalings(const InitializerList<Pair<RealVariable,ApproximateDouble>>& scalings) {
+inline SimpleHybridScalings::SimpleHybridScalings(const InitializerList<Pair<RealVariable,ApproximateDouble>>& scalings)
+    : _default_scaling(1.0_x), _scalings() {
+    // Unlisted variables retain the same unit scaling as the default policy.
     for(auto iter=scalings.begin(); iter!=scalings.end(); ++iter) {
         this->_scalings.insert(iter->first.name(),cast_exact(iter->second));
     }
