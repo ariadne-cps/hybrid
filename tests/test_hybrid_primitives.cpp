@@ -23,6 +23,7 @@ public:
         ARIADNE_TEST_CALL(test_real_box_enclosures());
         ARIADNE_TEST_CALL(test_validated_image());
         ARIADNE_TEST_CALL(test_cell_and_curve_descriptions());
+        ARIADNE_TEST_CALL(test_equality_and_list_iteration());
     }
     template<class X> X coordinate(Int value) {
         if constexpr(Same<X,Real>) return Real(value);
@@ -153,6 +154,36 @@ public:
         ARIADNE_TEST_FAIL(root.euclidean_set(other,space));
         ARIADNE_TEST_FAIL(root.euclidean_set(loc,RealSpace({y,x})));
     }
+    Void test_equality_and_list_iteration() {
+        DiscreteLocation first(1),second(2),third(3),fourth(4);
+        RealVariable x("x"),y("y"); RealSpace space({x});
+        ExactBoxType unit({{0,1}}),next_box({{1,2}});
+        HybridExactBox original(first,space,unit),same_box(first,space,unit);
+        HybridExactBox other_location(second,space,unit);
+        ARIADNE_TEST_ASSERT(definitely(original==same_box));
+        ARIADNE_TEST_ASSERT(!definitely(original==other_location));
+        HybridExactBox other_space(first,RealSpace({y}),unit);
+        ARIADNE_TEST_FAIL(static_cast<void>(original==other_space));
+        HybridListSet<ExactBoxType> list;
+        list.insert(first,space); list.insert(third,space);
+        list.adjoin(second,space,unit); list.adjoin(second,space,next_box);
+        list.adjoin(fourth,space,unit);
+        ARIADNE_TEST_FAIL(list.adjoin(second,RealSpace({y}),unit));
+        auto begin=list.begin(); auto shifted=begin;
+        ARIADNE_TEST_ASSERT(begin==shifted);
+        ++shifted;
+        ARIADNE_TEST_ASSERT(begin!=shifted);
+        ARIADNE_TEST_ASSERT((*begin).location()==(*shifted).location());
+        ++shifted;
+        ARIADNE_TEST_ASSERT(begin!=shifted);
+        ARIADNE_TEST_ASSERT((*shifted).location()==fourth);
+        ++shifted;
+        ARIADNE_TEST_ASSERT(shifted==list.end());
+        HybridListSet<ExactBoxType> empty;
+        ARIADNE_TEST_ASSERT(empty.begin()==empty.end());
+        ARIADNE_TEST_EQUALS(list.size(),3u);
+    }
+
     Void test_cell_and_curve_descriptions() {
         DiscreteLocation loc(1); RealVariable x("x"),y("y"); RealSpace space({x,y});
         MonolithicHybridSpace hspace; hspace.new_location(loc,space);

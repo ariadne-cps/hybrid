@@ -133,7 +133,7 @@ class HybridBasicSet
 // NOTE: Must be out-of-function for case that EBS has no EqualityType
 template<class EBS> EqualsType<EBS> operator==(const HybridBasicSet<EBS>& hset1, const HybridBasicSet<EBS>& hset2) {
     if(hset1.location()==hset2.location()) {
-        ARIADNE_ASSERT(hset1.space()==hset2.space());
+        ARIADNE_PRECONDITION(hset1.space()==hset2.space());
         return hset1.continuous_set() == hset2.continuous_set();
     } else {
         return false;
@@ -408,7 +408,7 @@ class HybridListSet
     Void adjoin(const DiscreteLocation& loc, const RealSpace& spc, const ES& es) {
         LocationsIterator loc_iter=this->_locations.find(loc);
         if(loc_iter!=this->_locations.end()) {
-            ARIADNE_ASSERT_MSG(loc_iter->second.first==spc,
+            ARIADNE_PRECONDITION_MSG(loc_iter->second.first==spc,
                                "Space "<<loc_iter->second.first<<" of location "<<loc_iter->first<<" differs from "<<spc); }
         else { this->insert(loc,spc); loc_iter=this->_locations.find(loc); }
         loc_iter->second.second.adjoin(es); }
