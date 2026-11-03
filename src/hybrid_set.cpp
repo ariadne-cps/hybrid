@@ -87,7 +87,7 @@ Set<RealVariable> HybridBoxSet::variables(DiscreteLocation) const {
     return this->HybridVariablesBox<RealInterval>::variables();
 }
 RealBox HybridBoxSet::euclidean_set(DiscreteLocation loc, RealSpace spc) const {
-    ARIADNE_ASSERT(this->location()==loc);
+    ARIADNE_PRECONDITION(this->location()==loc);
     return this->HybridVariablesBox<RealInterval>::euclidean_set(spc);
 }
 RealSpace HybridBoxSet::space() const {
@@ -95,11 +95,12 @@ RealSpace HybridBoxSet::space() const {
 }
 RealSpace HybridBoxSet::space(DiscreteLocation loc) const {
     static_cast<void>(loc);
-    ARIADNE_ASSERT(this->location()==loc);
+    ARIADNE_PRECONDITION(this->location()==loc);
     return RealSpace( make_list(this->HybridVariablesBox<RealInterval>::variables()) );
 }
-EuclideanSetInterfaceBase* HybridBoxSet::_euclidean_set(DiscreteLocation, RealSpace) const {
-    ARIADNE_NOT_IMPLEMENTED; // FIXME: Box does not inherit from SetInterface...
+EuclideanSetInterfaceBase* HybridBoxSet::_euclidean_set(DiscreteLocation loc, RealSpace spc) const {
+    // The existing RealBoxSet adapter supplies every effective set view.
+    return new RealBoxSet(this->euclidean_set(loc,spc));
 }
 
 using DyadicBox = Box<Interval<Dyadic>>;
