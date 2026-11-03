@@ -84,8 +84,13 @@ Void HybridGridTreePaving::remove(const HybridGridTreePaving& hgts) {
 }
 
 Void HybridGridTreePaving::restrict(const HybridGridTreePaving& hgts) {
-    for(HybridGridTreePaving::LocationsConstIterator _loc_iter=hgts.locations_begin(); _loc_iter!=hgts.locations_end(); ++_loc_iter) {
-        this->_provide_location(_loc_iter->first).restrict(_loc_iter->second);
+    // Intersection must also clear left-hand locations absent on the right.
+    // Iterating the left map preserves its locations and cannot introduce
+    // unrelated locations from the restricting paving.
+    for(LocationsIterator iter=this->locations_begin(); iter!=this->locations_end(); ++iter) {
+        auto other=hgts._map.find(iter->first);
+        if(other==hgts._map.end()) iter->second.clear();
+        else iter->second.restrict(other->second);
     }
 }
 
@@ -108,7 +113,7 @@ Void HybridGridTreePaving::adjoin_inner_approximation(const HybridExactBoxes& hb
             _loc_iter!=hbxs.end(); ++_loc_iter) {
         DiscreteLocation const& loc=_loc_iter->first;
         LabelledSet<ExactBoxType> const& vbx=_loc_iter->second;
-        ARIADNE_ASSERT(vbx.space() == this->space(loc));
+        ARIADNE_PRECONDITION(vbx.space() == this->space(loc));
         this->_provide_location(loc).adjoin_inner_approximation(vbx.euclidean_set(),fineness);
     }
 }
@@ -138,7 +143,7 @@ Void HybridGridTreePaving::adjoin_outer_approximation(const HybridExactBoxes& hb
             _loc_iter!=hbxs.end(); ++_loc_iter) {
         DiscreteLocation const& loc=_loc_iter->first;
         LabelledSet<ExactBoxType> const& vbx=_loc_iter->second;
-        ARIADNE_ASSERT(vbx.space() == this->space(loc));
+        ARIADNE_PRECONDITION(vbx.space() == this->space(loc));
         this->_provide_location(_loc_iter->first).adjoin_outer_approximation(vbx.euclidean_set(),fineness);
     }
 }
@@ -149,7 +154,7 @@ GridTreePaving& HybridGridTreePaving::operator[](DiscreteLocation q) {
 }
 
 const GridTreePaving& HybridGridTreePaving::operator[](DiscreteLocation q) const {
-    ARIADNE_ASSERT_MSG(this->has_location(q),"q="<<q);
+    ARIADNE_PRECONDITION_MSG(this->has_location(q),"q="<<q);
     return const_cast<HybridGridTreePaving*>(this)->_provide_location(q);
 }
 
@@ -243,7 +248,8 @@ Bool subset(const HybridGridTreePaving& hgts1, const HybridGridTreePaving& hgts2
         if( !_loc_iter->second.is_empty() ) {
             DiscreteLocation const& loc = _loc_iter->first;
             RealSpace spc=hgts1.space(loc);
-            if(not subset(hgts1.euclidean_set(loc),hgts2.euclidean_set(loc,spc))) {
+            // A missing right-hand slice denotes the empty set.
+            if(!hgts2.nontrivial_location(loc) || not subset(hgts1.euclidean_set(loc),hgts2.euclidean_set(loc,spc))) {
                 return false;
             }
         }
@@ -256,7 +262,7 @@ Bool intersect(const HybridGridTreePaving& hgts1, const HybridGridTreePaving& hg
         if( !_loc_iter->second.is_empty() ) {
             DiscreteLocation const& loc = _loc_iter->first;
             RealSpace spc=hgts1.space(loc);
-            if(intersect(hgts1.euclidean_set(loc),hgts2.euclidean_set(loc,spc))) {
+            if(hgts2.nontrivial_location(loc) && intersect(hgts1.euclidean_set(loc),hgts2.euclidean_set(loc,spc))) {
                 return true;
             }
         }

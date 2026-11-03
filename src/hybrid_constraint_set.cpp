@@ -56,17 +56,17 @@ Bool HybridConstraintSet::has_location(DiscreteLocation loc) const {
 }
 
 Set<RealVariable> HybridConstraintSet::variables(DiscreteLocation loc) const {
-    ARIADNE_ASSERT(this->_sets.has_key(loc));
+    ARIADNE_PRECONDITION(this->_sets.has_key(loc));
     return _sets[loc].variables();
 }
 
 RealExpressionConstraintSet const& HybridConstraintSet::continuous_set(DiscreteLocation loc) const {
-    ARIADNE_ASSERT(this->_sets.has_key(loc));
+    ARIADNE_PRECONDITION(this->_sets.has_key(loc));
     return this->_sets[loc];
 }
 
 ConstraintSet const HybridConstraintSet::euclidean_set(DiscreteLocation loc, RealSpace spc) const {
-    ARIADNE_ASSERT(this->_sets.has_key(loc));
+    ARIADNE_PRECONDITION(this->_sets.has_key(loc));
     return ConstraintSet(this->_sets[loc].euclidean_set(spc));
 }
 

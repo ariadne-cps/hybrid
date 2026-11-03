@@ -1,6 +1,8 @@
 include(CTest)
 set(UNIT_TESTS
     test_hybrid_set
+    test_hybrid_set_interface
+    test_hybrid_primitives
     test_hybrid_scalings_header
     test_discrete_location
     test_hybrid_space

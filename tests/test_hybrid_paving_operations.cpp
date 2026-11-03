@@ -15,6 +15,8 @@ public:
     Void test() {
         ARIADNE_TEST_CALL(test_paving_operations());
         ARIADNE_TEST_CALL(test_inner_and_outer_approximation());
+        ARIADNE_TEST_CALL(test_empty_slice_relations());
+        ARIADNE_TEST_CALL(test_contracts_and_iterator_comparisons());
     }
 
     Void test_paving_operations() {
@@ -115,6 +117,73 @@ public:
         std::ostringstream output;
         paving._write(output);
         ARIADNE_TEST_ASSERT(!output.str().empty());
+    }
+
+    Void test_empty_slice_relations() {
+        DiscreteLocation loc(1),other(2); RealVariable x("x"); RealSpace space({x});
+        MonolithicHybridSpace hspace; hspace.new_location(loc,space); hspace.new_location(other,space);
+        HybridGrid grid(hspace);
+        HybridGridTreePaving left(grid),empty(grid),disjoint(grid),superset(grid),other_slice(grid);
+        HybridExactBoxes boxes; boxes.insert(loc,space,ExactBoxType({{0,1}}));
+        left.adjoin_outer_approximation(boxes,2u);
+        ARIADNE_TEST_ASSERT(!subset(left,empty));
+        ARIADNE_TEST_ASSERT(!intersect(left,empty));
+        empty[loc]; // Present but empty is equivalent to an absent slice.
+        ARIADNE_TEST_ASSERT(!subset(left,empty));
+        ARIADNE_TEST_ASSERT(!intersect(left,empty));
+        HybridExactBoxes far; far.insert(loc,space,ExactBoxType({{4,5}}));
+        disjoint.adjoin_outer_approximation(far,2u);
+        ARIADNE_TEST_ASSERT(!subset(left,disjoint));
+        ARIADNE_TEST_ASSERT(!intersect(left,disjoint));
+        HybridExactBoxes large; large.insert(loc,space,ExactBoxType({{-1,2}}));
+        superset.adjoin_outer_approximation(large,2u);
+        ARIADNE_TEST_ASSERT(subset(left,superset));
+        ARIADNE_TEST_ASSERT(intersect(left,superset));
+        HybridExactBoxes elsewhere; elsewhere.insert(other,space,ExactBoxType({{0,1}}));
+        other_slice.adjoin_outer_approximation(elsewhere,2u);
+        HybridGridTreePaving restricted=left;
+        restricted.restrict(other_slice);
+        ARIADNE_TEST_ASSERT(restricted.is_empty());
+        ARIADNE_TEST_ASSERT(!restricted.nontrivial_location(other));
+        restricted=left; restricted.restrict(empty);
+        ARIADNE_TEST_ASSERT(restricted.is_empty());
+        restricted=left; restricted.restrict(disjoint);
+        ARIADNE_TEST_ASSERT(restricted.is_empty());
+        restricted=left; restricted.restrict(superset);
+        ARIADNE_TEST_ASSERT(subset(left,restricted));
+        ARIADNE_TEST_ASSERT(subset(restricted,left));
+        restricted.restrict(restricted);
+        ARIADNE_TEST_ASSERT(subset(left,restricted));
+        HybridGridTreePaving nothing(grid); nothing.restrict(left);
+        ARIADNE_TEST_ASSERT(nothing.is_empty());
+    }
+    Void test_contracts_and_iterator_comparisons() {
+        DiscreteLocation first(1),empty(2),last(3),missing(4);
+        RealVariable x("x"),y("y"); RealSpace space({x});
+        MonolithicHybridSpace hspace;
+        hspace.new_location(first,space); hspace.new_location(empty,space); hspace.new_location(last,space);
+        HybridGridTreePaving paving{HybridGrid(hspace)};
+        HybridExactBoxes boxes;
+        boxes.insert(first,space,ExactBoxType({{0,1}}));
+        boxes.insert(last,space,ExactBoxType({{0,1}}));
+        paving.adjoin_outer_approximation(boxes,2u); paving[empty]; paving.mince(2u);
+        const HybridGridTreePaving& immutable=paving;
+        ARIADNE_TEST_FAIL(immutable[missing]);
+        ARIADNE_TEST_FAIL(immutable.euclidean_set(first,RealSpace({y})));
+        HybridExactBoxes wrong_space; wrong_space.insert(first,RealSpace({y}),ExactBoxType({{0,1}}));
+        ARIADNE_TEST_FAIL(paving.adjoin_inner_approximation(wrong_space,1u));
+        ARIADNE_TEST_FAIL(paving.adjoin_outer_approximation(wrong_space,1u));
+        auto begin=paving.begin(); auto shifted=begin;
+        ARIADNE_TEST_ASSERT(begin==shifted);
+        ++shifted;
+        ARIADNE_TEST_ASSERT((*begin).location()==(*shifted).location());
+        ARIADNE_TEST_ASSERT(begin!=shifted);
+        while(shifted!=paving.end() && (*shifted).location()==first) ++shifted;
+        ARIADNE_TEST_ASSERT(shifted!=paving.end());
+        ARIADNE_TEST_ASSERT((*shifted).location()==last);
+        ARIADNE_TEST_ASSERT(begin!=shifted);
+        while(shifted!=paving.end()) ++shifted;
+        ARIADNE_TEST_ASSERT(shifted==paving.end());
     }
 
     Void test_inner_and_outer_approximation() {

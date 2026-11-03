@@ -305,6 +305,7 @@ template<> class HybridRegularSetInterface<ValidatedTag>
     , public virtual HybridOpenSetInterface<ValidatedTag>,
       public virtual HybridClosedSetInterface<ValidatedTag>
 {
+  public:
     HybridRegularSetInterface<ValidatedTag>* clone() const { return this->_clone_as<HybridRegularSetInterface<ValidatedTag>>(); }
 //    inline ValidatedEuclideanRegularSet euclidean_set(DiscreteLocation loc, RealSpace spc) const { return this->_euclidean_set(loc,spc); }
   protected:
@@ -318,6 +319,7 @@ template<> class HybridLocatedSetInterface<ValidatedTag>
     , public virtual HybridOvertSetInterface<ValidatedTag>,
       public virtual HybridCompactSetInterface<ValidatedTag>
 {
+  public:
     HybridLocatedSetInterface<ValidatedTag>* clone() const { return this->_clone_as<HybridLocatedSetInterface<ValidatedTag>>(); }
 //    inline ValidatedEuclideanLocatedSet euclidean_set(DiscreteLocation loc, RealSpace spc) const { return this->_euclidean_set(loc,spc); }
   protected:

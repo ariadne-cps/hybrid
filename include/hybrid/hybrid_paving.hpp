@@ -106,8 +106,7 @@ class HybridGridTreePaving
     //! The continuous state space corresponding to location \a q.
     const GridTreePaving& euclidean_set(DiscreteLocation q, const RealSpace& s) const {
         static_cast<void>(s);
-        ARIADNE_ASSERT_MSG(s==this->space(q),"Variable ordering in HybridGridTreeSet location "<<q<<" is "<<this->space(q)<<", "
-                                             "which does not match requested ordering "<<q);
+        ARIADNE_PRECONDITION_MSG(s==this->space(q),"Variable ordering in location "<<q<<" is "<<this->space(q)<<", which does not match requested ordering "<<s);
         return _map[q]; }
 
     //!

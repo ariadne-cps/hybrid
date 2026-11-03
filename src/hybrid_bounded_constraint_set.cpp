@@ -52,17 +52,17 @@ HybridBoundedConstraintSet* HybridBoundedConstraintSet::clone() const {
 }
 
 Set<RealVariable> HybridBoundedConstraintSet::variables(DiscreteLocation loc) const {
-    ARIADNE_ASSERT(this->_sets.has_key(loc));
+    ARIADNE_PRECONDITION(this->_sets.has_key(loc));
     return _sets[loc].variables();
 }
 
 RealExpressionBoundedConstraintSet const& HybridBoundedConstraintSet::continuous_set(DiscreteLocation loc) const {
-    ARIADNE_ASSERT(this->_sets.has_key(loc));
+    ARIADNE_PRECONDITION(this->_sets.has_key(loc));
     return this->_sets[loc];
 }
 
 BoundedConstraintSet const HybridBoundedConstraintSet::euclidean_set(DiscreteLocation loc, RealSpace spc) const {
-    ARIADNE_ASSERT(this->_sets.has_key(loc));
+    ARIADNE_PRECONDITION(this->_sets.has_key(loc));
     return BoundedConstraintSet(this->_sets[loc].euclidean_set(spc));
 }
 
@@ -71,7 +71,7 @@ EuclideanSetInterfaceBase* HybridBoundedConstraintSet::_euclidean_set(DiscreteLo
 }
 
 DiscreteLocation HybridBoundedConstraintSet::location() const {
-    ARIADNE_ASSERT(this->_sets.size()==1);
+    ARIADNE_PRECONDITION(this->_sets.size()==1);
     return this->_sets.begin()->first;
 }
 
