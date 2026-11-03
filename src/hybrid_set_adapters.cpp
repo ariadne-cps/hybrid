@@ -53,12 +53,8 @@ Void HybridBoundedConstraintSet::draw(CanvasInterface& c, const Set<DiscreteLoca
 
 
 template<class EBS> Void HybridBasicSet<EBS>::adjoin_outer_approximation_to(HybridGridTreePaving& paving, Nat fineness) const {
-    if(this->space()==paving.space(this->location())) {
-        paving[this->location()].adjoin_outer_approximation(this->euclidean_set(),fineness);
-    } else {
-        ARIADNE_FAIL_MSG("HybridSet's state variables "<<this->space()<<
-                         " do not match variables "<<paving.space()<<" of paving in location "<<this->location());
-    }
+    ARIADNE_PRECONDITION_MSG(this->space()==paving.space(this->location()), "HybridSet's state variables "<<this->space()<<" do not match "<<paving.space(this->location())<<" in location "<<this->location());
+    paving[this->location()].adjoin_outer_approximation(this->euclidean_set(),fineness);
 }
 
 
@@ -72,8 +68,12 @@ template<class BS> Void draw_hybrid_basic_set(CanvasInterface& canvas, const Dis
 
 template<class EBS> Void HybridBasicSet<EBS>::draw(CanvasInterface& canvas, const Set<DiscreteLocation>& locations, const Variables2d& axes) const
 {
-    for (auto loc : locations) {
-        draw_hybrid_basic_set(canvas,loc,axes,*this);
+    // An empty selection means every location, as for all other hybrid
+    // drawables and as specified by HybridBasicSet's public contract.
+    if (locations.empty()) {
+        draw_hybrid_basic_set(canvas,this->location(),axes,*this);
+    } else {
+        for (auto loc : locations) draw_hybrid_basic_set(canvas,loc,axes,*this);
     }
 }
 
