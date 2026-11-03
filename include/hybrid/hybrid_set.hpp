@@ -298,7 +298,7 @@ class HybridValidatedConstrainedImageSet
 
     virtual Set<RealVariable> variables(DiscreteLocation loc) const override {
         static_cast<void>(loc);
-        ARIADNE_ASSERT(loc==this->location()); return this->Base::variables(); }
+        ARIADNE_PRECONDITION(loc==this->location()); return this->Base::variables(); }
     virtual Set<DiscreteLocation> locations() const override {
         return {this->Base::location()}; }
 
@@ -321,8 +321,8 @@ class HybridValidatedConstrainedImageSet
     virtual EuclideanSetInterfaceBase* _euclidean_set(DiscreteLocation loc, RealSpace spc) const override {
         static_cast<void>(loc);
         static_cast<void>(spc);
-        ARIADNE_ASSERT(loc==this->location());
-        ARIADNE_ASSERT(spc==this->space());
+        ARIADNE_PRECONDITION(loc==this->location());
+        ARIADNE_PRECONDITION(spc==this->space());
         return new ValidatedConstrainedImageSet(this->Base::euclidean_set()); }
 };
 

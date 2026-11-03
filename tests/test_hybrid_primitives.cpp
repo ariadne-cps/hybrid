@@ -1,0 +1,175 @@
+// Point construction, named-coordinate permutations and validated images.
+#include <memory>
+#include <sstream>
+#include <string>
+#include "macro/testing.hpp"
+#include "hybrid/hybrid_set.hpp"
+#include "hybrid/hybrid_paving.hpp"
+
+using namespace Ariadne;
+
+namespace Ariadne {
+HybridExactBox under_approximation(HybridRealBox const&);
+HybridExactBox over_approximation(HybridRealBox const&);
+}
+
+class TestHybridPrimitives {
+public:
+    Void test() {
+        ARIADNE_TEST_CALL(test_points<Real>());
+        ARIADNE_TEST_CALL(test_points<FloatDPApproximation>());
+        ARIADNE_TEST_CALL(test_boxes<ExactIntervalType>());
+        ARIADNE_TEST_CALL(test_boxes<UpperIntervalType>());
+        ARIADNE_TEST_CALL(test_real_box_enclosures());
+        ARIADNE_TEST_CALL(test_validated_image());
+        ARIADNE_TEST_CALL(test_cell_and_curve_descriptions());
+    }
+    template<class X> X coordinate(Int value) {
+        if constexpr(Same<X,Real>) return Real(value);
+        else return X(value,dp);
+    }
+    Void check_coordinate(const Real& value,Int expected) {
+        auto enclosure=value.get(dp);
+        ARIADNE_TEST_EQUALS(enclosure.lower_raw().get_d(),static_cast<double>(expected));
+        ARIADNE_TEST_EQUALS(enclosure.upper_raw().get_d(),static_cast<double>(expected));
+    }
+    Void check_coordinate(const FloatDPApproximation& value,Int expected) {
+        ARIADNE_TEST_EQUALS(value.raw().get_d(),static_cast<double>(expected));
+    }
+    template<class X> X named_coordinate(const HybridPoint<X>& point,const RealVariable& variable) {
+        const auto values=point.values(); return values[variable];
+    }
+    template<class X> Void test_points() {
+        const DiscreteLocation loc(1); const RealVariable x("x"),y("y");
+        const RealSpace space({x,y});
+        const X a=coordinate<X>(1),b=coordinate<X>(2);
+        HybridPoint<X> empty;
+        ARIADNE_TEST_EQUALS(empty.dimension(),0u);
+        ARIADNE_TEST_ASSERT(empty.values().empty());
+        Point<X> coordinates({a,b});
+        HybridPoint<X> direct(loc,space,coordinates);
+        ARIADNE_TEST_EQUALS(direct.dimension(),2u);
+        check_coordinate(named_coordinate(direct,x),1);
+        direct.point()[1]=coordinate<X>(3);
+        const HybridPoint<X>& immutable=direct;
+        check_coordinate(immutable.point()[1],3);
+        HybridPoint<X> mapped(loc,Map<RealVariable,X>{{x,a},{y,b}});
+        check_coordinate(named_coordinate(mapped,y),2);
+        const List<Assignment<RealVariable,X>> assignments{{x,a},{y,b}};
+        HybridPoint<X> from_list(loc,assignments);
+        check_coordinate(named_coordinate(from_list,x),1);
+        HybridPoint<X> from_initializer(loc,InitializerList<Assignment<RealVariable,X>>{{x,a},{y,b}});
+        check_coordinate(named_coordinate(from_initializer,y),2);
+        HybridBasicSet<Point<X>> labelled(loc,LabelledSet<Point<X>>(space,coordinates));
+        ARIADNE_TEST_EQUALS(labelled.dimension(),2u);
+        check_coordinate(labelled.euclidean_set()[0],1);
+    }
+    template<class IVL> Void check_interval(const IVL& interval,Int lower,Int upper) {
+        if constexpr(Same<IVL,RealInterval>) {
+            check_coordinate(interval.lower_bound(),lower);
+            check_coordinate(interval.upper_bound(),upper);
+        } else {
+            ARIADNE_TEST_EQUALS(interval.lower_bound().get_d(),static_cast<double>(lower));
+            ARIADNE_TEST_EQUALS(interval.upper_bound().get_d(),static_cast<double>(upper));
+        }
+    }
+    template<class IVL> Void test_boxes() {
+        using UB=typename IVL::UpperBoundType;
+        const DiscreteLocation loc(1); const RealVariable x("x"),y("y");
+        const RealSpace space({x,y}),reverse({y,x});
+        const Box<IVL> euclidean({{0,1},{2,3}});
+        const LabelledSet<Box<IVL>> labelled(space,euclidean);
+        HybridBox<IVL> direct(loc,space,euclidean);
+        HybridBox<IVL> from_labelled(loc,labelled);
+        VariablesBox<IVL> variables(space,euclidean);
+        HybridBox<IVL> from_variables(loc,variables);
+        List<VariableInterval<UB>> intervals{{x,euclidean[0]},{y,euclidean[1]}};
+        HybridBox<IVL> from_list(loc,intervals);
+        HybridBox<IVL> from_initializer(loc,InitializerList<VariableInterval<UB>>{{x,euclidean[0]},{y,euclidean[1]}});
+        ARIADNE_TEST_EQUALS(direct.dimension(),2u);
+        ARIADNE_TEST_ASSERT(direct.variables().contains(y));
+        check_interval(from_list[x],0,1);
+        check_interval(from_initializer[y],2,3);
+        check_interval(from_variables.euclidean_set(space)[0],0,1);
+        check_interval(from_labelled.euclidean_set(reverse)[0],2,3);
+        HybridBox<IVL> empty(loc,List<VariableInterval<UB>>{});
+        ARIADNE_TEST_EQUALS(empty.dimension(),0u);
+        HybridBoxes<IVL> collection;
+        collection.insert(direct);
+        collection.insert(DiscreteLocation(2),labelled);
+        ARIADNE_TEST_EQUALS(collection.locations().size(),2u);
+        ARIADNE_TEST_EQUALS(collection.space(loc).dimension(),2u);
+        ARIADNE_TEST_EQUALS(collection.continuous_set(loc).dimension(),2u);
+        check_interval(collection.euclidean_set(loc)[0],0,1);
+        ARIADNE_TEST_ASSERT(direct.bounding_box().location()==loc);
+        ARIADNE_TEST_ASSERT(direct.bounding_boxes().has_location(loc));
+        std::ostringstream text;
+        text<<static_cast<const HybridBasicSet<Box<IVL>>&>(direct);
+        ARIADNE_TEST_ASSERT(text.str().find("Box")!=std::string::npos);
+        ARIADNE_TEST_ASSERT(text.str().find("x")!=std::string::npos);
+    }
+    Void test_real_box_enclosures() {
+        DiscreteLocation loc(1); RealVariable x("x"),y("y"); RealSpace space({x,y});
+        RealBox euclidean({{0,1},{2,3}});
+        HybridRealBox box(loc,space,euclidean);
+        check_interval(box[x],0,1);
+        check_interval(box.euclidean_set(RealSpace({y,x}))[0],2,3);
+        HybridExactBox inner=under_approximation(box),outer=over_approximation(box);
+        ARIADNE_TEST_ASSERT(inner.location()==loc);
+        ARIADNE_TEST_ASSERT(outer.location()==loc);
+        check_interval(inner.euclidean_set()[0],0,1);
+        check_interval(outer.euclidean_set()[1],2,3);
+        std::ostringstream text; text<<static_cast<const HybridBasicSet<RealBox>&>(box);
+        ARIADNE_TEST_ASSERT(text.str().find("RealBox")!=std::string::npos);
+    }
+    Void test_validated_image() {
+        DiscreteLocation loc(1),other(2); RealVariable x("x"),y("y"); RealSpace space({x,y});
+        ValidatedConstrainedImageSet euclidean(ExactBoxType({{0,1},{2,3}}));
+        HybridValidatedConstrainedImageSet image(loc,space,euclidean);
+        ARIADNE_TEST_ASSERT(image.variables(loc).contains(x));
+        ARIADNE_TEST_ASSERT(image.locations().contains(loc));
+        ARIADNE_TEST_EQUALS(image.bounding_box().locations().size(),1u);
+        std::unique_ptr<HybridValidatedConstrainedImageSet> copy(image.clone());
+        ARIADNE_TEST_ASSERT(copy->locations().contains(loc));
+        const ValidatedHybridLocatedSetInterface& view=image;
+        std::unique_ptr<ValidatedHybridLocatedSetInterface> cloned(view.clone());
+        ARIADNE_TEST_ASSERT(cloned->variables(loc).contains(y));
+        const HybridSetInterfaceBase& root=image;
+        ARIADNE_TEST_EQUALS(root.euclidean_set(loc,space).dimension(),2u);
+        HybridExactBox disjoint(loc,space,ExactBoxType({{4,5},{6,7}}));
+        HybridExactBox absent(other,space,ExactBoxType({{4,5},{6,7}}));
+        ARIADNE_TEST_ASSERT(definitely(image.separated(disjoint)));
+        ARIADNE_TEST_ASSERT(definitely(image.separated(absent)));
+        HybridExactBox enclosing(loc,space,ExactBoxType({{-1,2},{1,4}}));
+        ARIADNE_TEST_ASSERT(definitely(image.overlaps(enclosing)));
+        ARIADNE_TEST_ASSERT(!definitely(image.overlaps(absent)));
+        HybridExactBoxes boxes; boxes.insert(enclosing);
+        ARIADNE_TEST_ASSERT(definitely(image.inside(boxes)));
+        HybridExactBoxes no_boxes;
+        ARIADNE_TEST_ASSERT(!definitely(image.inside(no_boxes)));
+        std::ostringstream text; image._write(text); text<<image;
+        ARIADNE_TEST_ASSERT(!text.str().empty());
+        ARIADNE_TEST_FAIL(image.variables(other));
+        ARIADNE_TEST_FAIL(root.euclidean_set(other,space));
+        ARIADNE_TEST_FAIL(root.euclidean_set(loc,RealSpace({y,x})));
+    }
+    Void test_cell_and_curve_descriptions() {
+        DiscreteLocation loc(1); RealVariable x("x"),y("y"); RealSpace space({x,y});
+        MonolithicHybridSpace hspace; hspace.new_location(loc,space);
+        HybridGridTreePaving paving{HybridGrid(hspace)};
+        HybridExactBoxes boxes; boxes.insert(loc,space,ExactBoxType({{0,1},{0,1}}));
+        paving.adjoin_outer_approximation(boxes,1u);
+        HybridGridCell cell=*paving.begin();
+        ARIADNE_TEST_EQUALS(cell.dimension(),2u);
+        ARIADNE_TEST_ASSERT(cell.box().location()==loc);
+        std::ostringstream cell_text; cell_text<<cell;
+        ARIADNE_TEST_ASSERT(cell_text.str().find("GridCell")!=std::string::npos);
+        InterpolatedCurve curve(Point<FloatDPApproximation>({0.0_x,0.0_x},dp),
+                                Point<FloatDPApproximation>({1.0_x,1.0_x},dp));
+        HybridBasicSet<InterpolatedCurve> path(loc,space,curve);
+        std::ostringstream curve_text; curve_text<<path;
+        ARIADNE_TEST_ASSERT(curve_text.str().find("InterpolatedCurve")!=std::string::npos);
+    }
+};
+
+Int main() { TestHybridPrimitives().test(); return ARIADNE_TEST_FAILURES; }
