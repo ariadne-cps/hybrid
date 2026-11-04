@@ -32,7 +32,7 @@
 #include <map>
 #include <memory>
 
-#include "macro/general.hpp"
+#include "utility/macros.hpp"
 #include "utility/stlio.hpp"
 #include "numeric/declarations.hpp"
 #include "algebra/declarations.hpp"
