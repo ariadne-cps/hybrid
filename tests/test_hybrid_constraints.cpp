@@ -4,7 +4,7 @@
 #include <sstream>
 #include <string>
 
-#include "macro/testing.hpp"
+#include "ariadne-testing.hpp"
 #include "hybrid/hybrid_constraint_set.hpp"
 #include "hybrid/hybrid_bounded_constraint_set.hpp"
 #include "hybrid/hybrid_expression_set.hpp"
@@ -12,13 +12,9 @@
 
 using namespace Ariadne;
 
-class TestHybridConstraints {
+class TestHybridConstraints : public Ariadne::Testing::ContextFixture {
 public:
-    Void test() {
-        ARIADNE_TEST_CALL(test_constraints());
-        ARIADNE_TEST_CALL(test_bounded_sets());
-        ARIADNE_TEST_CALL(test_intersection_with_missing_constraint());
-    }
+    using ContextFixture::ContextFixture;
 
     Void test_constraints() {
         DiscreteLocation q(1), other(2), absent(3);
@@ -28,31 +24,31 @@ public:
         RealExpressionConstraintSet symbolic(predicates);
 
         HybridConstraintSet empty;
-        ARIADNE_TEST_ASSERT(empty.locations().empty());
-        ARIADNE_TEST_ASSERT(!empty.has_location(q));
+        ARIADNE_TESTING_PROVE(empty.locations().empty());
+        ARIADNE_TESTING_PROVE(!empty.has_location(q));
 
         HybridConstraintSet from_predicates(q,predicates);
         HybridConstraintSet from_symbolic(q,symbolic);
         Set<DiscreteLocation> both={q,other};
         HybridConstraintSet multi(both,symbolic);
-        ARIADNE_TEST_EQUALS(multi.locations().size(),2u);
-        ARIADNE_TEST_ASSERT(multi.has_location(other));
-        ARIADNE_TEST_ASSERT(from_predicates.has_location(q));
-        ARIADNE_TEST_ASSERT(from_symbolic.variables(q).contains(x));
-        ARIADNE_TEST_EQUALS(from_symbolic.euclidean_set(q,space).dimension(),1u);
-        ARIADNE_TEST_ASSERT(from_symbolic.continuous_set(q).variables().contains(x));
+        ARIADNE_TESTING_EXPECT_EQUAL(multi.locations().size(),2u);
+        ARIADNE_TESTING_PROVE(multi.has_location(other));
+        ARIADNE_TESTING_PROVE(from_predicates.has_location(q));
+        ARIADNE_TESTING_PROVE(from_symbolic.variables(q).contains(x));
+        ARIADNE_TESTING_EXPECT_EQUAL(from_symbolic.euclidean_set(q,space).dimension(),1u);
+        ARIADNE_TESTING_PROVE(from_symbolic.continuous_set(q).variables().contains(x));
 
         HybridConstraintSet appended;
         appended.adjoin(q,predicates);
         appended.adjoin(other,symbolic);
-        ARIADNE_TEST_EQUALS(appended.locations().size(),2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(appended.locations().size(),2u);
         std::unique_ptr<HybridConstraintSet> clone(appended.clone());
-        ARIADNE_TEST_EQUALS(clone->locations().size(),2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(clone->locations().size(),2u);
 
         HybridExactBox known(q,space,ExactBoxType({{0,1}}));
         HybridExactBox unknown(absent,space,ExactBoxType({{0,1}}));
         // The unknown location denotes an empty slice.
-        ARIADNE_TEST_ASSERT(definitely(from_symbolic.separated(unknown)));
+        ARIADNE_TESTING_PROVE(definitely(from_symbolic.separated(unknown)));
         static_cast<void>(from_symbolic.overlaps(known));
         static_cast<void>(from_symbolic.covers(known));
         static_cast<void>(from_symbolic.separated(known));
@@ -61,7 +57,7 @@ public:
 
         std::ostringstream output;
         from_symbolic._write(output);
-        ARIADNE_TEST_ASSERT(output.str().find("HybridConstraintSet")!=std::string::npos);
+        ARIADNE_TESTING_PROVE(output.str().find("HybridConstraintSet")!=std::string::npos);
     }
 
     Void test_bounded_sets() {
@@ -71,7 +67,7 @@ public:
         RealExpressionBoundedConstraintSet symbolic({0<=x<=2});
 
         HybridBoundedConstraintSet empty;
-        ARIADNE_TEST_ASSERT(empty.locations().empty());
+        ARIADNE_TESTING_PROVE(empty.locations().empty());
         HybridBoundedConstraintSet from_symbolic(q,symbolic);
         HybridBoundedConstraintSet from_intervals(q,{0<=x<=2});
         HybridBoundedConstraintSet with_predicate(q,{0<=x<=2},{x>=0});
@@ -80,26 +76,26 @@ public:
         Set<DiscreteLocation> both={q,other};
         HybridBoundedConstraintSet multiple(both,symbolic);
 
-        ARIADNE_TEST_EQUALS(multiple.locations().size(),2u);
-        ARIADNE_TEST_ASSERT(from_symbolic.variables(q).contains(x));
-        ARIADNE_TEST_ASSERT(from_intervals.variables(q).contains(x));
-        ARIADNE_TEST_ASSERT(with_predicate.variables(q).contains(x));
-        ARIADNE_TEST_ASSERT(from_box.variables(q).contains(x));
-        ARIADNE_TEST_EQUALS(from_symbolic.euclidean_set(q,space).dimension(),1u);
-        ARIADNE_TEST_ASSERT(from_symbolic.continuous_set(q).variables().contains(x));
-        ARIADNE_TEST_ASSERT(are_same(from_symbolic.location(),q));
-        ARIADNE_TEST_ASSERT(from_symbolic.bounding_box().has_location(q));
+        ARIADNE_TESTING_EXPECT_EQUAL(multiple.locations().size(),2u);
+        ARIADNE_TESTING_PROVE(from_symbolic.variables(q).contains(x));
+        ARIADNE_TESTING_PROVE(from_intervals.variables(q).contains(x));
+        ARIADNE_TESTING_PROVE(with_predicate.variables(q).contains(x));
+        ARIADNE_TESTING_PROVE(from_box.variables(q).contains(x));
+        ARIADNE_TESTING_EXPECT_EQUAL(from_symbolic.euclidean_set(q,space).dimension(),1u);
+        ARIADNE_TESTING_PROVE(from_symbolic.continuous_set(q).variables().contains(x));
+        ARIADNE_TESTING_PROVE(are_same(from_symbolic.location(),q));
+        ARIADNE_TESTING_PROVE(from_symbolic.bounding_box().has_location(q));
 
         HybridBoundedConstraintSet appended;
         appended.adjoin(q,symbolic);
         appended.adjoin(other,symbolic);
-        ARIADNE_TEST_EQUALS(appended.locations().size(),2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(appended.locations().size(),2u);
         std::unique_ptr<HybridBoundedConstraintSet> clone(appended.clone());
-        ARIADNE_TEST_EQUALS(clone->locations().size(),2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(clone->locations().size(),2u);
 
         HybridExactBox known(q,space,ExactBoxType({{0,1}}));
         HybridExactBox unknown(absent,space,ExactBoxType({{0,1}}));
-        ARIADNE_TEST_ASSERT(definitely(from_symbolic.separated(unknown)));
+        ARIADNE_TESTING_PROVE(definitely(from_symbolic.separated(unknown)));
         static_cast<void>(from_symbolic.overlaps(known));
         static_cast<void>(from_symbolic.covers(known));
         static_cast<void>(from_symbolic.separated(known));
@@ -111,7 +107,7 @@ public:
 
         std::ostringstream output;
         from_symbolic._write(output);
-        ARIADNE_TEST_ASSERT(output.str().find("HybridBoundedConstraintSet")!=std::string::npos);
+        ARIADNE_TESTING_PROVE(output.str().find("HybridBoundedConstraintSet")!=std::string::npos);
     }
 
     Void test_intersection_with_missing_constraint() {
@@ -125,15 +121,18 @@ public:
         List<ContinuousPredicate> predicates({x>=0});
         HybridConstraintSet restrictions(constrained,predicates);
         HybridBoundedConstraintSet intersected=intersection(bounds,restrictions);
-        ARIADNE_TEST_EQUALS(intersected.locations().size(),2u);
-        ARIADNE_TEST_ASSERT(intersected.locations().contains(constrained));
-        ARIADNE_TEST_ASSERT(intersected.locations().contains(unconstrained));
-        ARIADNE_TEST_EQUALS(intersected.euclidean_set(unconstrained,space).dimension(),1u);
-        ARIADNE_TEST_ASSERT(intersected.bounding_box().has_location(unconstrained));
+        ARIADNE_TESTING_EXPECT_EQUAL(intersected.locations().size(),2u);
+        ARIADNE_TESTING_PROVE(intersected.locations().contains(constrained));
+        ARIADNE_TESTING_PROVE(intersected.locations().contains(unconstrained));
+        ARIADNE_TESTING_EXPECT_EQUAL(intersected.euclidean_set(unconstrained,space).dimension(),1u);
+        ARIADNE_TESTING_PROVE(intersected.bounding_box().has_location(unconstrained));
     }
 };
 
-Int main() {
-    TestHybridConstraints().test();
-    return ARIADNE_TEST_FAILURES;
+int main(int argc, char** argv) {
+    ARIADNE_TESTING_SUITE("test_hybrid_constraints");
+    ARIADNE_TESTING_ADD_TEST(TestHybridConstraints, test_constraints);
+    ARIADNE_TESTING_ADD_TEST(TestHybridConstraints, test_bounded_sets);
+    ARIADNE_TESTING_ADD_TEST(TestHybridConstraints, test_intersection_with_missing_constraint);
+    return ARIADNE_TESTING_RUN_TESTS_WITH_ARGS(argc, argv);
 }

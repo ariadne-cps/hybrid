@@ -1,7 +1,7 @@
 // Typed cloning/conversion contracts, including ownership on a failed cast.
 #include <memory>
 #include <sstream>
-#include "macro/testing.hpp"
+#include "ariadne-testing.hpp"
 #include "hybrid/hybrid_set.hpp"
 #include "hybrid/hybrid_bounded_constraint_set.hpp"
 #include "hybrid/hybrid_constraint_set.hpp"
@@ -78,23 +78,18 @@ protected:
     }
 };
 
-class TestHybridInterfaces {
+class TestHybridInterfaces : public Ariadne::Testing::ContextFixture {
 public:
+    using ContextFixture::ContextFixture;
     template<class Interface,class Object>
     Void check_clone(const Object& object,DiscreteLocation loc,const RealVariable& variable) {
         const Interface& view=object;
         std::unique_ptr<Interface> copy(view.clone());
-        ARIADNE_TEST_ASSERT(copy.get()!=nullptr);
-        ARIADNE_TEST_ASSERT(copy.get()!=&view);
-        ARIADNE_TEST_ASSERT(copy->variables(loc).contains(variable));
+        ARIADNE_TESTING_PROVE(copy.get()!=nullptr);
+        ARIADNE_TESTING_PROVE(copy.get()!=&view);
+        ARIADNE_TESTING_PROVE(copy->variables(loc).contains(variable));
     }
-    Void test() {
-        ARIADNE_TEST_CALL(test_effective_views());
-        ARIADNE_TEST_CALL(test_validated_views());
-        ARIADNE_TEST_CALL(test_failed_cast_ownership());
-        ARIADNE_TEST_CALL(test_location_contracts());
-    }
-    Void test_effective_views() {
+        Void test_effective_views() {
         DiscreteLocation loc(1); RealVariable x("x"); RealSpace space({x});
         HybridBoxSet box(loc,RealVariablesBox({0<=x<=1}));
         check_clone<EffectiveHybridBoundedSetInterface>(box,loc,x);
@@ -107,15 +102,15 @@ public:
         check_clone<EffectiveHybridSetInterface>(box,loc,x);
         const EffectiveHybridOpenSetInterface& open=box;
         const EffectiveHybridRegularSetInterface& regular=box;
-        ARIADNE_TEST_EQUALS(open.euclidean_set(loc,space).dimension(),1u);
-        ARIADNE_TEST_EQUALS(regular.euclidean_set(loc,space).dimension(),1u);
-        ARIADNE_TEST_ASSERT(definitely(open.euclidean_set(loc,space).covers(ExactBoxType({{0.25_x,0.75_x}}))));
+        ARIADNE_TESTING_EXPECT_EQUAL(open.euclidean_set(loc,space).dimension(),1u);
+        ARIADNE_TESTING_EXPECT_EQUAL(regular.euclidean_set(loc,space).dimension(),1u);
+        ARIADNE_TESTING_PROVE(definitely(open.euclidean_set(loc,space).covers(ExactBoxType({{0.25_x,0.75_x}}))));
         std::ostringstream text; text<<static_cast<const HybridSetInterfaceBase&>(box);
-        ARIADNE_TEST_ASSERT(!text.str().empty());
+        ARIADNE_TESTING_PROVE(!text.str().empty());
         HybridConstraintSet constraints(loc,RealExpressionConstraintSet({x>=0}));
         check_clone<EffectiveHybridClosedSetInterface>(constraints,loc,x);
         const HybridSetInterfaceBase& root=constraints;
-        ARIADNE_TEST_EQUALS(root.euclidean_set(loc,space).dimension(),1u);
+        ARIADNE_TESTING_EXPECT_EQUAL(root.euclidean_set(loc,space).dimension(),1u);
         HybridBoundedConstraintSet bounded(loc,{0<=x<=1});
         check_clone<EffectiveHybridSetInterface>(bounded,loc,x);
     }
@@ -131,9 +126,9 @@ public:
         check_clone<ValidatedHybridLocatedSetInterface>(box,loc,x);
         check_clone<ValidatedHybridSetInterface>(box,loc,x);
         HybridExactBox interior(loc,space,ExactBoxType({{0.25_x,0.75_x}}));
-        ARIADNE_TEST_ASSERT(definitely(box.overlaps(interior)));
-        ARIADNE_TEST_ASSERT(definitely(box.covers(interior.euclidean_set())));
-        ARIADNE_TEST_ASSERT(box.bounding_box().has_location(loc));
+        ARIADNE_TESTING_PROVE(definitely(box.overlaps(interior)));
+        ARIADNE_TESTING_PROVE(definitely(box.covers(interior.euclidean_set())));
+        ARIADNE_TESTING_PROVE(box.bounding_box().has_location(loc));
     }
     Void test_failed_cast_ownership() {
         DiscreteLocation loc(1); RealVariable x("x"); RealSpace space({x});
@@ -142,29 +137,36 @@ public:
         IncompatibleResults faulty(loc,RealExpressionBoundedConstraintSet({0<=x<=1}),
                                    constraints.euclidean_set(loc,space),destroyed);
         const EffectiveHybridBoundedSetInterface& view=faulty;
-        ARIADNE_TEST_THROWS(std::unique_ptr<EffectiveHybridBoundedSetInterface>(view.clone()),std::bad_cast);
-        ARIADNE_TEST_EQUALS(destroyed,1);
-        ARIADNE_TEST_THROWS(static_cast<void>(view.euclidean_set(loc,space)),std::bad_cast);
-        ARIADNE_TEST_EQUALS(destroyed,2);
+        ARIADNE_TESTING_EXPECT_THROWS(std::bad_cast, std::unique_ptr<EffectiveHybridBoundedSetInterface>(view.clone()));
+        ARIADNE_TESTING_EXPECT_EQUAL(destroyed,1);
+        ARIADNE_TESTING_EXPECT_THROWS(std::bad_cast, static_cast<void>(view.euclidean_set(loc,space)));
+        ARIADNE_TESTING_EXPECT_EQUAL(destroyed,2);
     }
     Void test_location_contracts() {
         DiscreteLocation loc(1),missing(2); RealVariable x("x"); RealSpace space({x});
         HybridConstraintSet constraints(loc,RealExpressionConstraintSet({x>=0}));
-        ARIADNE_TEST_FAIL(constraints.variables(missing));
-        ARIADNE_TEST_FAIL(constraints.continuous_set(missing));
-        ARIADNE_TEST_FAIL(constraints.euclidean_set(missing,space));
+        ARIADNE_TESTING_EXPECT_EXCEPTION(constraints.variables(missing));
+        ARIADNE_TESTING_EXPECT_EXCEPTION(constraints.continuous_set(missing));
+        ARIADNE_TESTING_EXPECT_EXCEPTION(constraints.euclidean_set(missing,space));
         HybridBoundedConstraintSet bounded(loc,{0<=x<=1});
-        ARIADNE_TEST_FAIL(bounded.variables(missing));
-        ARIADNE_TEST_FAIL(bounded.continuous_set(missing));
-        ARIADNE_TEST_FAIL(bounded.euclidean_set(missing,space));
+        ARIADNE_TESTING_EXPECT_EXCEPTION(bounded.variables(missing));
+        ARIADNE_TESTING_EXPECT_EXCEPTION(bounded.continuous_set(missing));
+        ARIADNE_TESTING_EXPECT_EXCEPTION(bounded.euclidean_set(missing,space));
         HybridBoundedConstraintSet empty;
-        ARIADNE_TEST_FAIL(empty.location());
+        ARIADNE_TESTING_EXPECT_EXCEPTION(empty.location());
         bounded.adjoin(missing,RealExpressionBoundedConstraintSet({0<=x<=1}));
-        ARIADNE_TEST_FAIL(bounded.location());
+        ARIADNE_TESTING_EXPECT_EXCEPTION(bounded.location());
         HybridBoxSet box(loc,RealVariablesBox({0<=x<=1}));
-        ARIADNE_TEST_FAIL(box.euclidean_set(missing,space));
-        ARIADNE_TEST_FAIL(box.space(missing));
+        ARIADNE_TESTING_EXPECT_EXCEPTION(box.euclidean_set(missing,space));
+        ARIADNE_TESTING_EXPECT_EXCEPTION(box.space(missing));
     }
 };
 
-Int main() { TestHybridInterfaces().test(); return ARIADNE_TEST_FAILURES; }
+int main(int argc, char** argv) {
+    ARIADNE_TESTING_SUITE("test_hybrid_set_interface");
+    ARIADNE_TESTING_ADD_TEST(TestHybridInterfaces, test_effective_views);
+    ARIADNE_TESTING_ADD_TEST(TestHybridInterfaces, test_validated_views);
+    ARIADNE_TESTING_ADD_TEST(TestHybridInterfaces, test_failed_cast_ownership);
+    ARIADNE_TESTING_ADD_TEST(TestHybridInterfaces, test_location_contracts);
+    return ARIADNE_TESTING_RUN_TESTS_WITH_ARGS(argc, argv);
+}

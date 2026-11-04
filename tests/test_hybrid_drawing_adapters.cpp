@@ -1,6 +1,6 @@
 // Semantic rendering-adapter tests with an in-memory CanvasInterface.
 // No files, graphical backend or display server are needed.
-#include "macro/testing.hpp"
+#include "ariadne-testing.hpp"
 #include "rendering/rendering_interface.hpp"
 #include "rendering/rendering_manager.hpp"
 #include "hybrid/hybrid_graphics.hpp"
@@ -96,16 +96,9 @@ public:
     ~BackendScope() { RenderingManager::instance().set_backend(_previous); }
 };
 
-class TestHybridDrawingAdapters {
+class TestHybridDrawingAdapters : public Ariadne::Testing::ContextFixture {
 public:
-    Void test() {
-        ARIADNE_TEST_CALL(test_location_selection());
-        ARIADNE_TEST_CALL(test_box_set_and_box_collection());
-        ARIADNE_TEST_CALL(test_figure_paint());
-        ARIADNE_TEST_CALL(test_figure_write_backend());
-        ARIADNE_TEST_CALL(test_remaining_drawable_adapters());
-        ARIADNE_TEST_CALL(test_outer_approximation_adapters());
-    }
+    using ContextFixture::ContextFixture;
 
     Void test_location_selection() {
         DiscreteLocation q(1), other(2);
@@ -121,20 +114,20 @@ public:
 
         // A nonmatching location must not reach the Euclidean renderer.
         shape.draw(canvas,excluded,axes);
-        ARIADNE_TEST_EQUALS(canvas.boundaries,0u);
+        ARIADNE_TESTING_EXPECT_EQUAL(canvas.boundaries,0u);
         shape.draw(canvas,selected,axes);
-        ARIADNE_TEST_EQUALS(canvas.boundaries,1u);
+        ARIADNE_TESTING_EXPECT_EQUAL(canvas.boundaries,1u);
         shape.draw(canvas,all,axes);
-        ARIADNE_TEST_EQUALS(canvas.boundaries,2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(canvas.boundaries,2u);
 
         // The base adapter follows the same empty-means-all contract.
         HybridBasicSet<ExactBoxType> const& base=shape;
         base.draw(canvas,excluded,axes);
-        ARIADNE_TEST_EQUALS(canvas.boundaries,2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(canvas.boundaries,2u);
         base.draw(canvas,selected,axes);
-        ARIADNE_TEST_EQUALS(canvas.boundaries,3u);
+        ARIADNE_TESTING_EXPECT_EQUAL(canvas.boundaries,3u);
         base.draw(canvas,all,axes);
-        ARIADNE_TEST_EQUALS(canvas.boundaries,4u);
+        ARIADNE_TESTING_EXPECT_EQUAL(canvas.boundaries,4u);
     }
 
     Void test_box_set_and_box_collection() {
@@ -149,33 +142,33 @@ public:
         HybridBoxSet set(q,RealVariablesBox({0<=x<=2,0<=y<=2}));
         RecordingCanvas set_canvas;
         set.draw(set_canvas,excluded,axes);
-        ARIADNE_TEST_EQUALS(set_canvas.boundaries,0u);
+        ARIADNE_TESTING_EXPECT_EQUAL(set_canvas.boundaries,0u);
         set.draw(set_canvas,selected,axes);
-        ARIADNE_TEST_EQUALS(set_canvas.boundaries,1u);
+        ARIADNE_TESTING_EXPECT_EQUAL(set_canvas.boundaries,1u);
         set.draw(set_canvas,all,axes);
-        ARIADNE_TEST_EQUALS(set_canvas.boundaries,2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(set_canvas.boundaries,2u);
 
         HybridExactBoxes boxes;
         boxes.insert(q,spc,ExactBoxType({{0,1},{0,1}}));
         RecordingCanvas boxes_canvas;
         boxes.draw(boxes_canvas,excluded,axes);
-        ARIADNE_TEST_EQUALS(boxes_canvas.boundaries,0u);
+        ARIADNE_TESTING_EXPECT_EQUAL(boxes_canvas.boundaries,0u);
         boxes.draw(boxes_canvas,selected,axes);
-        ARIADNE_TEST_EQUALS(boxes_canvas.boundaries,1u);
+        ARIADNE_TESTING_EXPECT_EQUAL(boxes_canvas.boundaries,1u);
         boxes.draw(boxes_canvas,all,axes);
-        ARIADNE_TEST_EQUALS(boxes_canvas.boundaries,2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(boxes_canvas.boundaries,2u);
     }
 
     template<class Shape> Void check_location_filter(const Shape& shape,
                                                     DiscreteLocation loc,const Variables2d& axes) {
         RecordingCanvas canvas;
         shape.draw(canvas,Set<DiscreteLocation>{DiscreteLocation(99)},axes);
-        ARIADNE_TEST_EQUALS(canvas.boundaries+canvas.primitives,0u);
+        ARIADNE_TESTING_EXPECT_EQUAL(canvas.boundaries+canvas.primitives,0u);
         shape.draw(canvas,Set<DiscreteLocation>{loc},axes);
         const SizeType selected=canvas.boundaries+canvas.primitives;
-        ARIADNE_TEST_ASSERT(selected>0u);
+        ARIADNE_TESTING_PROVE(selected>0u);
         shape.draw(canvas,Set<DiscreteLocation>{},axes);
-        ARIADNE_TEST_ASSERT(canvas.boundaries+canvas.primitives>selected);
+        ARIADNE_TESTING_PROVE(canvas.boundaries+canvas.primitives>selected);
     }
     Void test_remaining_drawable_adapters() {
         DiscreteLocation loc(1); RealVariable x("x"),y("y"); RealSpace space({x,y});
@@ -190,12 +183,12 @@ public:
         HybridUpperBoxes empty_boxes;
         RecordingCanvas empty;
         empty_boxes.draw(empty,{},axes);
-        ARIADNE_TEST_EQUALS(empty.boundaries+empty.primitives,0u);
+        ARIADNE_TESTING_EXPECT_EQUAL(empty.boundaries+empty.primitives,0u);
         HybridBoundedConstraintSet bounded(loc,{0<=x<=1,0<=y<=1});
         check_location_filter(bounded,loc,axes);
         HybridBoundedConstraintSet empty_constraints;
         empty_constraints.draw(empty,{},axes);
-        ARIADNE_TEST_EQUALS(empty.boundaries+empty.primitives,0u);
+        ARIADNE_TESTING_EXPECT_EQUAL(empty.boundaries+empty.primitives,0u);
         HybridValidatedConstrainedImageSet image(loc,space,
             ValidatedConstrainedImageSet(ExactBoxType({{0,1},{0,1}})));
         check_location_filter(image,loc,axes);
@@ -206,7 +199,7 @@ public:
         check_location_filter(paving,loc,axes);
         HybridGridTreePaving empty_paving{HybridGrid(hspace)};
         empty_paving.draw(empty,{},axes);
-        ARIADNE_TEST_EQUALS(empty.boundaries+empty.primitives,0u);
+        ARIADNE_TESTING_EXPECT_EQUAL(empty.boundaries+empty.primitives,0u);
     }
     Void test_outer_approximation_adapters() {
         DiscreteLocation loc(1); RealVariable x("x"),y("y"),z("z");
@@ -219,14 +212,14 @@ public:
         const HybridBasicSet<UpperBoxType>& upper_base=upper;
         exact_base.adjoin_outer_approximation_to(paving,1u);
         const SizeType initial=paving.size();
-        ARIADNE_TEST_ASSERT(initial>0u);
+        ARIADNE_TESTING_PROVE(initial>0u);
         upper_base.adjoin_outer_approximation_to(paving,1u);
-        ARIADNE_TEST_EQUALS(paving.size(),initial);
+        ARIADNE_TESTING_EXPECT_EQUAL(paving.size(),initial);
         MonolithicHybridSpace other_space; other_space.new_location(loc,RealSpace({x,z}));
         HybridGridTreePaving mismatched{HybridGrid(other_space)};
-        ARIADNE_TEST_FAIL(exact_base.adjoin_outer_approximation_to(mismatched,1u));
-        ARIADNE_TEST_FAIL(upper_base.adjoin_outer_approximation_to(mismatched,1u));
-        ARIADNE_TEST_ASSERT(mismatched.is_empty());
+        ARIADNE_TESTING_EXPECT_EXCEPTION(exact_base.adjoin_outer_approximation_to(mismatched,1u));
+        ARIADNE_TESTING_EXPECT_EXCEPTION(upper_base.adjoin_outer_approximation_to(mismatched,1u));
+        ARIADNE_TESTING_PROVE(mismatched.is_empty());
     }
 
     Void test_figure_write_backend() {
@@ -239,25 +232,25 @@ public:
         figure.set_axes(Axes2d(-2.0,x,2.0,-3.0,y,3.0));
         figure.draw(shape);
         figure.write("record-default.png");
-        ARIADNE_TEST_EQUALS(backend->width,800u);
-        ARIADNE_TEST_EQUALS(backend->height,800u);
-        ARIADNE_TEST_ASSERT(!backend->animated);
-        ARIADNE_TEST_ASSERT(backend->filename=="record-default.png");
-        ARIADNE_TEST_EQUALS(canvas->writes,1u);
-        ARIADNE_TEST_EQUALS(canvas->boundaries,1u);
+        ARIADNE_TESTING_EXPECT_EQUAL(backend->width,800u);
+        ARIADNE_TESTING_EXPECT_EQUAL(backend->height,800u);
+        ARIADNE_TESTING_PROVE(!backend->animated);
+        ARIADNE_TESTING_PROVE(backend->filename=="record-default.png");
+        ARIADNE_TESTING_EXPECT_EQUAL(canvas->writes,1u);
+        ARIADNE_TESTING_EXPECT_EQUAL(canvas->boundaries,1u);
         figure.properties.is_animated=true;
         figure.write("record-sized.png",320u,240u);
-        ARIADNE_TEST_EQUALS(backend->width,320u);
-        ARIADNE_TEST_EQUALS(backend->height,240u);
-        ARIADNE_TEST_ASSERT(backend->animated);
-        ARIADNE_TEST_ASSERT(canvas->written_filename=="record-sized.png");
-        ARIADNE_TEST_EQUALS(canvas->writes,2u);
-        ARIADNE_TEST_EQUALS(canvas->initialisations,2u);
-        ARIADNE_TEST_EQUALS(canvas->finalisations,2u);
-        ARIADNE_TEST_EQUALS(canvas->boundaries,2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(backend->width,320u);
+        ARIADNE_TESTING_EXPECT_EQUAL(backend->height,240u);
+        ARIADNE_TESTING_PROVE(backend->animated);
+        ARIADNE_TESTING_PROVE(canvas->written_filename=="record-sized.png");
+        ARIADNE_TESTING_EXPECT_EQUAL(canvas->writes,2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(canvas->initialisations,2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(canvas->finalisations,2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(canvas->boundaries,2u);
         RecordingCanvas direct;
         Ariadne::draw(direct,Set<DiscreteLocation>{loc},Variables2d(x,y),shape);
-        ARIADNE_TEST_EQUALS(direct.boundaries,1u);
+        ARIADNE_TESTING_EXPECT_EQUAL(direct.boundaries,1u);
     }
 
     Void test_figure_paint() {
@@ -275,35 +268,41 @@ public:
 
         RecordingCanvas painted;
         fig._paint_all(painted);
-        ARIADNE_TEST_EQUALS(painted.initialisations,1u);
-        ARIADNE_TEST_EQUALS(painted.finalisations,1u);
-        ARIADNE_TEST_ASSERT(painted.horizontal_axis=="x");
-        ARIADNE_TEST_ASSERT(painted.vertical_axis=="y");
-        ARIADNE_TEST_ASSERT(painted.x_lower<painted.x_upper);
-        ARIADNE_TEST_ASSERT(painted.styles>0u);
-        ARIADNE_TEST_EQUALS(painted.boundaries,1u);
+        ARIADNE_TESTING_EXPECT_EQUAL(painted.initialisations,1u);
+        ARIADNE_TESTING_EXPECT_EQUAL(painted.finalisations,1u);
+        ARIADNE_TESTING_PROVE(painted.horizontal_axis=="x");
+        ARIADNE_TESTING_PROVE(painted.vertical_axis=="y");
+        ARIADNE_TESTING_PROVE(painted.x_lower<painted.x_upper);
+        ARIADNE_TESTING_PROVE(painted.styles>0u);
+        ARIADNE_TESTING_EXPECT_EQUAL(painted.boundaries,1u);
 
         // The figure still initialises and finalises the canvas when its
         // selected location excludes the registered drawable.
         fig.set_locations({other});
         RecordingCanvas filtered;
         fig._paint_all(filtered);
-        ARIADNE_TEST_EQUALS(filtered.initialisations,1u);
-        ARIADNE_TEST_EQUALS(filtered.finalisations,1u);
-        ARIADNE_TEST_EQUALS(filtered.boundaries,0u);
+        ARIADNE_TESTING_EXPECT_EQUAL(filtered.initialisations,1u);
+        ARIADNE_TESTING_EXPECT_EQUAL(filtered.finalisations,1u);
+        ARIADNE_TESTING_EXPECT_EQUAL(filtered.boundaries,0u);
 
         // An empty object list does not issue drawing operations.
         fig.clear();
         RecordingCanvas empty;
         fig._paint_all(empty);
-        ARIADNE_TEST_EQUALS(empty.initialisations,1u);
-        ARIADNE_TEST_EQUALS(empty.finalisations,1u);
-        ARIADNE_TEST_EQUALS(empty.boundaries,0u);
-        ARIADNE_TEST_EQUALS(empty.styles,0u);
+        ARIADNE_TESTING_EXPECT_EQUAL(empty.initialisations,1u);
+        ARIADNE_TESTING_EXPECT_EQUAL(empty.finalisations,1u);
+        ARIADNE_TESTING_EXPECT_EQUAL(empty.boundaries,0u);
+        ARIADNE_TESTING_EXPECT_EQUAL(empty.styles,0u);
     }
 };
 
-Int main() {
-    TestHybridDrawingAdapters().test();
-    return ARIADNE_TEST_FAILURES;
+int main(int argc, char** argv) {
+    ARIADNE_TESTING_SUITE("test_hybrid_drawing_adapters");
+    ARIADNE_TESTING_ADD_TEST(TestHybridDrawingAdapters, test_location_selection);
+    ARIADNE_TESTING_ADD_TEST(TestHybridDrawingAdapters, test_box_set_and_box_collection);
+    ARIADNE_TESTING_ADD_TEST(TestHybridDrawingAdapters, test_figure_paint);
+    ARIADNE_TESTING_ADD_TEST(TestHybridDrawingAdapters, test_figure_write_backend);
+    ARIADNE_TESTING_ADD_TEST(TestHybridDrawingAdapters, test_remaining_drawable_adapters);
+    ARIADNE_TESTING_ADD_TEST(TestHybridDrawingAdapters, test_outer_approximation_adapters);
+    return ARIADNE_TESTING_RUN_TESTS_WITH_ARGS(argc, argv);
 }

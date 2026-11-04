@@ -21,8 +21,9 @@ Hybrid depends directly on:
 
 - [ariadne-cps/labelled](https://github.com/ariadne-cps/labelled), included as a Git submodule.
 - [ariadne-cps/configuration](https://github.com/ariadne-cps/configuration), used for shared build configuration.
+- [ariadne-cps/testing](https://github.com/ariadne-cps/testing), pinned at `ss/tst`, for C++ test fixtures and diagnostics only; not a production dependency.
 
-Labelled supplies the lower Ariadne layers and their external dependencies.
+Labelled supplies the lower Ariadne layers and their external dependencies. C++ unit tests use independent `Ariadne::Testing::ContextFixture` cases; the standalone graphics-output demonstration remains intentionally excluded from CTest.
 
 ## Build
 

@@ -22,7 +22,7 @@
  *  along with Ariadne.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "macro/testing.hpp"
+#include "ariadne-testing.hpp"
 
 #include "foundation/logical.hpp"
 #include "numeric/real.hpp"
@@ -36,14 +36,11 @@
 
 using namespace Ariadne;
 
-class TestHybridGraphics {
+class TestHybridGraphics : public Ariadne::Testing::ContextFixture {
   public:
+    using ContextFixture::ContextFixture;
 
-    Void test() const {
-        ARIADNE_TEST_CALL(test_boxes());
-    }
-
-    Void test_boxes() const {
+        Void test_boxes() {
 
         RealVariable x("x"),y("y"),z("z");
         DiscreteLocation location(1);
@@ -65,10 +62,9 @@ class TestHybridGraphics {
     }
 };
 
-Int main(Int argc, const char* argv[])
-{
-    if (not DrawingCommandLineInterface().acquire(argc,argv)) return -1;
-    TestHybridGraphics().test();
-
-    return ARIADNE_TEST_FAILURES;
+int main(int argc, char** argv) {
+    if (not DrawingCommandLineInterface().acquire(argc, argv)) return -1;
+    ARIADNE_TESTING_SUITE("test_hybrid_graphics");
+    ARIADNE_TESTING_ADD_TEST(TestHybridGraphics, test_boxes);
+    return ARIADNE_TESTING_RUN_TESTS();
 }

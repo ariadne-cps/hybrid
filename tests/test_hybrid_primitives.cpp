@@ -2,7 +2,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
-#include "macro/testing.hpp"
+#include "ariadne-testing.hpp"
 #include "hybrid/hybrid_set.hpp"
 #include "hybrid/hybrid_paving.hpp"
 
@@ -13,29 +13,26 @@ HybridExactBox under_approximation(HybridRealBox const&);
 HybridExactBox over_approximation(HybridRealBox const&);
 }
 
-class TestHybridPrimitives {
+class TestHybridPrimitives : public Ariadne::Testing::ContextFixture {
 public:
-    Void test() {
-        ARIADNE_TEST_CALL(test_points<Real>());
-        ARIADNE_TEST_CALL(test_points<FloatDPApproximation>());
-        ARIADNE_TEST_CALL(test_boxes<ExactIntervalType>());
-        ARIADNE_TEST_CALL(test_boxes<UpperIntervalType>());
-        ARIADNE_TEST_CALL(test_real_box_enclosures());
-        ARIADNE_TEST_CALL(test_validated_image());
-        ARIADNE_TEST_CALL(test_cell_and_curve_descriptions());
-        ARIADNE_TEST_CALL(test_equality_and_list_iteration());
-    }
-    template<class X> X coordinate(Int value) {
+    using ContextFixture::ContextFixture;
+
+    Void test_points_real() { test_points<Real>(); }
+    Void test_points_approximation() { test_points<FloatDPApproximation>(); }
+    Void test_boxes_exact() { test_boxes<ExactIntervalType>(); }
+    Void test_boxes_upper() { test_boxes<UpperIntervalType>(); }
+
+        template<class X> X coordinate(Int value) {
         if constexpr(Same<X,Real>) return Real(value);
         else return X(value,dp);
     }
     Void check_coordinate(const Real& value,Int expected) {
         auto enclosure=value.get(dp);
-        ARIADNE_TEST_EQUALS(enclosure.lower_raw().get_d(),static_cast<double>(expected));
-        ARIADNE_TEST_EQUALS(enclosure.upper_raw().get_d(),static_cast<double>(expected));
+        ARIADNE_TESTING_EXPECT_EQUAL(enclosure.lower_raw().get_d(),static_cast<double>(expected));
+        ARIADNE_TESTING_EXPECT_EQUAL(enclosure.upper_raw().get_d(),static_cast<double>(expected));
     }
     Void check_coordinate(const FloatDPApproximation& value,Int expected) {
-        ARIADNE_TEST_EQUALS(value.raw().get_d(),static_cast<double>(expected));
+        ARIADNE_TESTING_EXPECT_EQUAL(value.raw().get_d(),static_cast<double>(expected));
     }
     template<class X> X named_coordinate(const HybridPoint<X>& point,const RealVariable& variable) {
         const auto values=point.values(); return values[variable];
@@ -45,11 +42,11 @@ public:
         const RealSpace space({x,y});
         const X a=coordinate<X>(1),b=coordinate<X>(2);
         HybridPoint<X> empty;
-        ARIADNE_TEST_EQUALS(empty.dimension(),0u);
-        ARIADNE_TEST_ASSERT(empty.values().empty());
+        ARIADNE_TESTING_EXPECT_EQUAL(empty.dimension(),0u);
+        ARIADNE_TESTING_PROVE(empty.values().empty());
         Point<X> coordinates({a,b});
         HybridPoint<X> direct(loc,space,coordinates);
-        ARIADNE_TEST_EQUALS(direct.dimension(),2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(direct.dimension(),2u);
         check_coordinate(named_coordinate(direct,x),1);
         direct.point()[1]=coordinate<X>(3);
         const HybridPoint<X>& immutable=direct;
@@ -62,7 +59,7 @@ public:
         HybridPoint<X> from_initializer(loc,InitializerList<Assignment<RealVariable,X>>{{x,a},{y,b}});
         check_coordinate(named_coordinate(from_initializer,y),2);
         HybridBasicSet<Point<X>> labelled(loc,LabelledSet<Point<X>>(space,coordinates));
-        ARIADNE_TEST_EQUALS(labelled.dimension(),2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(labelled.dimension(),2u);
         check_coordinate(labelled.euclidean_set()[0],1);
     }
     template<class IVL> Void check_interval(const IVL& interval,Int lower,Int upper) {
@@ -70,8 +67,8 @@ public:
             check_coordinate(interval.lower_bound(),lower);
             check_coordinate(interval.upper_bound(),upper);
         } else {
-            ARIADNE_TEST_EQUALS(interval.lower_bound().get_d(),static_cast<double>(lower));
-            ARIADNE_TEST_EQUALS(interval.upper_bound().get_d(),static_cast<double>(upper));
+            ARIADNE_TESTING_EXPECT_EQUAL(interval.lower_bound().get_d(),static_cast<double>(lower));
+            ARIADNE_TESTING_EXPECT_EQUAL(interval.upper_bound().get_d(),static_cast<double>(upper));
         }
     }
     template<class IVL> Void test_boxes() {
@@ -87,27 +84,27 @@ public:
         List<VariableInterval<UB>> intervals{{x,euclidean[0]},{y,euclidean[1]}};
         HybridBox<IVL> from_list(loc,intervals);
         HybridBox<IVL> from_initializer(loc,InitializerList<VariableInterval<UB>>{{x,euclidean[0]},{y,euclidean[1]}});
-        ARIADNE_TEST_EQUALS(direct.dimension(),2u);
-        ARIADNE_TEST_ASSERT(direct.variables().contains(y));
+        ARIADNE_TESTING_EXPECT_EQUAL(direct.dimension(),2u);
+        ARIADNE_TESTING_PROVE(direct.variables().contains(y));
         check_interval(from_list[x],0,1);
         check_interval(from_initializer[y],2,3);
         check_interval(from_variables.euclidean_set(space)[0],0,1);
         check_interval(from_labelled.euclidean_set(reverse)[0],2,3);
         HybridBox<IVL> empty(loc,List<VariableInterval<UB>>{});
-        ARIADNE_TEST_EQUALS(empty.dimension(),0u);
+        ARIADNE_TESTING_EXPECT_EQUAL(empty.dimension(),0u);
         HybridBoxes<IVL> collection;
         collection.insert(direct);
         collection.insert(DiscreteLocation(2),labelled);
-        ARIADNE_TEST_EQUALS(collection.locations().size(),2u);
-        ARIADNE_TEST_EQUALS(collection.space(loc).dimension(),2u);
-        ARIADNE_TEST_EQUALS(collection.continuous_set(loc).dimension(),2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(collection.locations().size(),2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(collection.space(loc).dimension(),2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(collection.continuous_set(loc).dimension(),2u);
         check_interval(collection.euclidean_set(loc)[0],0,1);
-        ARIADNE_TEST_ASSERT(direct.bounding_box().location()==loc);
-        ARIADNE_TEST_ASSERT(direct.bounding_boxes().has_location(loc));
+        ARIADNE_TESTING_PROVE(direct.bounding_box().location()==loc);
+        ARIADNE_TESTING_PROVE(direct.bounding_boxes().has_location(loc));
         std::ostringstream text;
         text<<static_cast<const HybridBasicSet<Box<IVL>>&>(direct);
-        ARIADNE_TEST_ASSERT(text.str().find("Box")!=std::string::npos);
-        ARIADNE_TEST_ASSERT(text.str().find("x")!=std::string::npos);
+        ARIADNE_TESTING_PROVE(text.str().find("Box")!=std::string::npos);
+        ARIADNE_TESTING_PROVE(text.str().find("x")!=std::string::npos);
     }
     Void test_real_box_enclosures() {
         DiscreteLocation loc(1); RealVariable x("x"),y("y"); RealSpace space({x,y});
@@ -116,43 +113,43 @@ public:
         check_interval(box[x],0,1);
         check_interval(box.euclidean_set(RealSpace({y,x}))[0],2,3);
         HybridExactBox inner=under_approximation(box),outer=over_approximation(box);
-        ARIADNE_TEST_ASSERT(inner.location()==loc);
-        ARIADNE_TEST_ASSERT(outer.location()==loc);
+        ARIADNE_TESTING_PROVE(inner.location()==loc);
+        ARIADNE_TESTING_PROVE(outer.location()==loc);
         check_interval(inner.euclidean_set()[0],0,1);
         check_interval(outer.euclidean_set()[1],2,3);
         std::ostringstream text; text<<static_cast<const HybridBasicSet<RealBox>&>(box);
-        ARIADNE_TEST_ASSERT(text.str().find("RealBox")!=std::string::npos);
+        ARIADNE_TESTING_PROVE(text.str().find("RealBox")!=std::string::npos);
     }
     Void test_validated_image() {
         DiscreteLocation loc(1),other(2); RealVariable x("x"),y("y"); RealSpace space({x,y});
         ValidatedConstrainedImageSet euclidean(ExactBoxType({{0,1},{2,3}}));
         HybridValidatedConstrainedImageSet image(loc,space,euclidean);
-        ARIADNE_TEST_ASSERT(image.variables(loc).contains(x));
-        ARIADNE_TEST_ASSERT(image.locations().contains(loc));
-        ARIADNE_TEST_EQUALS(image.bounding_box().locations().size(),1u);
+        ARIADNE_TESTING_PROVE(image.variables(loc).contains(x));
+        ARIADNE_TESTING_PROVE(image.locations().contains(loc));
+        ARIADNE_TESTING_EXPECT_EQUAL(image.bounding_box().locations().size(),1u);
         std::unique_ptr<HybridValidatedConstrainedImageSet> copy(image.clone());
-        ARIADNE_TEST_ASSERT(copy->locations().contains(loc));
+        ARIADNE_TESTING_PROVE(copy->locations().contains(loc));
         const ValidatedHybridLocatedSetInterface& view=image;
         std::unique_ptr<ValidatedHybridLocatedSetInterface> cloned(view.clone());
-        ARIADNE_TEST_ASSERT(cloned->variables(loc).contains(y));
+        ARIADNE_TESTING_PROVE(cloned->variables(loc).contains(y));
         const HybridSetInterfaceBase& root=image;
-        ARIADNE_TEST_EQUALS(root.euclidean_set(loc,space).dimension(),2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(root.euclidean_set(loc,space).dimension(),2u);
         HybridExactBox disjoint(loc,space,ExactBoxType({{4,5},{6,7}}));
         HybridExactBox absent(other,space,ExactBoxType({{4,5},{6,7}}));
-        ARIADNE_TEST_ASSERT(definitely(image.separated(disjoint)));
-        ARIADNE_TEST_ASSERT(definitely(image.separated(absent)));
+        ARIADNE_TESTING_PROVE(definitely(image.separated(disjoint)));
+        ARIADNE_TESTING_PROVE(definitely(image.separated(absent)));
         HybridExactBox enclosing(loc,space,ExactBoxType({{-1,2},{1,4}}));
-        ARIADNE_TEST_ASSERT(definitely(image.overlaps(enclosing)));
-        ARIADNE_TEST_ASSERT(!definitely(image.overlaps(absent)));
+        ARIADNE_TESTING_PROVE(definitely(image.overlaps(enclosing)));
+        ARIADNE_TESTING_PROVE(!definitely(image.overlaps(absent)));
         HybridExactBoxes boxes; boxes.insert(enclosing);
-        ARIADNE_TEST_ASSERT(definitely(image.inside(boxes)));
+        ARIADNE_TESTING_PROVE(definitely(image.inside(boxes)));
         HybridExactBoxes no_boxes;
-        ARIADNE_TEST_ASSERT(!definitely(image.inside(no_boxes)));
+        ARIADNE_TESTING_PROVE(!definitely(image.inside(no_boxes)));
         std::ostringstream text; image._write(text); text<<image;
-        ARIADNE_TEST_ASSERT(!text.str().empty());
-        ARIADNE_TEST_FAIL(image.variables(other));
-        ARIADNE_TEST_FAIL(root.euclidean_set(other,space));
-        ARIADNE_TEST_FAIL(root.euclidean_set(loc,RealSpace({y,x})));
+        ARIADNE_TESTING_PROVE(!text.str().empty());
+        ARIADNE_TESTING_EXPECT_EXCEPTION(image.variables(other));
+        ARIADNE_TESTING_EXPECT_EXCEPTION(root.euclidean_set(other,space));
+        ARIADNE_TESTING_EXPECT_EXCEPTION(root.euclidean_set(loc,RealSpace({y,x})));
     }
     Void test_equality_and_list_iteration() {
         DiscreteLocation first(1),second(2),third(3),fourth(4);
@@ -160,28 +157,28 @@ public:
         ExactBoxType unit({{0,1}}),next_box({{1,2}});
         HybridExactBox original(first,space,unit),same_box(first,space,unit);
         HybridExactBox other_location(second,space,unit);
-        ARIADNE_TEST_ASSERT(definitely(original==same_box));
-        ARIADNE_TEST_ASSERT(!definitely(original==other_location));
+        ARIADNE_TESTING_PROVE(definitely(original==same_box));
+        ARIADNE_TESTING_PROVE(!definitely(original==other_location));
         HybridExactBox other_space(first,RealSpace({y}),unit);
-        ARIADNE_TEST_FAIL(static_cast<void>(original==other_space));
+        ARIADNE_TESTING_EXPECT_EXCEPTION(static_cast<void>(original==other_space));
         HybridListSet<ExactBoxType> list;
         list.insert(first,space); list.insert(third,space);
         list.adjoin(second,space,unit); list.adjoin(second,space,next_box);
         list.adjoin(fourth,space,unit);
-        ARIADNE_TEST_FAIL(list.adjoin(second,RealSpace({y}),unit));
+        ARIADNE_TESTING_EXPECT_EXCEPTION(list.adjoin(second,RealSpace({y}),unit));
         auto begin=list.begin(); auto shifted=begin;
-        ARIADNE_TEST_ASSERT(begin==shifted);
+        ARIADNE_TESTING_PROVE(begin==shifted);
         ++shifted;
-        ARIADNE_TEST_ASSERT(begin!=shifted);
-        ARIADNE_TEST_ASSERT((*begin).location()==(*shifted).location());
+        ARIADNE_TESTING_PROVE(begin!=shifted);
+        ARIADNE_TESTING_PROVE((*begin).location()==(*shifted).location());
         ++shifted;
-        ARIADNE_TEST_ASSERT(begin!=shifted);
-        ARIADNE_TEST_ASSERT((*shifted).location()==fourth);
+        ARIADNE_TESTING_PROVE(begin!=shifted);
+        ARIADNE_TESTING_PROVE((*shifted).location()==fourth);
         ++shifted;
-        ARIADNE_TEST_ASSERT(shifted==list.end());
+        ARIADNE_TESTING_PROVE(shifted==list.end());
         HybridListSet<ExactBoxType> empty;
-        ARIADNE_TEST_ASSERT(empty.begin()==empty.end());
-        ARIADNE_TEST_EQUALS(list.size(),3u);
+        ARIADNE_TESTING_PROVE(empty.begin()==empty.end());
+        ARIADNE_TESTING_EXPECT_EQUAL(list.size(),3u);
     }
 
     Void test_cell_and_curve_descriptions() {
@@ -191,16 +188,27 @@ public:
         HybridExactBoxes boxes; boxes.insert(loc,space,ExactBoxType({{0,1},{0,1}}));
         paving.adjoin_outer_approximation(boxes,1u);
         HybridGridCell cell=*paving.begin();
-        ARIADNE_TEST_EQUALS(cell.dimension(),2u);
-        ARIADNE_TEST_ASSERT(cell.box().location()==loc);
+        ARIADNE_TESTING_EXPECT_EQUAL(cell.dimension(),2u);
+        ARIADNE_TESTING_PROVE(cell.box().location()==loc);
         std::ostringstream cell_text; cell_text<<cell;
-        ARIADNE_TEST_ASSERT(cell_text.str().find("GridCell")!=std::string::npos);
+        ARIADNE_TESTING_PROVE(cell_text.str().find("GridCell")!=std::string::npos);
         InterpolatedCurve curve(Point<FloatDPApproximation>({0.0_x,0.0_x},dp),
                                 Point<FloatDPApproximation>({1.0_x,1.0_x},dp));
         HybridBasicSet<InterpolatedCurve> path(loc,space,curve);
         std::ostringstream curve_text; curve_text<<path;
-        ARIADNE_TEST_ASSERT(curve_text.str().find("InterpolatedCurve")!=std::string::npos);
+        ARIADNE_TESTING_PROVE(curve_text.str().find("InterpolatedCurve")!=std::string::npos);
     }
 };
 
-Int main() { TestHybridPrimitives().test(); return ARIADNE_TEST_FAILURES; }
+int main(int argc, char** argv) {
+    ARIADNE_TESTING_SUITE("test_hybrid_primitives");
+    ARIADNE_TESTING_ADD_TEST(TestHybridPrimitives, test_points_real);
+    ARIADNE_TESTING_ADD_TEST(TestHybridPrimitives, test_points_approximation);
+    ARIADNE_TESTING_ADD_TEST(TestHybridPrimitives, test_boxes_exact);
+    ARIADNE_TESTING_ADD_TEST(TestHybridPrimitives, test_boxes_upper);
+    ARIADNE_TESTING_ADD_TEST(TestHybridPrimitives, test_real_box_enclosures);
+    ARIADNE_TESTING_ADD_TEST(TestHybridPrimitives, test_validated_image);
+    ARIADNE_TESTING_ADD_TEST(TestHybridPrimitives, test_cell_and_curve_descriptions);
+    ARIADNE_TESTING_ADD_TEST(TestHybridPrimitives, test_equality_and_list_iteration);
+    return ARIADNE_TESTING_RUN_TESTS_WITH_ARGS(argc, argv);
+}

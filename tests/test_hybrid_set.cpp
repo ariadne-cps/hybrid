@@ -25,7 +25,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "macro/testing.hpp"
+#include "ariadne-testing.hpp"
 
 #include "numeric/rational.hpp"
 #include "algebra/vector.hpp"
@@ -43,14 +43,9 @@ using namespace std;
 using namespace Ariadne;
 
 
-class TestHybridSet {
+class TestHybridSet : public Ariadne::Testing::ContextFixture {
 public:
-    Void test() {
-        ARIADNE_TEST_CALL(test_hybrid_list_set());
-        ARIADNE_TEST_CALL(test_hybrid_paving_separation());
-        ARIADNE_TEST_CALL(test_hybrid_initial_outer_approximation());
-        //ARIADNE_TEST_CALL(test_compile_incorrect_hybrid_paving());
-    }
+    using ContextFixture::ContextFixture;
 
     Void test_hybrid_list_set() {
         HybridListSet<ExactBoxType> hls;
@@ -68,29 +63,29 @@ public:
                             {5, 6}};
         ExactBoxType bx5 = {{6, 7},
                             {8, 9}};
-        ARIADNE_TEST_EXECUTE(hls.adjoin(loc1, spc1, bx1));
-        ARIADNE_TEST_FAIL(hls.adjoin(loc1, bx3)); // Should fail due to incompatible dimensions
-        ARIADNE_TEST_FAIL(hls.adjoin(loc2, bx3)); // Should fail due to unspecified space
-        ARIADNE_TEST_EXECUTE(hls.adjoin(loc2, spc2, bx3));
-        ARIADNE_TEST_EXECUTE(hls.adjoin(loc2, bx4));
-        ARIADNE_TEST_PRINT(hls);
-        ARIADNE_TEST_EXECUTE(hls.adjoin(HybridExactBox(loc1, spc1, bx2)));
-        ARIADNE_TEST_EXECUTE(hls.adjoin(loc2, bx5));
+        ARIADNE_TESTING_EXPECT_NO_THROW(hls.adjoin(loc1, spc1, bx1));
+        ARIADNE_TESTING_EXPECT_EXCEPTION(hls.adjoin(loc1, bx3)); // Should fail due to incompatible dimensions
+        ARIADNE_TESTING_EXPECT_EXCEPTION(hls.adjoin(loc2, bx3)); // Should fail due to unspecified space
+        ARIADNE_TESTING_EXPECT_NO_THROW(hls.adjoin(loc2, spc2, bx3));
+        ARIADNE_TESTING_EXPECT_NO_THROW(hls.adjoin(loc2, bx4));
+        ARIADNE_TESTING_NOTE(hls);
+        ARIADNE_TESTING_EXPECT_NO_THROW(hls.adjoin(HybridExactBox(loc1, spc1, bx2)));
+        ARIADNE_TESTING_EXPECT_NO_THROW(hls.adjoin(loc2, bx5));
 
-        ARIADNE_TEST_PRINT(hls);
+        ARIADNE_TESTING_NOTE(hls);
 
         HybridListSet<ExactBoxType>::ConstIterator iter = hls.begin();
-        ARIADNE_TEST_EQUAL(*iter, HybridExactBox(loc2, spc2, bx3));
+        ARIADNE_TESTING_EXPECT_EQUAL(*iter, HybridExactBox(loc2, spc2, bx3));
         ++iter;
-        ARIADNE_TEST_EQUAL(*iter, HybridExactBox(loc2, spc2, bx4));
+        ARIADNE_TESTING_EXPECT_EQUAL(*iter, HybridExactBox(loc2, spc2, bx4));
         ++iter;
-        ARIADNE_TEST_EQUAL(*iter, HybridExactBox(loc2, spc2, bx5));
+        ARIADNE_TESTING_EXPECT_EQUAL(*iter, HybridExactBox(loc2, spc2, bx5));
         ++iter;
-        ARIADNE_TEST_EQUAL(*iter, HybridExactBox(loc1, spc1, bx1));
+        ARIADNE_TESTING_EXPECT_EQUAL(*iter, HybridExactBox(loc1, spc1, bx1));
         ++iter;
-        ARIADNE_TEST_EQUAL(*iter, HybridExactBox(loc1, spc1, bx2));
+        ARIADNE_TESTING_EXPECT_EQUAL(*iter, HybridExactBox(loc1, spc1, bx2));
         ++iter;
-        ARIADNE_TEST_ASSERT(iter == hls.end());
+        ARIADNE_TESTING_PROVE(iter == hls.end());
 
         ListSet<ExactBoxType> ls1;
         ls1.adjoin(bx1);
@@ -101,13 +96,13 @@ public:
         ls2.adjoin(bx5);
 
         HybridListSet<ExactBoxType>::LocationsConstIterator loc_iter = hls.locations_begin();
-        ARIADNE_TEST_EQUAL(loc_iter->first, loc2);
-        ARIADNE_TEST_EQUAL(loc_iter->second.second, ls2);
+        ARIADNE_TESTING_EXPECT_EQUAL(loc_iter->first, loc2);
+        ARIADNE_TESTING_EXPECT_EQUAL(loc_iter->second.second, ls2);
         ++loc_iter;
-        ARIADNE_TEST_EQUAL(loc_iter->first, loc1);
-        ARIADNE_TEST_EQUAL(loc_iter->second.second, ls1);
+        ARIADNE_TESTING_EXPECT_EQUAL(loc_iter->first, loc1);
+        ARIADNE_TESTING_EXPECT_EQUAL(loc_iter->second.second, ls1);
         ++loc_iter;
-        ARIADNE_TEST_ASSERT(loc_iter == hls.locations_end());
+        ARIADNE_TESTING_PROVE(loc_iter == hls.locations_end());
     }
 
     // ValidatedLowerKleenean(false) maps to UNLIKELY rather than FALSE:
@@ -122,15 +117,15 @@ public:
         hybrid_space.new_location(loc,state_space);
         HybridGridTreePaving paving{HybridGrid(hybrid_space)};
         HybridExactBox box(loc,state_space,ExactBoxType({{0,1}}));
-        ARIADNE_TEST_ASSERT(definitely(paving.separated(box)));
-        ARIADNE_TEST_EQUAL(paving.overlaps(box).repr(), LogicalValue::UNLIKELY);
-        ARIADNE_TEST_EQUAL(paving.covers(box).repr(), LogicalValue::UNLIKELY);
+        ARIADNE_TESTING_PROVE(definitely(paving.separated(box)));
+        ARIADNE_TESTING_EXPECT_EQUAL(paving.overlaps(box).repr(), LogicalValue::UNLIKELY);
+        ARIADNE_TESTING_EXPECT_EQUAL(paving.covers(box).repr(), LogicalValue::UNLIKELY);
 
         // A present but empty Euclidean paving is separated as well.
         paving[loc];
-        ARIADNE_TEST_ASSERT(definitely(paving.separated(box)));
-        ARIADNE_TEST_EQUAL(paving.overlaps(box).repr(), LogicalValue::UNLIKELY);
-        ARIADNE_TEST_EQUAL(paving.covers(box).repr(), LogicalValue::UNLIKELY);
+        ARIADNE_TESTING_PROVE(definitely(paving.separated(box)));
+        ARIADNE_TESTING_EXPECT_EQUAL(paving.overlaps(box).repr(), LogicalValue::UNLIKELY);
+        ARIADNE_TESTING_EXPECT_EQUAL(paving.covers(box).repr(), LogicalValue::UNLIKELY);
     }
 
     // Isolate the bounding-box paving from hybrid evolution.
@@ -146,8 +141,8 @@ public:
             {height-radius<=x<=height+radius,-radius<=v<=radius});
         // Probe the effective Euclidean interface before the paving call.
         const auto euclidean=initial.euclidean_set(loc,state_space);
-        ARIADNE_TEST_EQUALS(euclidean.dimension(),2u);
-        ARIADNE_TEST_PRINT(euclidean.bounding_box());
+        ARIADNE_TESTING_EXPECT_EQUAL(euclidean.dimension(),2u);
+        ARIADNE_TESTING_NOTE(euclidean.bounding_box());
         // Exercise each abstract view of the same multiply inherited
         // object. This used to dispatch via incompatible covariant thunks
         // on MSVC Debug, before reaching the paving implementation.
@@ -157,25 +152,25 @@ public:
         const EffectiveHybridCompactSetInterface& as_compact=initial;
         const EffectiveHybridLocatedSetInterface& as_located=initial;
         const EffectiveHybridSetInterface& as_full=initial;
-        ARIADNE_TEST_EQUALS(as_base.euclidean_set(loc,state_space).dimension(),2u);
-        ARIADNE_TEST_EQUALS(as_bounded.euclidean_set(loc,state_space).dimension(),2u);
-        ARIADNE_TEST_EQUALS(as_closed.euclidean_set(loc,state_space).dimension(),2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(as_base.euclidean_set(loc,state_space).dimension(),2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(as_bounded.euclidean_set(loc,state_space).dimension(),2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(as_closed.euclidean_set(loc,state_space).dimension(),2u);
         auto from_compact=as_compact.euclidean_set(loc,state_space);
-        ARIADNE_TEST_EQUALS(from_compact.dimension(),2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(from_compact.dimension(),2u);
         // Upper bounds have three-valued geometric equality. We need
         // identical endpoint representations across the two conversions.
-        ARIADNE_TEST_ASSERT(same(from_compact.bounding_box(),euclidean.bounding_box()));
-        ARIADNE_TEST_EQUALS(as_located.euclidean_set(loc,state_space).dimension(),2u);
-        ARIADNE_TEST_EQUALS(as_full.euclidean_set(loc,state_space).dimension(),2u);
+        ARIADNE_TESTING_PROVE(same(from_compact.bounding_box(),euclidean.bounding_box()));
+        ARIADNE_TESTING_EXPECT_EQUAL(as_located.euclidean_set(loc,state_space).dimension(),2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(as_full.euclidean_set(loc,state_space).dimension(),2u);
         HybridGridTreePaving paving{HybridGrid(hybrid_space)};
         paving.adjoin_outer_approximation(initial,4u);
-        ARIADNE_TEST_ASSERT(paving.nontrivial_location(loc));
-        ARIADNE_TEST_ASSERT(paving.size()>0u);
+        ARIADNE_TESTING_PROVE(paving.nontrivial_location(loc));
+        ARIADNE_TESTING_PROVE(paving.size()>0u);
         // The domain is a RealBox; use an outward enclosure before
         // converting to an exact box for the paving containment check.
         const HybridUpperBoxes bounds=initial.bounding_box();
         ExactBoxType initial_box=cast_exact_box(bounds.euclidean_set(loc,state_space));
-        ARIADNE_TEST_ASSERT(paving.euclidean_set(loc).superset(initial_box));
+        ARIADNE_TESTING_PROVE(paving.euclidean_set(loc).superset(initial_box));
     }
 
     Void test_compile_incorrect_hybrid_paving() {
@@ -195,8 +190,10 @@ public:
     }
 };
 
-Int main() {
-    TestHybridSet().test();
-    return ARIADNE_TEST_FAILURES;
+int main(int argc, char** argv) {
+    ARIADNE_TESTING_SUITE("test_hybrid_set");
+    ARIADNE_TESTING_ADD_TEST(TestHybridSet, test_hybrid_list_set);
+    ARIADNE_TESTING_ADD_TEST(TestHybridSet, test_hybrid_paving_separation);
+    ARIADNE_TESTING_ADD_TEST(TestHybridSet, test_hybrid_initial_outer_approximation);
+    return ARIADNE_TESTING_RUN_TESTS_WITH_ARGS(argc, argv);
 }
-

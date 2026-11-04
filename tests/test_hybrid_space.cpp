@@ -2,18 +2,15 @@
 #include <memory>
 #include <sstream>
 #include <string>
-#include "macro/testing.hpp"
+#include "ariadne-testing.hpp"
 #include "hybrid/hybrid_space.hpp"
 #include "hybrid/hybrid_grid.hpp"
 
 using namespace Ariadne;
 
-class TestHybridSpace {
+class TestHybridSpace : public Ariadne::Testing::ContextFixture {
 public:
-    Void test() {
-        ARIADNE_TEST_CALL(test_location_spaces());
-        ARIADNE_TEST_CALL(test_grid_and_scalings());
-    }
+    using ContextFixture::ContextFixture;
 
     Void test_location_spaces() {
         DiscreteLocation first(1), second(2), missing(3);
@@ -23,14 +20,14 @@ public:
         MonolithicHybridSpace m;
         m.new_location(first,one);
         m.new_location(second,two_dimensions);
-        ARIADNE_TEST_ASSERT(m.has_location(first));
-        ARIADNE_TEST_ASSERT(m.has_location(second));
-        ARIADNE_TEST_ASSERT(!m.has_location(missing));
-        ARIADNE_TEST_EQUALS(m[first].dimension(),1u);
-        ARIADNE_TEST_EQUALS(m[second].dimension(),2u);
-        ARIADNE_TEST_FAIL(static_cast<void>(m[missing]));
-        ARIADNE_TEST_EQUALS(m.locations().size(),2u);
-        ARIADNE_TEST_ASSERT(m.begin()!=m.end());
+        ARIADNE_TESTING_PROVE(m.has_location(first));
+        ARIADNE_TESTING_PROVE(m.has_location(second));
+        ARIADNE_TESTING_PROVE(!m.has_location(missing));
+        ARIADNE_TESTING_EXPECT_EQUAL(m[first].dimension(),1u);
+        ARIADNE_TESTING_EXPECT_EQUAL(m[second].dimension(),2u);
+        ARIADNE_TESTING_EXPECT_EXCEPTION(static_cast<void>(m[missing]));
+        ARIADNE_TESTING_EXPECT_EQUAL(m.locations().size(),2u);
+        ARIADNE_TESTING_PROVE(m.begin()!=m.end());
 
         MonolithicHybridSpace same;
         same.new_location(first,one);
@@ -40,24 +37,24 @@ public:
         altered.new_location(second,two_dimensions);
         MonolithicHybridSpace partial;
         partial.new_location(first,one);
-        ARIADNE_TEST_ASSERT(definitely(m.operator==(static_cast<const HybridSpaceInterface&>(same))));
-        ARIADNE_TEST_ASSERT(!definitely(m.operator==(static_cast<const HybridSpaceInterface&>(altered))));
-        ARIADNE_TEST_ASSERT(!definitely(m.operator==(static_cast<const HybridSpaceInterface&>(partial))));
+        ARIADNE_TESTING_PROVE(definitely(m.operator==(static_cast<const HybridSpaceInterface&>(same))));
+        ARIADNE_TESTING_PROVE(!definitely(m.operator==(static_cast<const HybridSpaceInterface&>(altered))));
+        ARIADNE_TESTING_PROVE(!definitely(m.operator==(static_cast<const HybridSpaceInterface&>(partial))));
 
         Map<DiscreteLocation,RealSpace> entries{{first,one},{second,two_dimensions}};
         MonolithicHybridSpace from_map(entries);
-        ARIADNE_TEST_EQUALS(from_map[second].dimension(),2u);
-        ARIADNE_TEST_ASSERT(definitely(from_map.operator==(static_cast<const HybridSpaceInterface&>(m))));
+        ARIADNE_TESTING_EXPECT_EQUAL(from_map[second].dimension(),2u);
+        ARIADNE_TESTING_PROVE(definitely(from_map.operator==(static_cast<const HybridSpaceInterface&>(m))));
         HybridSpace polymorphic(m);
-        ARIADNE_TEST_ASSERT(polymorphic.has_location(second));
-        ARIADNE_TEST_EQUALS(polymorphic[second].dimension(),2u);
+        ARIADNE_TESTING_PROVE(polymorphic.has_location(second));
+        ARIADNE_TESTING_EXPECT_EQUAL(polymorphic[second].dimension(),2u);
         HybridSpace cloned(new MonolithicHybridSpace(m));
-        ARIADNE_TEST_ASSERT(cloned.has_location(first));
-        ARIADNE_TEST_ASSERT(definitely(polymorphic==cloned));
+        ARIADNE_TESTING_PROVE(cloned.has_location(first));
+        ARIADNE_TESTING_PROVE(definitely(polymorphic==cloned));
 
         std::ostringstream output;
         output << polymorphic;
-        ARIADNE_TEST_ASSERT(output.str().find("HybridSpace")!=std::string::npos);
+        ARIADNE_TESTING_PROVE(output.str().find("HybridSpace")!=std::string::npos);
     }
 
     Void test_grid_and_scalings() {
@@ -69,28 +66,30 @@ public:
         HybridSpace hspc(m);
 
         HybridGrid unit(hspc);
-        ARIADNE_TEST_ASSERT(unit.has_location(q));
-        ARIADNE_TEST_ASSERT(!unit.has_location(missing));
-        ARIADNE_TEST_ASSERT(unit.space().has_location(q));
-        ARIADNE_TEST_EQUALS(unit.space(q).dimension(),2u);
-        ARIADNE_TEST_EQUALS(unit.scalings().scaling(q,x),1.0_x);
-        ARIADNE_TEST_EQUALS(unit[q].dimension(),2u);
-        ARIADNE_TEST_EQUALS(unit.grid(q).dimension(),2u);
+        ARIADNE_TESTING_PROVE(unit.has_location(q));
+        ARIADNE_TESTING_PROVE(!unit.has_location(missing));
+        ARIADNE_TESTING_PROVE(unit.space().has_location(q));
+        ARIADNE_TESTING_EXPECT_EQUAL(unit.space(q).dimension(),2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(unit.scalings().scaling(q,x),1.0_x);
+        ARIADNE_TESTING_EXPECT_EQUAL(unit[q].dimension(),2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(unit.grid(q).dimension(),2u);
 
         SimpleHybridScalings policy;
         HybridScalings scalings(policy);
         HybridGrid scaled(hspc,scalings);
-        ARIADNE_TEST_EQUALS(scaled.grid(q).dimension(),2u);
-        ARIADNE_TEST_EQUALS(scaled.space(q).dimension(),2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(scaled.grid(q).dimension(),2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(scaled.space(q).dimension(),2u);
         std::unique_ptr<HybridGrid> cloned_grid(scaled.clone());
-        ARIADNE_TEST_EQUALS(cloned_grid->grid(q).dimension(),2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(cloned_grid->grid(q).dimension(),2u);
         std::ostringstream output;
         output << scaled;
-        ARIADNE_TEST_ASSERT(output.str().find("HybridGrid")!=std::string::npos);
+        ARIADNE_TESTING_PROVE(output.str().find("HybridGrid")!=std::string::npos);
     }
 };
 
-Int main() {
-    TestHybridSpace().test();
-    return ARIADNE_TEST_FAILURES;
+int main(int argc, char** argv) {
+    ARIADNE_TESTING_SUITE("test_hybrid_space");
+    ARIADNE_TESTING_ADD_TEST(TestHybridSpace, test_location_spaces);
+    ARIADNE_TESTING_ADD_TEST(TestHybridSpace, test_grid_and_scalings);
+    return ARIADNE_TESTING_RUN_TESTS_WITH_ARGS(argc, argv);
 }
