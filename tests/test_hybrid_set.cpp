@@ -42,6 +42,15 @@
 using namespace std;
 using namespace Ariadne;
 
+// LogicalValue::operator== implements multi-valued logic, not enum identity.
+// Check the represented values when testing the exact logical outcome.
+namespace {
+bool same_logical_value(LogicalValue actual, LogicalValue expected) {
+    return static_cast<ComparableEnumerationType>(actual)
+        == static_cast<ComparableEnumerationType>(expected);
+}
+}
+
 
 class TestHybridSet : public Ariadne::Testing::ContextFixture {
 public:
@@ -118,14 +127,14 @@ public:
         HybridGridTreePaving paving{HybridGrid(hybrid_space)};
         HybridExactBox box(loc,state_space,ExactBoxType({{0,1}}));
         ARIADNE_TESTING_PROVE(definitely(paving.separated(box)));
-        ARIADNE_TESTING_EXPECT_EQUAL(paving.overlaps(box).repr(), LogicalValue::UNLIKELY);
-        ARIADNE_TESTING_EXPECT_EQUAL(paving.covers(box).repr(), LogicalValue::UNLIKELY);
+        ARIADNE_TESTING_PROVE(same_logical_value(paving.overlaps(box).repr(), LogicalValue::UNLIKELY));
+        ARIADNE_TESTING_PROVE(same_logical_value(paving.covers(box).repr(), LogicalValue::UNLIKELY));
 
         // A present but empty Euclidean paving is separated as well.
         paving[loc];
         ARIADNE_TESTING_PROVE(definitely(paving.separated(box)));
-        ARIADNE_TESTING_EXPECT_EQUAL(paving.overlaps(box).repr(), LogicalValue::UNLIKELY);
-        ARIADNE_TESTING_EXPECT_EQUAL(paving.covers(box).repr(), LogicalValue::UNLIKELY);
+        ARIADNE_TESTING_PROVE(same_logical_value(paving.overlaps(box).repr(), LogicalValue::UNLIKELY));
+        ARIADNE_TESTING_PROVE(same_logical_value(paving.covers(box).repr(), LogicalValue::UNLIKELY));
     }
 
     // Isolate the bounding-box paving from hybrid evolution.
