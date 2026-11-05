@@ -14,7 +14,7 @@ if(Python3_FOUND)
     add_subdirectory(bindings)
 
     if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
-        ariadne_finalize_python_module(NAME hybrid MODULE_IMPORT_NAME pyariadne_hybrid
+        ariadne_finalize_python_module(NAME hybrid MODULE_IMPORT_NAME pyariadne_hybrid)
 
         if(WIN32)
             set(_python_install_dir "Lib/site-packages")
