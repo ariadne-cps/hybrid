@@ -8,7 +8,7 @@ The two programs cover the same basic ideas: discrete locations, continuous
 state variables that differ by location, hybrid spaces, boxes, grids and
 pavings. The C++ example also builds an outer approximation of a bounded
 hybrid constraint set. The Python example uses the subset of this interface
-currently exposed by the standalone `pyariadne` bindings.
+currently exposed by the standalone `pyariadne_hybrid` bindings.
 
 ## Build the library
 
@@ -38,7 +38,7 @@ path (or `bin` on Windows), as with the Symbolic tutorial.
 
 ## Python tutorial
 
-Run the installed `pyariadne` extension. For a non-system install, add
+Run the installed `pyariadne_hybrid` extension. For a non-system install, add
 `install/lib/pythonX.Y/site-packages` (or
 `install/Lib/site-packages` on Windows) to `PYTHONPATH` and ensure the
 library loader can locate the installed shared libraries, then run:

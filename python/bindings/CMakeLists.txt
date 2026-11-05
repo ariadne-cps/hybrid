@@ -24,4 +24,4 @@ target_include_directories(pyariadne-hybrid INTERFACE
 )
 target_link_libraries(pyariadne-hybrid INTERFACE pyariadne-labelled)
 
-ariadne_add_python_module(NAME hybrid MODULE_SOURCE hybrid_module.cpp)
+ariadne_add_python_module(NAME hybrid MODULE_IMPORT_NAME pyariadne_hybrid MODULE_SOURCE hybrid_module.cpp)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tour of hybrid *representations*, without automata or dynamics."""
 
-from pyariadne import (
+from pyariadne_hybrid import (
     DiscreteLocation,
     HybridGrid,
     HybridGridTreePaving,

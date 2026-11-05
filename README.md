@@ -40,14 +40,10 @@ The C++ and Python examples are available in [the Hybrid tutorial](tutorial/READ
 
 ## Python bindings
 
-When a compatible Python development environment is available, the standalone build produces the combined `pyariadne` extension from the Labelled dependency and Hybrid bindings. The smoke test `python/tests/test_hybrid.py` checks discrete locations, hybrid spaces, grids, paving, and boxes.
+When a compatible Python development environment is available, the standalone build produces the combined `pyariadne_hybrid` extension from the Labelled dependency and Hybrid bindings. The smoke test `python/tests/test_hybrid.py` checks discrete locations, hybrid spaces, grids, paving, and boxes.
 
 ## Contribution guidelines
 
 If you would like to contribute to Ariadne Hybrid, please contact the developer:
 
 - Luca Geretti <luca.geretti@univr.it>
-
-## License
-
-Ariadne Hybrid is released under the GNU General Public License v3.0.

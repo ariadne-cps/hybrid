@@ -1,6 +1,6 @@
-"""Smoke tests for genuine hybrid representations in the composed pyariadne extension."""
+"""Smoke tests for genuine hybrid representations in the composed pyariadne_hybrid extension."""
 
-from pyariadne import (
+from pyariadne_hybrid import (
     DiscreteLocation,
     HybridGrid,
     HybridGridTreePaving,
