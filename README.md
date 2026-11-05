@@ -8,6 +8,7 @@
 [![codecov](https://codecov.io/gh/ariadne-cps/hybrid/branch/main/graph/badge.svg)](https://codecov.io/gh/ariadne-cps/hybrid)
 
 Ariadne Hybrid is the standalone C++20 hybrid-space representation layer used by Ariadne. It provides discrete locations, hybrid spaces, sets, constraints, grids, pavings, and graphical representations on top of Ariadne Labelled. Dynamical systems, hybrid automata, simulation, evolution, and reachability analysis belong to the separate System, Evolution, and Analysis layers.
+Although independently maintained and usable, this repository is also part of the [Ariadne repository structure](https://github.com/ariadne-cps/ariadne/blob/main/doc/structure.md).
 
 ## Layout
 
@@ -20,7 +21,7 @@ The umbrella header is `include/ariadne-hybrid.hpp`.
 Hybrid depends directly on:
 
 - [ariadne-cps/labelled](https://github.com/ariadne-cps/labelled), included as a Git submodule.
-- [ariadne-cps/configuration](https://github.com/ariadne-cps/configuration), used for shared build configuration.
+- [ariadne-cps/build](https://github.com/ariadne-cps/build), used for shared build configuration.
 - [ariadne-cps/testing](https://github.com/ariadne-cps/testing), pinned at `ss/tst`, for C++ test fixtures and diagnostics only; not a production dependency.
 
 Labelled supplies the lower Ariadne layers and their external dependencies. C++ unit tests use independent `Ariadne::Testing::ContextFixture` cases; the standalone graphics-output demonstration remains intentionally excluded from CTest.
