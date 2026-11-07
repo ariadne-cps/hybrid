@@ -1,6 +1,7 @@
 #include <functional>
 #include "hybrid/hybrid_augmented_paving.hpp"
 #include "hybrid/hybrid_augmented_paving_draw.hpp"
+#include "labelled/figure.hpp"
 #include "rendering/null_rendering.hpp"
 #include "ariadne-testing.hpp"
 
