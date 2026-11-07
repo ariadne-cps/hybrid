@@ -14,6 +14,9 @@
 #include "hybrid/hybrid_expression_set.hpp"
 #include "hybrid/hybrid_set.hpp"
 #include "hybrid/hybrid_paving.hpp"
+#include "hybrid/hybrid_auxiliary_mapping.hpp"
+#include "hybrid/hybrid_augmented_paving.hpp"
+#include "hybrid/hybrid_augmented_paving_draw.hpp"
 #include "hybrid/hybrid_graphics_interface.hpp"
 #include "hybrid/hybrid_graphics.hpp"
 

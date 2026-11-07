@@ -8,6 +8,7 @@ set(UNIT_TESTS
     test_hybrid_space
     test_hybrid_constraints
     test_hybrid_paving_operations
+    test_hybrid_augmented_paving
     test_hybrid_graphics_configuration
     test_hybrid_box_set
     test_hybrid_drawing_adapters
