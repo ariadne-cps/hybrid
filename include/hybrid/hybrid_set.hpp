@@ -43,7 +43,7 @@
 #include "utility/container.hpp"
 #include "set/function_set.hpp"
 #include "set/list_set.hpp"
-#include "paving/grid_paving.hpp"
+#include "paving/binary_tree_paving.hpp"
 #include "set/curve.hpp"
 
 #include "expression-set/expression_set.hpp"
@@ -118,7 +118,7 @@ class HybridBasicSet
     HybridUpperBoxes bounding_boxes() const;
 
     //! \brief Adjoin an outer approximation of the set to \a paving using a given \a fineness of subdividing the paving cells.
-    Void adjoin_outer_approximation_to(HybridGridTreePaving& paving, Nat fineness) const;
+    Void adjoin_outer_approximation_to(HybridBinaryTreePaving& paving, Nat fineness) const;
 
     //! \brief Draw to a canvas. Only draws if the set of locations \a q is empty, or contains the set's actual location.
     Void draw(CanvasInterface& c, const Set<DiscreteLocation>& q, const Variables2d& v) const;

@@ -193,11 +193,11 @@ public:
             ValidatedConstrainedImageSet(ExactBoxType({{0,1},{0,1}})));
         check_location_filter(image,loc,axes);
         MonolithicHybridSpace hspace; hspace.new_location(loc,space);
-        HybridGridTreePaving paving{HybridGrid(hspace)};
+        HybridBinaryTreePaving paving{HybridGrid(hspace)};
         HybridExactBoxes exact_boxes; exact_boxes.insert(loc,space,ExactBoxType({{0,1},{0,1}}));
         paving.adjoin_outer_approximation(exact_boxes,1u);
         check_location_filter(paving,loc,axes);
-        HybridGridTreePaving empty_paving{HybridGrid(hspace)};
+        HybridBinaryTreePaving empty_paving{HybridGrid(hspace)};
         empty_paving.draw(empty,{},axes);
         ARIADNE_TESTING_EXPECT_EQUAL(empty.boundaries+empty.primitives,0u);
     }
@@ -205,7 +205,7 @@ public:
         DiscreteLocation loc(1); RealVariable x("x"),y("y"),z("z");
         RealSpace space({x,y});
         MonolithicHybridSpace hspace; hspace.new_location(loc,space);
-        HybridGridTreePaving paving{HybridGrid(hspace)};
+        HybridBinaryTreePaving paving{HybridGrid(hspace)};
         HybridExactBox exact(loc,space,ExactBoxType({{0,1},{0,1}}));
         HybridUpperBox upper(loc,space,UpperBoxType({{0,1},{0,1}}));
         const HybridBasicSet<ExactBoxType>& exact_base=exact;
@@ -216,7 +216,7 @@ public:
         upper_base.adjoin_outer_approximation_to(paving,1u);
         ARIADNE_TESTING_EXPECT_EQUAL(paving.size(),initial);
         MonolithicHybridSpace other_space; other_space.new_location(loc,RealSpace({x,z}));
-        HybridGridTreePaving mismatched{HybridGrid(other_space)};
+        HybridBinaryTreePaving mismatched{HybridGrid(other_space)};
         ARIADNE_TESTING_EXPECT_EXCEPTION(exact_base.adjoin_outer_approximation_to(mismatched,1u));
         ARIADNE_TESTING_EXPECT_EXCEPTION(upper_base.adjoin_outer_approximation_to(mismatched,1u));
         ARIADNE_TESTING_PROVE(mismatched.is_empty());

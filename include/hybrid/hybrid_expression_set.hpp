@@ -41,7 +41,7 @@
 #include "utility/container.hpp"
 #include "set/function_set.hpp"
 #include "set/list_set.hpp"
-#include "paving/grid_paving.hpp"
+#include "paving/binary_tree_paving.hpp"
 #include "set/curve.hpp"
 
 #include "expression-set/expression_set.hpp"

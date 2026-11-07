@@ -270,7 +270,7 @@ template<> String class_name<GridCell>() { return "GridCell"; }
 template class HybridPoint<FloatDPApproximation>;
 template class HybridPoint<Real>;
 
-template class HybridSpaceSetConstIterator<GridTreePaving, HybridGridCell>;
+template class HybridSpaceSetConstIterator<BinaryTreePaving, HybridGridCell>;
 
 
 

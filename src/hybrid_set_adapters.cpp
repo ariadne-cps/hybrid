@@ -52,7 +52,7 @@ Void HybridBoundedConstraintSet::draw(CanvasInterface& c, const Set<DiscreteLoca
 }
 
 
-template<class EBS> Void HybridBasicSet<EBS>::adjoin_outer_approximation_to(HybridGridTreePaving& paving, Nat fineness) const {
+template<class EBS> Void HybridBasicSet<EBS>::adjoin_outer_approximation_to(HybridBinaryTreePaving& paving, Nat fineness) const {
     ARIADNE_PRECONDITION_MSG(this->space()==paving.space(this->location()), "HybridSet's state variables "<<this->space()<<" do not match "<<paving.space(this->location())<<" in location "<<this->location());
     paving[this->location()].adjoin_outer_approximation(this->euclidean_set(),fineness);
 }

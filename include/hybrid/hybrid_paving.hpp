@@ -43,7 +43,7 @@
 #include "utility/container.hpp"
 #include "set/function_set.hpp"
 #include "set/list_set.hpp"
-#include "paving/grid_paving.hpp"
+#include "paving/binary_tree_paving.hpp"
 #include "set/curve.hpp"
 
 #include "expression-set/expression_set.hpp"
@@ -63,18 +63,18 @@ namespace Ariadne {
 
 
 //! \ingroup HybridSetSubModule
-//! A set comprising a %GridTreeSet in each location.
-class HybridGridTreePaving
+//! A set comprising a %BinaryTreePaving in each location.
+class HybridBinaryTreePaving
     : public HybridDrawableInterface
 {
   public:
     HybridGrid _hgrid;
-    Map<DiscreteLocation,GridTreePaving> _map;
+    Map<DiscreteLocation,BinaryTreePaving> _map;
   public:
     typedef HybridGrid GridType;
-    typedef Map<DiscreteLocation,GridTreePaving>::Iterator LocationsIterator;
-    typedef Map<DiscreteLocation,GridTreePaving>::ConstIterator LocationsConstIterator;
-    typedef HybridSpaceSetConstIterator<GridTreePaving,HybridGridCell> ConstIterator;
+    typedef Map<DiscreteLocation,BinaryTreePaving>::Iterator LocationsIterator;
+    typedef Map<DiscreteLocation,BinaryTreePaving>::ConstIterator LocationsConstIterator;
+    typedef HybridSpaceSetConstIterator<BinaryTreePaving,HybridGridCell> ConstIterator;
   public:
     //!
     LocationsIterator locations_begin() { return this->_map.begin(); }
@@ -90,29 +90,29 @@ class HybridGridTreePaving
     ConstIterator end() const;
   public:
     //! Construct from a hybrid grid.
-    HybridGridTreePaving(const HybridGrid& hgrid) : _hgrid(hgrid), _map() { }
+    HybridBinaryTreePaving(const HybridGrid& hgrid) : _hgrid(hgrid), _map() { }
 
     //! The hybrid grid.
     HybridGrid grid() const { return this->_hgrid; }
 
     //! Test if \a q is a location of the set i.e. corresponds to a valid location of the underlying hybrid space.
     Bool has_location(DiscreteLocation q) const { return _hgrid.has_location(q); }
-    //! Test if \a q is a nontrivial location of the set i.e. contained in the map of <DiscreteLocation,GridTreeSet> pairs.
+    //! Test if \a q is a nontrivial location of the set i.e. contained in the map of <DiscreteLocation,BinaryTreePaving> pairs.
     Bool nontrivial_location(DiscreteLocation q) const { return _map.has_key(q); }
     //! The continuous state space corresponding to location \a q.
     RealSpace space(DiscreteLocation q) const { return _hgrid.space(q); }
     //! The continuous state space corresponding to location \a q.
-    const GridTreePaving& euclidean_set(DiscreteLocation q) const { return _map[q]; }
+    const BinaryTreePaving& euclidean_set(DiscreteLocation q) const { return _map[q]; }
     //! The continuous state space corresponding to location \a q.
-    const GridTreePaving& euclidean_set(DiscreteLocation q, const RealSpace& s) const {
+    const BinaryTreePaving& euclidean_set(DiscreteLocation q, const RealSpace& s) const {
         static_cast<void>(s);
         ARIADNE_PRECONDITION_MSG(s==this->space(q),"Variable ordering in location "<<q<<" is "<<this->space(q)<<", which does not match requested ordering "<<s);
         return _map[q]; }
 
     //!
-//    Void insert(DiscreteLocation q, const GridTreeSet& gts) {
+//    Void insert(DiscreteLocation q, const BinaryTreePaving& gts) {
 //        this->_map.insert(q,gts); }
-//    Void insert(Pair<DiscreteLocation,GridTreeSet>& qgts) {
+//    Void insert(Pair<DiscreteLocation,BinaryTreePaving>& qgts) {
 //        this->_map.insert(qgts); }
 
     //!
@@ -122,9 +122,9 @@ class HybridGridTreePaving
     Void clear();
     Void adjoin(const HybridGridCell& hgc);
     Void adjoin(const ListSet<HybridGridCell>& hgcls);
-    Void adjoin(const HybridGridTreePaving& hgts);
-    Void remove(const HybridGridTreePaving& hgts);
-    Void restrict(const HybridGridTreePaving& hgts);
+    Void adjoin(const HybridBinaryTreePaving& hgts);
+    Void remove(const HybridBinaryTreePaving& hgts);
+    Void restrict(const HybridBinaryTreePaving& hgts);
     Void restrict_to_extent(Nat extent);
     Void adjoin_inner_approximation(const HybridExactBoxes& hbxs, const Nat fineness);
     Void adjoin_inner_approximation(const EffectiveHybridSetInterface& hs, const Nat fineness);
@@ -133,19 +133,19 @@ class HybridGridTreePaving
     Void adjoin_outer_approximation(const HybridExactBoxes& hbxs, const Nat fineness);
     template<class S> Void adjoin_outer_approximation(DiscreteLocation q, const S& s);
 
-    GridTreePaving& operator[](DiscreteLocation q);
-    const GridTreePaving& operator[](DiscreteLocation q) const ;
+    BinaryTreePaving& operator[](DiscreteLocation q);
+    const BinaryTreePaving& operator[](DiscreteLocation q) const ;
     Bool is_empty() const;
     SizeType size() const;
     HybridListSet<ExactBoxType> boxes() const;
     Void mince(Nat fineness);
     Void recombine();
 
-    friend Bool subset(const HybridGridTreePaving& hgts1, const HybridGridTreePaving& hgts2);
-    friend Bool intersect(const HybridGridTreePaving& hgts1, const HybridGridTreePaving& hgts2);
+    friend Bool subset(const HybridBinaryTreePaving& hgts1, const HybridBinaryTreePaving& hgts2);
+    friend Bool intersect(const HybridBinaryTreePaving& hgts1, const HybridBinaryTreePaving& hgts2);
   public:
     //!@{ \name HybridSetInterface methods
-    HybridGridTreePaving* clone() const { return new HybridGridTreePaving(*this); }
+    HybridBinaryTreePaving* clone() const { return new HybridBinaryTreePaving(*this); }
     HybridSpace space() const { return this->grid().space(); }
     ValidatedLowerKleenean separated(const HybridExactBox& hbx) const;
     ValidatedLowerKleenean overlaps(const HybridExactBox& hbx) const;
@@ -156,17 +156,17 @@ class HybridGridTreePaving
     Void draw(CanvasInterface& c, const Set<DiscreteLocation>& l, const Variables2d&v) const;
     //!@}
   public:
-    friend OutputStream& operator<<(OutputStream& os, const HybridGridTreePaving& hgts) {
-        return os << "HybridGridTreeSet(" << hgts._map << ")"; }
+    friend OutputStream& operator<<(OutputStream& os, const HybridBinaryTreePaving& hgts) {
+        return os << "HybridBinaryTreePaving(" << hgts._map << ")"; }
   private:
-    GridTreePaving& _provide_location(const DiscreteLocation& q);
+    BinaryTreePaving& _provide_location(const DiscreteLocation& q);
 };
 
-template<class S> Void HybridGridTreePaving::adjoin_outer_approximation(DiscreteLocation q, const S& s) {
+template<class S> Void HybridBinaryTreePaving::adjoin_outer_approximation(DiscreteLocation q, const S& s) {
     this->_provide_location(q).adjoin_outer_approximation(s); }
 
-inline HybridGridTreePaving inner_approximation(const EffectiveHybridSetInterface& set, HybridGrid const& grid, const Nat fineness) {
-    HybridGridTreePaving paving(grid); paving.adjoin_inner_approximation(set,fineness); return paving; }
+inline HybridBinaryTreePaving inner_approximation(const EffectiveHybridSetInterface& set, HybridGrid const& grid, const Nat fineness) {
+    HybridBinaryTreePaving paving(grid); paving.adjoin_inner_approximation(set,fineness); return paving; }
 
 
 } // namespace Ariadne

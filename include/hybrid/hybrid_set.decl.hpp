@@ -78,7 +78,7 @@ using HybridExactBoxesType = HybridExactBoxes;
 using HybridUpperBoxesType = HybridUpperBoxes;
 
 template<class EBS> class HybridListSet;
-class HybridGridTreePaving;
+class HybridBinaryTreePaving;
 
 } // namespace Ariadne
 
