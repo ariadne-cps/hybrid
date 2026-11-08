@@ -51,7 +51,7 @@ setup_project_library(
     LINK_LIBRARIES hybrid
 )
 
-setup_standalone_project_tests(
+setup_standalone_project(
     TARGET ariadne-hybrid
     TEST_DIRECTORY tests
     TEST_TARGET tests
