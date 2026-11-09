@@ -6,7 +6,7 @@ HybridPaving HybridAugmentedPaving::state_auxiliary_paving() const {
     HybridGrid state_grid=this->state_paving().grid();
     HybridScalings scalings=state_grid.scalings();
     HybridGrid result_grid(this->_auxiliary_mapping.state_auxiliary_space(),scalings);
-    HybridPaving result(result_grid);
+    HybridPaving result=this->state_paving().with_grid(result_grid);
     for (auto it=this->state_paving().locations_begin(); it!=this->state_paving().locations_end(); ++it) {
         DiscreteLocation const& q=it->first;
         Paving const& paving=it->second;
@@ -18,7 +18,8 @@ HybridPaving HybridAugmentedPaving::state_auxiliary_paving() const {
         for(auto cell=paving.begin(),end=paving.end();cell!=end;++cell)
             tree.adjoin(*cell);
         auto product=outer_skew_product(tree,auxiliary_grid,mapping.mapping());
-        result[q]=Paving(new BinaryTreePaving(product));
+        // Copy geometry through the selected backend, not a Tree handle.
+        result[q].adjoin(static_cast<SubPavingInterface const&>(product));
     }
     return result;
 }

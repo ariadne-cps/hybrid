@@ -85,6 +85,11 @@ class HybridPaving : public HybridDrawableInterface {
         return Paving(new RobddPaving(manager,g));
     }) { }
     HybridPaving* clone() const { return new HybridPaving(*this); }
+    // Create another hybrid paving on a different hybrid grid while
+    // preserving the selected backend factory and shared ROBDD manager.
+    HybridPaving with_grid(HybridGrid const& grid) const {
+        return HybridPaving(grid,_factory);
+    }
     HybridGrid grid() const { return _hgrid; }
     HybridSpace space() const { return _hgrid.space(); }
     RealSpace space(DiscreteLocation q) const { return _hgrid.space(q); }
