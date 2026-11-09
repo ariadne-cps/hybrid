@@ -60,6 +60,66 @@ public:
         ARIADNE_TESTING_PROVE(it==paving.end());
     }
 
+    Void test_generic_location_relations_and_contracts() {
+        DiscreteLocation first(1),second(2),vacant(3),missing(4);
+        RealVariable x("x");
+        RealSpace space({x});
+        MonolithicHybridSpace hspace;
+        hspace.new_location(first,space);
+        hspace.new_location(second,space);
+        hspace.new_location(vacant,space);
+        HybridGrid grid(hspace);
+        HybridPaving left(grid),right(grid),empty(grid),different(grid);
+        GridCell root(grid[first],0u,BinaryWord{});
+        left[first].adjoin(root.split(false));
+        right[first].adjoin(root.split(true));
+        different[second].adjoin(root);
+        left[vacant];
+        ARIADNE_TESTING_PROVE(left.grid().has_location(first));
+        ARIADNE_TESTING_PROVE(left.space().has_location(second));
+        ARIADNE_TESTING_EXPECT_EQUAL(left.space(first),space);
+        ARIADNE_TESTING_PROVE(left.has_location(vacant));
+        ARIADNE_TESTING_PROVE(!left.has_location(missing));
+        ARIADNE_TESTING_PROVE(left.nontrivial_location(first));
+        ARIADNE_TESTING_PROVE(!left.nontrivial_location(second));
+        ARIADNE_TESTING_PROVE(left.locations_begin()!=left.locations_end());
+        HybridPaving const& const_left=left;
+        ARIADNE_TESTING_PROVE(const_left.locations_begin()!=const_left.locations_end());
+        ARIADNE_TESTING_PROVE(const_left.euclidean_set(first).superset(root.split(false)));
+        ARIADNE_TESTING_EXPECT_EXCEPTION(const_left[second]);
+        ARIADNE_TESTING_EXPECT_EXCEPTION(left[missing]);
+        ARIADNE_TESTING_EXPECT_EXCEPTION((HybridPaving(grid,HybridPaving::Factory{})));
+        HybridPaving wrong_backend(grid,[](Grid const&) { return Paving(new BinaryTreePaving(Grid(2u))); });
+        ARIADNE_TESTING_EXPECT_EXCEPTION(wrong_backend[first]);
+        ARIADNE_TESTING_PROVE(!subset(left,empty));
+        ARIADNE_TESTING_PROVE(!subset(left,right));
+        ARIADNE_TESTING_PROVE(!subset(left,different));
+        ARIADNE_TESTING_PROVE(subset(empty,left));
+        ARIADNE_TESTING_PROVE(!intersect(left,empty));
+        ARIADNE_TESTING_PROVE(!intersect(left,right));
+        ARIADNE_TESTING_PROVE(!intersect(left,different));
+        ARIADNE_TESTING_PROVE(intersect(left,left));
+        ARIADNE_TESTING_PROVE(!intersect(empty,left));
+        HybridPaving joined(grid);
+        joined.adjoin(left);
+        joined.adjoin(right);
+        ARIADNE_TESTING_PROVE(joined[first].superset(root));
+        joined.remove(different); // A source location absent from the target.
+        joined.remove(right);
+        ARIADNE_TESTING_PROVE(subset(joined,left));
+        joined.restrict(left);
+        ARIADNE_TESTING_PROVE(subset(left,joined));
+        joined.restrict(different);
+        ARIADNE_TESTING_PROVE(joined.is_empty());
+        joined.adjoin(*left.begin());
+        joined.mince(3u);
+        ARIADNE_TESTING_PROVE(joined.size()>1u);
+        joined.recombine();
+        ARIADNE_TESTING_PROVE(subset(left,joined));
+        joined.clear();
+        ARIADNE_TESTING_PROVE(joined.is_empty());
+    }
+
     Void test_paving_operations() {
         DiscreteLocation filled(1), vacant(2);
         RealVariable x("x");
@@ -267,6 +327,7 @@ public:
 int main(int argc, char** argv) {
     ARIADNE_TESTING_SUITE("test_hybrid_paving_operations");
     ARIADNE_TESTING_ADD_TEST(TestHybridPavingOperations, test_generic_shared_manager_locations);
+    ARIADNE_TESTING_ADD_TEST(TestHybridPavingOperations, test_generic_location_relations_and_contracts);
     ARIADNE_TESTING_ADD_TEST(TestHybridPavingOperations, test_paving_operations);
     ARIADNE_TESTING_ADD_TEST(TestHybridPavingOperations, test_inner_and_outer_approximation);
     ARIADNE_TESTING_ADD_TEST(TestHybridPavingOperations, test_empty_slice_relations);
