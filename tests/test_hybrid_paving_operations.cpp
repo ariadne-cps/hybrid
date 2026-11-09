@@ -14,6 +14,52 @@ class TestHybridPavingOperations : public Ariadne::Testing::ContextFixture {
 public:
     using ContextFixture::ContextFixture;
 
+
+    Void test_generic_shared_manager_locations() {
+        DiscreteLocation first(1), second(2);
+        RealVariable x("x");
+        RealSpace space({x});
+        MonolithicHybridSpace hspace;
+        hspace.new_location(first,space);
+        hspace.new_location(second,space);
+        HybridGrid grid(hspace);
+        auto manager=std::make_shared<RobddManager>();
+        std::weak_ptr<RobddManager> weak=manager;
+        HybridPaving paving(grid,manager);
+        manager.reset();
+
+        GridCell first_root(grid[first],0u,BinaryWord{});
+        GridCell second_root(grid[second],0u,BinaryWord{});
+        paving[first].adjoin(first_root.split(false));
+        paving[second].adjoin(second_root.split(true));
+        ARIADNE_TESTING_PROVE(!paving.is_empty());
+        ARIADNE_TESTING_EXPECT_EQUAL(paving.size(),2u);
+        ARIADNE_TESTING_PROVE(!weak.expired());
+
+        // Cross-location Boolean operations reuse the same canonical manager.
+        Paving joined=join(
+            static_cast<PavingInterface const&>(paving[first]),
+            static_cast<PavingInterface const&>(paving[second]));
+        ARIADNE_TESTING_PROVE(joined.size()>0u);
+
+        HybridPaving copy(paving);
+        ARIADNE_TESTING_PROVE(subset(paving,copy));
+        ARIADNE_TESTING_PROVE(subset(copy,paving));
+        ARIADNE_TESTING_EXPECT_EQUAL(copy.size(),paving.size());
+        copy.clear();
+        ARIADNE_TESTING_PROVE(copy.is_empty());
+        ARIADNE_TESTING_PROVE(!paving.is_empty());
+
+        auto it=paving.begin();
+        ARIADNE_TESTING_PROVE(it!=paving.end());
+        ARIADNE_TESTING_PROVE((*it).location()==first);
+        ++it;
+        ARIADNE_TESTING_PROVE(it!=paving.end());
+        ARIADNE_TESTING_PROVE((*it).location()==second);
+        ++it;
+        ARIADNE_TESTING_PROVE(it==paving.end());
+    }
+
     Void test_paving_operations() {
         DiscreteLocation filled(1), vacant(2);
         RealVariable x("x");
@@ -220,6 +266,7 @@ public:
 
 int main(int argc, char** argv) {
     ARIADNE_TESTING_SUITE("test_hybrid_paving_operations");
+    ARIADNE_TESTING_ADD_TEST(TestHybridPavingOperations, test_generic_shared_manager_locations);
     ARIADNE_TESTING_ADD_TEST(TestHybridPavingOperations, test_paving_operations);
     ARIADNE_TESTING_ADD_TEST(TestHybridPavingOperations, test_inner_and_outer_approximation);
     ARIADNE_TESTING_ADD_TEST(TestHybridPavingOperations, test_empty_slice_relations);

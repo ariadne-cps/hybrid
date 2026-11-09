@@ -25,6 +25,7 @@
 #include "function/functional.hpp"
 #include "hybrid/hybrid_expression_set.hpp"
 #include "hybrid/hybrid_set.hpp"
+#include "paving/paving_interface.hpp"
 #include "numeric/real.hpp"
 #include "numeric/casts.hpp"
 #include "numeric/rounding.hpp"
@@ -271,6 +272,7 @@ template class HybridPoint<FloatDPApproximation>;
 template class HybridPoint<Real>;
 
 template class HybridSpaceSetConstIterator<BinaryTreePaving, HybridGridCell>;
+template class HybridSpaceSetConstIterator<Paving, HybridGridCell>;
 
 
 
