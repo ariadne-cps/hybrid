@@ -194,8 +194,12 @@ public:
         g = hg[loc];
 
         hgts.has_location(loc);
-        BinaryTreePaving const &gtscr = hgts[loc];
-        draw(fig, gtscr);
+        // HybridPaving exposes the selected backend as a polymorphic
+        // Paving. Build a tree view only for this legacy Figure draw check.
+        Paving const& slice=hgts[loc];
+        BinaryTreePaving drawable(slice.grid());
+        for(auto const& cell : slice) drawable.adjoin(cell);
+        draw(fig,drawable);
     }
 };
 
