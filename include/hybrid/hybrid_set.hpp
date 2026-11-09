@@ -460,7 +460,7 @@ template<class ES> inline
 Bool
 HybridListSetConstIterator<ES>::equal(const HybridListSetConstIterator<ES>& other) const
 {
-    return this->_loc_iter==other._loc_iter && (this->_loc_iter==this->_loc_end || *this->_bs_iter==*other._bs_iter);
+    return this->_loc_iter==other._loc_iter && (this->_loc_iter==this->_loc_end || this->_bs_iter==other._bs_iter);
 }
 
 
