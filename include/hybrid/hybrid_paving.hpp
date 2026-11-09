@@ -30,6 +30,8 @@
 #define ARIADNE_HYBRID_PAVING_HPP
 
 #include <map>
+#include <functional>
+#include <utility>
 
 
 #include <memory>
@@ -44,6 +46,7 @@
 #include "set/function_set.hpp"
 #include "set/list_set.hpp"
 #include "paving/binary_tree_paving.hpp"
+#include "paving/robdd_paving.hpp"
 #include "set/curve.hpp"
 
 #include "expression-set/expression_set.hpp"
@@ -160,6 +163,149 @@ class HybridBinaryTreePaving
         return os << "HybridBinaryTreePaving(" << hgts._map << ")"; }
   private:
     BinaryTreePaving& _provide_location(const DiscreteLocation& q);
+};
+
+//! \brief A location-indexed paving using one selected backend per location.
+//! \details A supplied factory selects the backend at first insertion; this
+//! choice survives copies and mutations. A shared RobddManager constructor
+//! makes all location pavings interoperable in one canonical node table.
+class HybridPaving {
+  public:
+    using Factory = std::function<Paving(Grid const&)>;
+    using GridType = HybridGrid;
+    using LocationsIterator = Map<DiscreteLocation,Paving>::Iterator;
+    using LocationsConstIterator = Map<DiscreteLocation,Paving>::ConstIterator;
+    using ConstIterator = HybridSpaceSetConstIterator<Paving,HybridGridCell>;
+
+    explicit HybridPaving(HybridGrid const& grid)
+        : HybridPaving(grid,[](Grid const& g) {
+            return Paving(new BinaryTreePaving(g));
+        }) { }
+
+    HybridPaving(HybridGrid const& grid, Factory factory)
+        : _hgrid(grid), _map(), _factory(std::move(factory)) {
+        ARIADNE_PRECONDITION_MSG(static_cast<Bool>(_factory),
+            "HybridPaving requires a backend factory");
+    }
+
+    HybridPaving(HybridGrid const& grid,
+                 std::shared_ptr<RobddManager> manager)
+        : HybridPaving(grid,[manager=std::move(manager)](Grid const& g) {
+            return Paving(new RobddPaving(manager,g));
+        }) { }
+
+    HybridGrid grid() const { return _hgrid; }
+    HybridSpace space() const { return _hgrid.space(); }
+    RealSpace space(DiscreteLocation q) const { return _hgrid.space(q); }
+    Bool has_location(DiscreteLocation q) const {
+        return _hgrid.has_location(q);
+    }
+    Bool nontrivial_location(DiscreteLocation q) const {
+        return _map.has_key(q);
+    }
+
+    LocationsIterator locations_begin() { return _map.begin(); }
+    LocationsIterator locations_end() { return _map.end(); }
+    LocationsConstIterator locations_begin() const { return _map.begin(); }
+    LocationsConstIterator locations_end() const { return _map.end(); }
+    ConstIterator begin() const {
+        return ConstIterator(_map,_hgrid.space(),false);
+    }
+    ConstIterator end() const {
+        return ConstIterator(_map,_hgrid.space(),true);
+    }
+
+    Paving& operator[](DiscreteLocation q) { return _provide_location(q); }
+    Paving const& operator[](DiscreteLocation q) const {
+        auto i=_map.find(q);
+        ARIADNE_PRECONDITION_MSG(i!=_map.end(),
+            "No paving has been materialized at the requested location");
+        return i->second;
+    }
+    Paving const& euclidean_set(DiscreteLocation q) const {
+        return (*this)[q];
+    }
+
+    Void adjoin(HybridGridCell const& cell) {
+        _provide_location(cell.location()).adjoin(cell.euclidean_set());
+    }
+    Void adjoin(HybridPaving const& other) {
+        for(auto i=other.locations_begin();i!=other.locations_end();++i) {
+            _provide_location(i->first).adjoin(i->second);
+        }
+    }
+    Void remove(HybridPaving const& other) {
+        for(auto i=other.locations_begin();i!=other.locations_end();++i) {
+            auto self=_map.find(i->first);
+            if(self!=_map.end()) self->second.remove(i->second);
+        }
+    }
+    Void restrict(HybridPaving const& other) {
+        for(auto i=_map.begin();i!=_map.end();++i) {
+            auto source=other._map.find(i->first);
+            if(source==other._map.end()) i->second.clear();
+            else i->second.restrict(source->second);
+        }
+    }
+    Void clear() {
+        for(auto i=_map.begin();i!=_map.end();++i) i->second.clear();
+    }
+    Bool is_empty() const {
+        for(auto i=_map.begin();i!=_map.end();++i)
+            if(not i->second.is_empty()) return false;
+        return true;
+    }
+    SizeType size() const {
+        SizeType count=0u;
+        for(auto i=_map.begin();i!=_map.end();++i) count+=i->second.size();
+        return count;
+    }
+    Void mince(Nat fineness) {
+        for(auto i=_map.begin();i!=_map.end();++i)
+            i->second.mince(fineness);
+    }
+    Void recombine() {
+        for(auto i=_map.begin();i!=_map.end();++i)
+            i->second.recombine();
+    }
+
+    friend Bool subset(HybridPaving const& first, HybridPaving const& second) {
+        for(auto i=first.locations_begin();i!=first.locations_end();++i) {
+            if(i->second.is_empty()) continue;
+            auto other=second._map.find(i->first);
+            if(other==second._map.end()
+               or not i->second.subset(other->second)) return false;
+        }
+        return true;
+    }
+    friend Bool intersect(HybridPaving const& first, HybridPaving const& second) {
+        for(auto i=first.locations_begin();i!=first.locations_end();++i) {
+            if(i->second.is_empty()) continue;
+            auto other=second._map.find(i->first);
+            if(other!=second._map.end()
+               and i->second.intersects(other->second)) return true;
+        }
+        return false;
+    }
+
+  private:
+    Paving& _provide_location(DiscreteLocation q) {
+        ARIADNE_PRECONDITION_MSG(_hgrid.has_location(q),
+            "HybridPaving location must belong to its grid");
+        auto found=_map.find(q);
+        if(found==_map.end()) {
+            Paving selected=_factory(_hgrid[q]);
+            ARIADNE_PRECONDITION_MSG(selected.grid()==_hgrid[q],
+                "Selected backend uses a grid incompatible with this location");
+            _map.insert(std::make_pair(q,std::move(selected)));
+            found=_map.find(q);
+        }
+        return found->second;
+    }
+
+    HybridGrid _hgrid;
+    Map<DiscreteLocation,Paving> _map;
+    Factory _factory;
 };
 
 template<class S> Void HybridBinaryTreePaving::adjoin_outer_approximation(DiscreteLocation q, const S& s) {
