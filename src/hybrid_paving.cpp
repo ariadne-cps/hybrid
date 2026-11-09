@@ -108,7 +108,7 @@ Void HybridPaving::adjoin_inner_approximation(const HybridExactBoxes& hbxs, cons
         DiscreteLocation const& loc=_loc_iter->first;
         LabelledSet<ExactBoxType> const& vbx=_loc_iter->second;
         ARIADNE_PRECONDITION(vbx.space() == this->space(loc));
-        this->_provide_location(loc).adjoin_inner_approximation(vbx.euclidean_set(),fineness);
+        this->_provide_location(loc).adjoin_inner_approximation(ExactBoxSetType(vbx.euclidean_set()),fineness);
     }
 }
 
@@ -138,7 +138,7 @@ Void HybridPaving::adjoin_outer_approximation(const HybridExactBoxes& hbxs, cons
         DiscreteLocation const& loc=_loc_iter->first;
         LabelledSet<ExactBoxType> const& vbx=_loc_iter->second;
         ARIADNE_PRECONDITION(vbx.space() == this->space(loc));
-        this->_provide_location(_loc_iter->first).adjoin_outer_approximation(vbx.euclidean_set(),fineness);
+        this->_provide_location(_loc_iter->first).adjoin_outer_approximation(ExactBoxSetType(vbx.euclidean_set()),fineness);
     }
 }
 
