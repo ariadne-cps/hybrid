@@ -40,7 +40,7 @@
 namespace Ariadne {
 
 typedef Vector<FloatDP> ExactFloatVector;
-class HybridBinaryTreePaving;
+class HybridPaving;
 
 //! \ingroup HybridModule
 //! \brief A grid in a hybrid space

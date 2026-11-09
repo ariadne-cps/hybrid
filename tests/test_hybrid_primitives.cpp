@@ -184,7 +184,7 @@ public:
     Void test_cell_and_curve_descriptions() {
         DiscreteLocation loc(1); RealVariable x("x"),y("y"); RealSpace space({x,y});
         MonolithicHybridSpace hspace; hspace.new_location(loc,space);
-        HybridBinaryTreePaving paving{HybridGrid(hspace)};
+        HybridPaving paving{HybridGrid(hspace)};
         HybridExactBoxes boxes; boxes.insert(loc,space,ExactBoxType({{0,1},{0,1}}));
         paving.adjoin_outer_approximation(boxes,1u);
         HybridGridCell cell=*paving.begin();

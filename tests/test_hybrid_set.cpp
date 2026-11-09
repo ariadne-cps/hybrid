@@ -124,7 +124,7 @@ public:
         RealSpace state_space({x});
         MonolithicHybridSpace hybrid_space;
         hybrid_space.new_location(loc,state_space);
-        HybridBinaryTreePaving paving{HybridGrid(hybrid_space)};
+        HybridPaving paving{HybridGrid(hybrid_space)};
         HybridExactBox box(loc,state_space,ExactBoxType({{0,1}}));
         ARIADNE_TESTING_PROVE(definitely(paving.separated(box)));
         ARIADNE_TESTING_PROVE(same_logical_value(paving.overlaps(box).repr(), LogicalValue::UNLIKELY));
@@ -171,7 +171,7 @@ public:
         ARIADNE_TESTING_PROVE(same(from_compact.bounding_box(),euclidean.bounding_box()));
         ARIADNE_TESTING_EXPECT_EQUAL(as_located.euclidean_set(loc,state_space).dimension(),2u);
         ARIADNE_TESTING_EXPECT_EQUAL(as_full.euclidean_set(loc,state_space).dimension(),2u);
-        HybridBinaryTreePaving paving{HybridGrid(hybrid_space)};
+        HybridPaving paving{HybridGrid(hybrid_space)};
         paving.adjoin_outer_approximation(initial,4u);
         ARIADNE_TESTING_PROVE(paving.nontrivial_location(loc));
         ARIADNE_TESTING_PROVE(paving.size()>0u);
@@ -188,7 +188,7 @@ public:
         MonolithicHybridSpace hspc;
         DiscreteLocation loc;
         HybridGrid hg(hspc);
-        HybridBinaryTreePaving hgts(hg);
+        HybridPaving hgts(hg);
         Figure fig(hgts[loc].bounding_box(), Projection2d(2, 0, 1));
         hg.has_location(loc);
         g = hg[loc];

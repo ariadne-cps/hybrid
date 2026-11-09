@@ -60,7 +60,7 @@ int main() {
 
     section("Grids and paving");
     HybridGrid grid(space);
-    HybridBinaryTreePaving paving(grid);
+    HybridPaving paving(grid);
     assert(grid.has_location(moving));
     assert(paving.is_empty());
     show("empty paving",paving);

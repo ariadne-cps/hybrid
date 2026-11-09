@@ -62,13 +62,13 @@ void hybrid_submodule(pybind11::module& module) {
     box_class.def("__str__", &__cstr__<HybridRealBox>);
     box_class.def("__repr__", &__cstr__<HybridRealBox>);
 
-    pybind11::class_<HybridBinaryTreePaving, pybind11::bases<HybridDrawableInterface>>
-        paving_class(module, "HybridBinaryTreePaving");
+    pybind11::class_<HybridPaving, pybind11::bases<HybridDrawableInterface>>
+        paving_class(module, "HybridPaving");
     paving_class.def(pybind11::init<HybridGrid const&>());
-    paving_class.def("has_location", &HybridBinaryTreePaving::has_location);
-    paving_class.def("is_empty", &HybridBinaryTreePaving::is_empty);
-    paving_class.def("size", &HybridBinaryTreePaving::size);
-    paving_class.def("clear", &HybridBinaryTreePaving::clear);
-    paving_class.def("__str__", &__cstr__<HybridBinaryTreePaving>);
-    paving_class.def("__repr__", &__cstr__<HybridBinaryTreePaving>);
+    paving_class.def("has_location", &HybridPaving::has_location);
+    paving_class.def("is_empty", &HybridPaving::is_empty);
+    paving_class.def("size", &HybridPaving::size);
+    paving_class.def("clear", &HybridPaving::clear);
+    paving_class.def("__str__", &__cstr__<HybridPaving>);
+    paving_class.def("__repr__", &__cstr__<HybridPaving>);
 }

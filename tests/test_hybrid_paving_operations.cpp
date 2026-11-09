@@ -128,7 +128,7 @@ public:
         hspace.new_location(filled,space);
         hspace.new_location(vacant,space);
         HybridGrid grid(hspace);
-        HybridBinaryTreePaving paving(grid);
+        HybridPaving paving(grid);
 
         ARIADNE_TESTING_PROVE(paving.is_empty());
         ARIADNE_TESTING_EXPECT_EQUAL(paving.size(),0u);
@@ -152,7 +152,7 @@ public:
         ARIADNE_TESTING_EXPECT_EQUAL((*exported.begin()).space().dimension(),1u);
 
         // The empty paving is contained even in an empty box collection.
-        HybridBinaryTreePaving empty_paving(grid);
+        HybridPaving empty_paving(grid);
         HybridExactBoxes no_bounds;
         ARIADNE_TESTING_PROVE(definitely(empty_paving.inside(no_bounds)));
         // A nonempty location omitted from the containing collection is
@@ -166,12 +166,12 @@ public:
 
         // Both single-cell and list-cell insertion preserve the cell.
         HybridGridCell cell=*paving.begin();
-        HybridBinaryTreePaving single_cell(grid);
+        HybridPaving single_cell(grid);
         single_cell.adjoin(cell);
         ARIADNE_TESTING_PROVE(single_cell.size()>0u);
         ListSet<HybridGridCell> cell_list;
         cell_list.adjoin(cell);
-        HybridBinaryTreePaving multiple_cells(grid);
+        HybridPaving multiple_cells(grid);
         multiple_cells.adjoin(cell_list);
         ARIADNE_TESTING_EXPECT_EQUAL(single_cell.size(),multiple_cells.size());
         ARIADNE_TESTING_PROVE(subset(single_cell,multiple_cells));
@@ -187,9 +187,9 @@ public:
         for(auto i=paving.begin();i!=paving.end();++i) { ++visited; }
         ARIADNE_TESTING_PROVE(visited>0u);
 
-        std::unique_ptr<HybridBinaryTreePaving> clone(paving.clone());
+        std::unique_ptr<HybridPaving> clone(paving.clone());
         ARIADNE_TESTING_EXPECT_EQUAL(clone->size(),paving.size());
-        HybridBinaryTreePaving copy(grid);
+        HybridPaving copy(grid);
         copy.adjoin(paving);
         ARIADNE_TESTING_PROVE(!copy.is_empty());
         ARIADNE_TESTING_PROVE(subset(copy,paving));
@@ -213,7 +213,7 @@ public:
         copy.clear();
         ARIADNE_TESTING_PROVE(copy.is_empty());
 
-        HybridBinaryTreePaving const& cpaving=paving;
+        HybridPaving const& cpaving=paving;
         ARIADNE_TESTING_PROVE(!cpaving[filled].is_empty());
         std::ostringstream output;
         paving._write(output);
@@ -224,7 +224,7 @@ public:
         DiscreteLocation loc(1),other(2); RealVariable x("x"); RealSpace space({x});
         MonolithicHybridSpace hspace; hspace.new_location(loc,space); hspace.new_location(other,space);
         HybridGrid grid(hspace);
-        HybridBinaryTreePaving left(grid),empty(grid),disjoint(grid),superset(grid),other_slice(grid);
+        HybridPaving left(grid),empty(grid),disjoint(grid),superset(grid),other_slice(grid);
         HybridExactBoxes boxes; boxes.insert(loc,space,ExactBoxType({{0,1}}));
         left.adjoin_outer_approximation(boxes,2u);
         ARIADNE_TESTING_PROVE(!subset(left,empty));
@@ -242,7 +242,7 @@ public:
         ARIADNE_TESTING_PROVE(intersect(left,superset));
         HybridExactBoxes elsewhere; elsewhere.insert(other,space,ExactBoxType({{0,1}}));
         other_slice.adjoin_outer_approximation(elsewhere,2u);
-        HybridBinaryTreePaving restricted=left;
+        HybridPaving restricted=left;
         restricted.restrict(other_slice);
         ARIADNE_TESTING_PROVE(restricted.is_empty());
         ARIADNE_TESTING_PROVE(!restricted.nontrivial_location(other));
@@ -255,7 +255,7 @@ public:
         ARIADNE_TESTING_PROVE(subset(restricted,left));
         restricted.restrict(restricted);
         ARIADNE_TESTING_PROVE(subset(left,restricted));
-        HybridBinaryTreePaving nothing(grid); nothing.restrict(left);
+        HybridPaving nothing(grid); nothing.restrict(left);
         ARIADNE_TESTING_PROVE(nothing.is_empty());
     }
     Void test_contracts_and_iterator_comparisons() {
@@ -263,12 +263,12 @@ public:
         RealVariable x("x"),y("y"); RealSpace space({x});
         MonolithicHybridSpace hspace;
         hspace.new_location(first,space); hspace.new_location(empty,space); hspace.new_location(last,space);
-        HybridBinaryTreePaving paving{HybridGrid(hspace)};
+        HybridPaving paving{HybridGrid(hspace)};
         HybridExactBoxes boxes;
         boxes.insert(first,space,ExactBoxType({{0,1}}));
         boxes.insert(last,space,ExactBoxType({{0,1}}));
         paving.adjoin_outer_approximation(boxes,2u); paving[empty]; paving.mince(2u);
-        const HybridBinaryTreePaving& immutable=paving;
+        const HybridPaving& immutable=paving;
         ARIADNE_TESTING_EXPECT_EXCEPTION(immutable[missing]);
         ARIADNE_TESTING_EXPECT_EXCEPTION(immutable.euclidean_set(first,RealSpace({y})));
         HybridExactBoxes wrong_space; wrong_space.insert(first,RealSpace({y}),ExactBoxType({{0,1}}));
@@ -297,28 +297,28 @@ public:
 
         HybridExactBoxes boxes;
         boxes.insert(loc,spc,ExactBoxType({{0,2}}));
-        HybridBinaryTreePaving inner(grid);
+        HybridPaving inner(grid);
         inner.adjoin_inner_approximation(boxes,2u);
         ARIADNE_TESTING_PROVE(inner.has_location(loc));
 
         HybridBoundedConstraintSet bounded(loc,{0<=x<=2});
-        HybridBinaryTreePaving outer(grid);
+        HybridPaving outer(grid);
         outer.adjoin_outer_approximation(bounded,3u);
         ARIADNE_TESTING_PROVE(outer.nontrivial_location(loc));
         ARIADNE_TESTING_PROVE(outer.size()>0u);
-        HybridBinaryTreePaving via_interface(grid);
+        HybridPaving via_interface(grid);
         EffectiveHybridSetInterface const& effective=bounded;
         via_interface.adjoin_inner_approximation(effective,2u);
         ARIADNE_TESTING_PROVE(via_interface.has_location(loc));
 
         // The free function delegates to the same inner approximation.
-        HybridBinaryTreePaving constructed=inner_approximation(effective,grid,2u);
+        HybridPaving constructed=inner_approximation(effective,grid,2u);
         ARIADNE_TESTING_PROVE(constructed.has_location(loc));
 
         // Lower approximation uses the overt view and must populate
         // the location even when no full cell can be proved inside.
         const EffectiveHybridOvertSetInterface& overt=bounded;
-        HybridBinaryTreePaving lower(grid);
+        HybridPaving lower(grid);
         lower.adjoin_lower_approximation(overt,2u,2u);
         ARIADNE_TESTING_PROVE(lower.nontrivial_location(loc));
     }

@@ -3,7 +3,7 @@
 from pyariadne_hybrid import (
     DiscreteLocation,
     HybridGrid,
-    HybridBinaryTreePaving,
+    HybridPaving,
     HybridRealBox,
     HybridSpace,
     MonolithicHybridSpace,
@@ -44,7 +44,7 @@ def test_space_grid_and_paving():
 
     grid = HybridGrid(space)
     assert grid.has_location(location)
-    paving = HybridBinaryTreePaving(grid)
+    paving = HybridPaving(grid)
     assert paving.has_location(location)
     assert paving.is_empty()
     assert paving.size() == 0
