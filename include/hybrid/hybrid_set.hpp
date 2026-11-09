@@ -33,6 +33,7 @@
 
 
 #include <memory>
+#include <optional>
 
 #include "utility/macros.hpp"
 #include "utility/stlio.hpp"
@@ -459,7 +460,7 @@ template<class ES> inline
 Bool
 HybridListSetConstIterator<ES>::equal(const HybridListSetConstIterator<ES>& other) const
 {
-    return this->_loc_iter==other._loc_iter && (this->_loc_iter==this->_loc_end || this->_bs_iter==other._bs_iter);
+    return this->_loc_iter==other._loc_iter && (this->_loc_iter==this->_loc_end || *this->_bs_iter==*other._bs_iter);
 }
 
 
@@ -530,7 +531,8 @@ class HybridSpaceSetConstIterator
     typename Map<DiscreteLocation,DS>::ConstIterator _loc_begin;
     typename Map<DiscreteLocation,DS>::ConstIterator _loc_end;
     typename Map<DiscreteLocation,DS>::ConstIterator _loc_iter;
-    typename DS::ConstIterator _bs_iter;
+    // Polymorphic Paving iterators have no default constructor.
+    std::optional<typename DS::ConstIterator> _bs_iter;
     HybridSpace hspc;
     mutable HBS hybrid_set;
 };
@@ -548,7 +550,7 @@ template<class DS, class HBS> inline
 HBS const&
 HybridSpaceSetConstIterator<DS,HBS>::dereference() const
 {
-    this->hybrid_set=HBS(_loc_iter->first,this->hspc[_loc_iter->first],*this->_bs_iter);
+    this->hybrid_set=HBS(_loc_iter->first,this->hspc[_loc_iter->first],**this->_bs_iter);
     return this->hybrid_set;
 }
 
@@ -557,7 +559,7 @@ template<class DS, class HBS> inline
 Void
 HybridSpaceSetConstIterator<DS,HBS>::increment()
 {
-    ++this->_bs_iter;
+    ++(*this->_bs_iter);
     this->increment_loc();
 }
 

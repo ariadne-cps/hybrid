@@ -250,7 +250,7 @@ template<class DS, class HBS> inline
 Void
 HybridSpaceSetConstIterator<DS,HBS>::increment_loc()
 {
-    while(_bs_iter==_loc_iter->second.end()) {
+    while(*_bs_iter==_loc_iter->second.end()) {
         ++_loc_iter;
         if(_loc_iter==_loc_end) { return; }
         _bs_iter=_loc_iter->second.begin();
