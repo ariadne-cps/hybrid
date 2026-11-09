@@ -26,7 +26,7 @@ class TestHybridAugmentedPaving : public Ariadne::Testing::ContextFixture {
         HybridAuxiliaryMapping mapping(HybridSpace(full),
             [labelled](DiscreteLocation const&) { return labelled; });
         HybridGrid grid(states);
-        HybridBinaryTreePaving source(grid);
+        HybridPaving source(grid);
         HybridExactBoxes boxes;
         boxes.insert(q,state,ExactBoxType({{0.125_x,0.875_x}}));
         source.adjoin_outer_approximation(boxes,3u);
