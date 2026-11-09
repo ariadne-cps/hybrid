@@ -46,44 +46,38 @@
 namespace Ariadne {
 
 
-HybridBinaryTreePaving::ConstIterator HybridBinaryTreePaving::begin() const {
-    return ConstIterator(this->_map,this->_hgrid.space(),false);
-}
-
-HybridBinaryTreePaving::ConstIterator HybridBinaryTreePaving::end() const {
-    return ConstIterator(this->_map,this->_hgrid.space(),true);
-}
 
 
-Void HybridBinaryTreePaving::clear() {
-    for(HybridBinaryTreePaving::LocationsIterator _loc_iter=this->locations_begin(); _loc_iter!=this->locations_end(); ++_loc_iter) {
+
+Void HybridPaving::clear() {
+    for(HybridPaving::LocationsIterator _loc_iter=this->locations_begin(); _loc_iter!=this->locations_end(); ++_loc_iter) {
         _loc_iter->second.clear();
     }
 }
 
-Void HybridBinaryTreePaving::adjoin(const HybridGridCell& hgc) {
+Void HybridPaving::adjoin(const HybridGridCell& hgc) {
     this->_provide_location(hgc.location()).adjoin(hgc.euclidean_set());
 }
 
-Void HybridBinaryTreePaving::adjoin(const ListSet<HybridGridCell>& hgcls) {
+Void HybridPaving::adjoin(const ListSet<HybridGridCell>& hgcls) {
     for(ListSet<HybridGridCell>::ConstIterator iter=hgcls.begin(); iter!=hgcls.end(); ++iter) {
         this ->adjoin(*iter);
     }
 }
 
-Void HybridBinaryTreePaving::adjoin(const HybridBinaryTreePaving& hgts) {
-    for(HybridBinaryTreePaving::LocationsConstIterator _loc_iter=hgts.locations_begin(); _loc_iter!=hgts.locations_end(); ++_loc_iter) {
+Void HybridPaving::adjoin(const HybridPaving& hgts) {
+    for(HybridPaving::LocationsConstIterator _loc_iter=hgts.locations_begin(); _loc_iter!=hgts.locations_end(); ++_loc_iter) {
         this->_provide_location(_loc_iter->first).adjoin(_loc_iter->second);
     }
 }
 
-Void HybridBinaryTreePaving::remove(const HybridBinaryTreePaving& hgts) {
-    for(HybridBinaryTreePaving::LocationsConstIterator _loc_iter=hgts.locations_begin(); _loc_iter!=hgts.locations_end(); ++_loc_iter) {
+Void HybridPaving::remove(const HybridPaving& hgts) {
+    for(HybridPaving::LocationsConstIterator _loc_iter=hgts.locations_begin(); _loc_iter!=hgts.locations_end(); ++_loc_iter) {
         this->_provide_location(_loc_iter->first).remove(_loc_iter->second);
     }
 }
 
-Void HybridBinaryTreePaving::restrict(const HybridBinaryTreePaving& hgts) {
+Void HybridPaving::restrict(const HybridPaving& hgts) {
     // Intersection must also clear left-hand locations absent on the right.
     // Iterating the left map preserves its locations and cannot introduce
     // unrelated locations from the restricting paving.
@@ -94,13 +88,13 @@ Void HybridBinaryTreePaving::restrict(const HybridBinaryTreePaving& hgts) {
     }
 }
 
-Void HybridBinaryTreePaving::restrict_to_extent(Nat h) {
+Void HybridPaving::restrict_to_extent(Nat h) {
     for(LocationsIterator _loc_iter=locations_begin(); _loc_iter!=locations_end(); ++_loc_iter) {
         _loc_iter->second.restrict_to_extent(h);
     }
 }
 
-Void HybridBinaryTreePaving::adjoin_inner_approximation(const EffectiveHybridSetInterface& hset, const Nat fineness) {
+Void HybridPaving::adjoin_inner_approximation(const EffectiveHybridSetInterface& hset, const Nat fineness) {
     Set<DiscreteLocation> locations=hset.locations();
     for(auto location : locations) {
         RealSpace space = this->space(location);
@@ -108,7 +102,7 @@ Void HybridBinaryTreePaving::adjoin_inner_approximation(const EffectiveHybridSet
     }
 }
 
-Void HybridBinaryTreePaving::adjoin_inner_approximation(const HybridExactBoxes& hbxs, const Nat fineness) {
+Void HybridPaving::adjoin_inner_approximation(const HybridExactBoxes& hbxs, const Nat fineness) {
     for(HybridExactBoxes::ConstIterator _loc_iter=hbxs.begin();
             _loc_iter!=hbxs.end(); ++_loc_iter) {
         DiscreteLocation const& loc=_loc_iter->first;
@@ -118,7 +112,7 @@ Void HybridBinaryTreePaving::adjoin_inner_approximation(const HybridExactBoxes& 
     }
 }
 
-Void HybridBinaryTreePaving::adjoin_lower_approximation(const EffectiveHybridOvertSetInterface& hs, const Nat extent, const Nat fineness) {
+Void HybridPaving::adjoin_lower_approximation(const EffectiveHybridOvertSetInterface& hs, const Nat extent, const Nat fineness) {
     Set<DiscreteLocation> hlocs=dynamic_cast<const EffectiveHybridBoundedSetInterface&>(hs).locations();
     for(Set<DiscreteLocation>::ConstIterator _loc_iter=hlocs.begin();
             _loc_iter!=hlocs.end(); ++_loc_iter) {
@@ -128,7 +122,7 @@ Void HybridBinaryTreePaving::adjoin_lower_approximation(const EffectiveHybridOve
     }
 }
 
-Void HybridBinaryTreePaving::adjoin_outer_approximation(const EffectiveHybridCompactSetInterface& hs, const Nat fineness) {
+Void HybridPaving::adjoin_outer_approximation(const EffectiveHybridCompactSetInterface& hs, const Nat fineness) {
     Set<DiscreteLocation> hlocs=hs.locations();
     for(Set<DiscreteLocation>::ConstIterator _loc_iter=hlocs.begin();
             _loc_iter!=hlocs.end(); ++_loc_iter) {
@@ -138,7 +132,7 @@ Void HybridBinaryTreePaving::adjoin_outer_approximation(const EffectiveHybridCom
     }
 }
 
-Void HybridBinaryTreePaving::adjoin_outer_approximation(const HybridExactBoxes& hbxs, const Nat fineness) {
+Void HybridPaving::adjoin_outer_approximation(const HybridExactBoxes& hbxs, const Nat fineness) {
     for(HybridExactBoxes::ConstIterator _loc_iter=hbxs.begin();
             _loc_iter!=hbxs.end(); ++_loc_iter) {
         DiscreteLocation const& loc=_loc_iter->first;
@@ -149,16 +143,18 @@ Void HybridBinaryTreePaving::adjoin_outer_approximation(const HybridExactBoxes& 
 }
 
 
-BinaryTreePaving& HybridBinaryTreePaving::operator[](DiscreteLocation q) {
+Paving& HybridPaving::operator[](DiscreteLocation q) {
     return this->_provide_location(q);
 }
 
-const BinaryTreePaving& HybridBinaryTreePaving::operator[](DiscreteLocation q) const {
+const Paving& HybridPaving::operator[](DiscreteLocation q) const {
     ARIADNE_PRECONDITION_MSG(this->has_location(q),"q="<<q);
-    return const_cast<HybridBinaryTreePaving*>(this)->_provide_location(q);
+    auto found=_map.find(q);
+    ARIADNE_PRECONDITION_MSG(found!=_map.end(),"Location has no materialized paving: "<<q);
+    return found->second;
 }
 
-Bool HybridBinaryTreePaving::is_empty() const {
+Bool HybridPaving::is_empty() const {
     for(LocationsConstIterator _loc_iter=this->locations_begin();
         _loc_iter!=this->locations_end(); ++_loc_iter) {
         if(!_loc_iter->second.is_empty()) { return false; }
@@ -166,7 +162,7 @@ Bool HybridBinaryTreePaving::is_empty() const {
     return true;
 }
 
-SizeType HybridBinaryTreePaving::size() const {
+SizeType HybridPaving::size() const {
     SizeType result=0;
     for(LocationsConstIterator _loc_iter=this->locations_begin(); _loc_iter!=this->locations_end(); ++_loc_iter) {
         result+=_loc_iter->second.size();
@@ -174,7 +170,7 @@ SizeType HybridBinaryTreePaving::size() const {
     return result;
 }
 
-HybridListSet<ExactBoxType> HybridBinaryTreePaving::boxes() const {
+HybridListSet<ExactBoxType> HybridPaving::boxes() const {
     HybridListSet<ExactBoxType> result;
     for(ConstIterator iter=this->begin(); iter!=this->end(); ++iter) {
         result.adjoin(iter->location(),iter->space(),iter->euclidean_set().box());
@@ -182,41 +178,41 @@ HybridListSet<ExactBoxType> HybridBinaryTreePaving::boxes() const {
     return result;
 }
 
-Void HybridBinaryTreePaving::mince(Nat fineness) {
+Void HybridPaving::mince(Nat fineness) {
     for(LocationsIterator _loc_iter=this->locations_begin();
         _loc_iter!=this->locations_end(); ++_loc_iter) {
         _loc_iter->second.mince(fineness);
     }
 }
 
-Void HybridBinaryTreePaving::recombine() {
+Void HybridPaving::recombine() {
     for(LocationsIterator _loc_iter=this->locations_begin();
         _loc_iter!=this->locations_end(); ++_loc_iter) {
         _loc_iter->second.recombine();
     }
 }
 
-ValidatedLowerKleenean HybridBinaryTreePaving::separated(const HybridExactBox& hbx) const {
+ValidatedLowerKleenean HybridPaving::separated(const HybridExactBox& hbx) const {
     LocationsConstIterator loc_iter = this->_map.find(hbx.location());
     // ValidatedLowerKleenean overloads operator||, so it does not short-circuit.
     if (loc_iter == this->locations_end()) { return true; }
     return loc_iter->second.separated(hbx.euclidean_set());
 }
 
-ValidatedLowerKleenean HybridBinaryTreePaving::overlaps(const HybridExactBox& hbx) const {
+ValidatedLowerKleenean HybridPaving::overlaps(const HybridExactBox& hbx) const {
     LocationsConstIterator loc_iter = this->_map.find(hbx.location());
     // Do not evaluate the predicate on an absent location (overloaded &&).
     if (loc_iter == this->locations_end()) { return false; }
     return loc_iter->second.overlaps(hbx.euclidean_set());
 }
 
-ValidatedLowerKleenean HybridBinaryTreePaving::covers(const HybridExactBox& hbx) const {
+ValidatedLowerKleenean HybridPaving::covers(const HybridExactBox& hbx) const {
     LocationsConstIterator loc_iter = this->_map.find(hbx.location());
     if (loc_iter == this->locations_end()) { return false; }
-    return loc_iter->second.covers(hbx.euclidean_set());
+    return loc_iter->second.superset(hbx.euclidean_set());
 }
 
-ValidatedLowerKleenean HybridBinaryTreePaving::inside(const HybridExactBoxes& hbx) const  {
+ValidatedLowerKleenean HybridPaving::inside(const HybridExactBoxes& hbx) const  {
     // All nonempty locations must be included. A box collection missing
     // a nonempty location cannot contain the whole hybrid paving.
     ValidatedLowerKleenean included=true;
@@ -231,7 +227,7 @@ ValidatedLowerKleenean HybridBinaryTreePaving::inside(const HybridExactBoxes& hb
     return included;
 }
 
-HybridUpperBoxes HybridBinaryTreePaving::bounding_box() const {
+HybridUpperBoxes HybridPaving::bounding_box() const {
     HybridUpperBoxes result;
     for( LocationsConstIterator _loc_iter = this->locations_begin(); _loc_iter != this->locations_end(); ++_loc_iter ) {
         if( !_loc_iter->second.is_empty() ) {
@@ -243,13 +239,14 @@ HybridUpperBoxes HybridBinaryTreePaving::bounding_box() const {
     return result;
 }
 
-Bool subset(const HybridBinaryTreePaving& hgts1, const HybridBinaryTreePaving& hgts2) {
-    for( typename HybridBinaryTreePaving::LocationsConstIterator _loc_iter = hgts1.locations_begin(); _loc_iter != hgts1.locations_end(); ++_loc_iter ) {
+Bool subset(const HybridPaving& hgts1, const HybridPaving& hgts2) {
+    for( typename HybridPaving::LocationsConstIterator _loc_iter = hgts1.locations_begin(); _loc_iter != hgts1.locations_end(); ++_loc_iter ) {
         if( !_loc_iter->second.is_empty() ) {
             DiscreteLocation const& loc = _loc_iter->first;
             RealSpace spc=hgts1.space(loc);
             // A missing right-hand slice denotes the empty set.
-            if(!hgts2.nontrivial_location(loc) || not subset(hgts1.euclidean_set(loc),hgts2.euclidean_set(loc,spc))) {
+            if(!hgts2.nontrivial_location(loc) || not hgts1.euclidean_set(loc).subset(
+                    static_cast<PavingInterface const&>(hgts2.euclidean_set(loc,spc)))) {
                 return false;
             }
         }
@@ -257,12 +254,13 @@ Bool subset(const HybridBinaryTreePaving& hgts1, const HybridBinaryTreePaving& h
     return true;
 }
 
-Bool intersect(const HybridBinaryTreePaving& hgts1, const HybridBinaryTreePaving& hgts2) {
-    for( typename HybridBinaryTreePaving::LocationsConstIterator _loc_iter = hgts1.locations_begin(); _loc_iter != hgts1.locations_end(); ++_loc_iter ) {
+Bool intersect(const HybridPaving& hgts1, const HybridPaving& hgts2) {
+    for( typename HybridPaving::LocationsConstIterator _loc_iter = hgts1.locations_begin(); _loc_iter != hgts1.locations_end(); ++_loc_iter ) {
         if( !_loc_iter->second.is_empty() ) {
             DiscreteLocation const& loc = _loc_iter->first;
             RealSpace spc=hgts1.space(loc);
-            if(hgts2.nontrivial_location(loc) && intersect(hgts1.euclidean_set(loc),hgts2.euclidean_set(loc,spc))) {
+            if(hgts2.nontrivial_location(loc) && hgts1.euclidean_set(loc).intersects(
+                    static_cast<PavingInterface const&>(hgts2.euclidean_set(loc,spc)))) {
                 return true;
             }
         }
@@ -270,28 +268,37 @@ Bool intersect(const HybridBinaryTreePaving& hgts1, const HybridBinaryTreePaving
     return false;
 }
 
-OutputStream& HybridBinaryTreePaving::_write(OutputStream& os) const {
+OutputStream& HybridPaving::_write(OutputStream& os) const {
     return os << this->_map;
 }
 
-Void HybridBinaryTreePaving::draw(CanvasInterface& canvas, const Set<DiscreteLocation>& locations, const Variables2d& axis_variables) const {
+Void HybridPaving::draw(CanvasInterface& canvas, const Set<DiscreteLocation>& locations, const Variables2d& axis_variables) const {
     for(LocationsConstIterator loc_iter=this->locations_begin(); loc_iter!=this->locations_end(); ++loc_iter) {
         if(locations.empty() || locations.contains(loc_iter->first)) {
             RealSpace const& space=this->space(loc_iter->first);
             Projection2d projection(space.dimension(),space.index(axis_variables.x()),space.index(axis_variables.y()));
-            Ariadne::draw(canvas,projection,loc_iter->second);
+            // Drawing creates a tree view; authoritative backend is unchanged.
+            BinaryTreePaving tree(loc_iter->second.grid());
+            for(auto it=loc_iter->second.begin(),end=loc_iter->second.end();it!=end;++it)
+                tree.adjoin(*it);
+            Ariadne::draw(canvas,projection,tree);
         }
     }
 }
 
 
-BinaryTreePaving& HybridBinaryTreePaving::_provide_location(const DiscreteLocation& q) {
-    std::map<DiscreteLocation,BinaryTreePaving>::iterator iter=this->_map.find(q);
-    if(iter==this->_map.end()) {
-        this->_map.insert(std::make_pair(q,BinaryTreePaving(this->_hgrid[q])));
-        iter=this->_map.find(q);
+Paving& HybridPaving::_provide_location(DiscreteLocation const& q) {
+    ARIADNE_PRECONDITION_MSG(_hgrid.has_location(q),
+        "HybridPaving location does not belong to grid");
+    auto found=_map.find(q);
+    if(found==_map.end()) {
+        Paving selected=_factory(_hgrid[q]);
+        ARIADNE_PRECONDITION_MSG(selected.grid()==_hgrid[q],
+            "Selected backend uses an incompatible grid");
+        _map.insert(std::make_pair(q,std::move(selected)));
+        found=_map.find(q);
     }
-    return iter->second;
+    return found->second;
 }
 
 

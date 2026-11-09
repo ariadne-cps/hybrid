@@ -46,7 +46,7 @@
 #include "hybrid/discrete_location.hpp"
 
 #include "geometry/box.hpp"
-// HybridAugmentedPaving owns a HybridBinaryTreePaving by value, so the type must be complete.
+// HybridAugmentedPaving owns a HybridPaving by value, so the type must be complete.
 #include "hybrid/hybrid_paving.hpp"
 #include "labelled/labelled_augmented_paving.hpp"
 #include "hybrid/hybrid_auxiliary_mapping.hpp"
@@ -73,15 +73,15 @@ class HybridAugmentedPavingElementReference {
 //! \brief A hybrid paving with a location-indexed algebraic auxiliary mapping.
 class HybridAugmentedPaving
 {
-    HybridBinaryTreePaving  _state_set;
+    HybridPaving  _state_set;
     HybridAuxiliaryMapping _auxiliary_mapping;
   public:
     typedef HybridGrid GridType;
-    typedef HybridBinaryTreePaving PavingType;
+    typedef HybridPaving PavingType;
 
     HybridAugmentedPaving(HybridGrid const& hg, HybridAuxiliaryMapping const& aux)
         : _state_set(hg), _auxiliary_mapping(aux) { }
-    HybridAugmentedPaving(HybridBinaryTreePaving const& hgtp, HybridAuxiliaryMapping const& aux)
+    HybridAugmentedPaving(HybridPaving const& hgtp, HybridAuxiliaryMapping const& aux)
         : _state_set(hgtp), _auxiliary_mapping(aux) { }
 
     HybridAuxiliaryMapping const& auxiliary_data() const { return _auxiliary_mapping; }
@@ -89,17 +89,17 @@ class HybridAugmentedPaving
         return _auxiliary_mapping(loc); }
 
     HybridGrid grid() const { return this->_state_set.grid(); }
-    HybridBinaryTreePaving& state_paving() { return this->_state_set; }
-    HybridBinaryTreePaving const& state_paving() const { return this->_state_set; }
+    HybridPaving& state_paving() { return this->_state_set; }
+    HybridPaving const& state_paving() const { return this->_state_set; }
     //! Compatibility aliases for analysis clients.
-    HybridBinaryTreePaving& state_set() { return this->state_paving(); }
-    HybridBinaryTreePaving const& state_set() const { return this->state_paving(); }
-    HybridBinaryTreePaving state_auxiliary_paving() const;
+    HybridPaving& state_set() { return this->state_paving(); }
+    HybridPaving const& state_set() const { return this->state_paving(); }
+    HybridPaving state_auxiliary_paving() const;
 
     Bool is_empty() const { return this->_state_set.is_empty(); }
     SizeType size() const { return this->_state_set.size(); }
-    HybridBinaryTreePaving::ConstIterator begin() const { return this->_state_set.begin(); }
-    HybridBinaryTreePaving::ConstIterator end() const { return this->_state_set.end(); }
+    HybridPaving::ConstIterator begin() const { return this->_state_set.begin(); }
+    HybridPaving::ConstIterator end() const { return this->_state_set.end(); }
 
     Void clear() { this->_state_set.clear(); }
     Void adjoin(HybridAugmentedPaving const& other) { return this->_state_set.adjoin(other._state_set); }
