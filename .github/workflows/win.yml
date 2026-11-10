@@ -63,7 +63,12 @@ jobs:
 
     - name: Build
       working-directory: ${{ runner.workspace }}/build
-      run: cmake --build . --parallel --target everything
+      run: cmake --build . --parallel --target ariadne-hybrid pyariadne
+
+    - name: Build Debug tests
+      if: matrix.build_type == 'Debug'
+      working-directory: ${{ runner.workspace }}/build
+      run: cmake --build . --parallel --target tests
 
     - name: Test C++
       if: matrix.build_type == 'Debug'
