@@ -6,24 +6,24 @@
  ****************************************************************************/
 
 /*
- *  This file is part of Ariadne.
+ *  This file is part of Ariadne Hybrid.
  *
- *  Ariadne is free software: you can redistribute it and/or modify
+ *  Ariadne Hybrid is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  Ariadne is distributed in the hope that it will be useful,
+ *  Ariadne Hybrid is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with Ariadne.  If not, see <https://www.gnu.org/licenses/>.
+ *  along with Ariadne Hybrid.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*! \file hybrid/hybrid_graphics.hpp
- *  \brief Graphics class for drawing objects in hybrid spaces.
+/** @file hybrid/hybrid_graphics.hpp
+ *  @brief Rendering of hybrid sets and figures.
  */
 
 #ifndef ARIADNE_HYBRID_GRAPHICS_HPP
@@ -47,6 +47,7 @@
 
 namespace Ariadne {
 
+/** @brief HybridGraphicsObject represents rendering of hybrid sets and figures. */
 struct HybridGraphicsObject {
     HybridGraphicsObject(const RenderingProperties& gp, const HybridDrawableInterface& sh)
         : properties(gp), shape_ptr(&sh) { }
@@ -58,13 +59,16 @@ struct HybridGraphicsObject {
 class HybridFigure
 {
   public:
+    /** @brief Construct or destroy an instance. */
     ~HybridFigure();
+    /** @brief Construct or destroy an instance. */
     HybridFigure();
 
     Void set_locations(const List<DiscreteLocation>& l) { locations=Set<DiscreteLocation>(l); }
     Void set_axes(const Axes2d& axes) { bounds=axes.bounds; variables=axes.variables; }
     Void set_bounds(const RealVariable& x, const ApproximateDouble& l, const ApproximateDouble& u) { bounds.insert(x,ApproximateDoubleInterval(l,u)); }
     Void set_bounds(const RealVariable& x, const ApproximateDoubleInterval& ivl) { bounds.insert(x,ivl); }
+    /** @brief Return the requested property or representation. */
     Void set_bounds(const Map<RealVariable,ApproximateDoubleInterval>& b) { bounds=b; };
     Void set_variables(const RealVariable& x, const RealVariable& y) { variables=Variables2d(x,y); }
 
@@ -86,10 +90,13 @@ class HybridFigure
 
     Void draw(const HybridDrawableInterface& shape) { objects.append(HybridGraphicsObject(this->properties,shape)); }
     Void clear() { objects.clear(); }
+    /** @brief Render the object. */
     Void write(const char* filename) const;
+    /** @brief Render the object. */
     Void write(const char* filename, Nat nx, Nat ny) const;
 
   public:
+    /** @brief Perform the hybrid-system operation. */
     Void _paint_all(CanvasInterface& canvas) const; // Writes all shapes to the canvas
   private:
   public:
@@ -115,10 +122,12 @@ inline HybridFigure& operator<<(HybridFigure& fig, const HybridDrawableInterface
 inline Void draw(HybridFigure&) { }
 
 template<class SET, class... CSETS>
+/** @brief Render the object. */
 inline Void draw(HybridFigure& g, const Colour& fc1, const SET& set1, CSETS const&... csets) {
     g.set_fill_colour(fc1); draw(g,set1); draw(g,csets...); }
 
 template<class... CSETS>
+/** @brief Perform the hybrid-system operation. */
 Void plot(const char* filename, const Axes2d& axes, CSETS const&... csets) {
     LOGGING_SCOPE_CREATE;
     HybridFigure g;  g.set_axes(axes); draw(g,csets...); g.write(filename); }

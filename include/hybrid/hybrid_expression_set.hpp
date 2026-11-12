@@ -6,24 +6,24 @@
  ****************************************************************************/
 
 /*
- *  This file is part of Ariadne.
+ *  This file is part of Ariadne Hybrid.
  *
- *  Ariadne is free software: you can redistribute it and/or modify
+ *  Ariadne Hybrid is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  Ariadne is distributed in the hope that it will be useful,
+ *  Ariadne Hybrid is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with Ariadne.  If not, see <https://www.gnu.org/licenses/>.
+ *  along with Ariadne Hybrid.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*! \file hybrid/hybrid_expression_set.hpp
- *  \brief Sets in hybrid spaces denoted by variables.
+/** @file hybrid/hybrid_expression_set.hpp
+ *  @brief Symbolic expression-defined sets in hybrid spaces.
  */
 
 #ifndef ARIADNE_HYBRID_EXPRESSION_SET_HPP
@@ -84,6 +84,7 @@ template<class IVL> class HybridVariablesBox
     Box<IVL> euclidean_set(const RealSpace& spc) const { return this->second.euclidean_set(spc); }
 };
 
+/** @brief HybridBoxSet represents symbolic expression-defined sets in hybrid spaces. */
 class HybridBoxSet
     : public virtual EffectiveHybridSetInterface
     , public virtual HybridDrawableInterface
@@ -94,28 +95,44 @@ class HybridBoxSet
     using HybridVariablesBox<RealInterval>::variables;
     using HybridVariablesBox<RealInterval>::euclidean_set;
 
+    /** @brief Perform the hybrid-system operation. */
     RealBox euclidean_set(DiscreteLocation, RealSpace) const;
+    /** @brief Return the requested property or representation. */
     virtual Set<DiscreteLocation> locations() const override;
+    /** @brief Return the requested property or representation. */
     virtual Set<RealVariable> variables(DiscreteLocation) const override;
+    /** @brief Return the requested property or representation. */
     RealSpace space() const;
+    /** @brief Return the requested property or representation. */
     virtual RealSpace space(DiscreteLocation) const;
+    /** @brief Return the requested property or representation. */
     virtual LowerKleenean is_empty() const;
 
+    /** @brief Perform the hybrid-system operation. */
     virtual LowerKleenean overlaps(const HybridExactBox& bx) const override;
+    /** @brief Perform the hybrid-system operation. */
     virtual LowerKleenean separated(const HybridExactBox& bx) const override;
+    /** @brief Perform the hybrid-system operation. */
     virtual LowerKleenean covers(const HybridExactBox& bx) const override;
+    /** @brief Perform the hybrid-system operation. */
     virtual LowerKleenean inside(const HybridExactBox& bx) const;
 //    virtual HybridUpperBox bounding_box() const;
 
+    /** @brief Perform the hybrid-system operation. */
     virtual LowerKleenean inside(const HybridExactBoxes& bx) const override;
+    /** @brief Perform the hybrid-system operation. */
     virtual HybridUpperBoxes bounding_box() const override;
 
+    /** @brief Perform the hybrid-system operation. */
     virtual OutputStream& _write(OutputStream& os) const override;
+    /** @brief Render the object. */
     virtual Void draw(CanvasInterface&, const Set<DiscreteLocation>&, const Variables2d&) const override;
   private:
     // Return the exact interface pointer type to avoid covariant-return
     // adjustment across the virtual-inheritance hierarchy on MSVC.
+    /** @brief Perform the hybrid-system operation. */
     virtual HybridSetInterfaceBase* _clone() const override;
+    /** @brief Perform the hybrid-system operation. */
     virtual EuclideanSetInterfaceBase* _euclidean_set(DiscreteLocation, RealSpace) const override;
 };
 
@@ -128,12 +145,16 @@ template<class IVL> class HybridVariablesBoxes
 {
     typedef Map<DiscreteLocation,VariablesBox<IVL>> Base;
   public:
+    /** @brief Construct or destroy an instance. */
     HybridVariablesBoxes() : Base() { }
+    /** @brief Construct or destroy an instance. */
     HybridVariablesBoxes(Set<DiscreteLocation> locs, VariablesBox<IVL> const& box) {
         for(auto loc : locs) { this->Base::insert(loc,box); } }
+    /** @brief Construct or destroy an instance. */
     HybridVariablesBoxes(List<HybridVariablesBox<IVL>> const& hboxes) {
         for(auto hbox : hboxes) { this->adjoin(hbox); } }
 
+    /** @brief Perform the hybrid-system operation. */
     HybridVariablesBoxes<IVL>& adjoin(HybridVariablesBox<IVL> const& hbox){
         this->Base::insert(hbox.location(),hbox.continuous_set()); return *this; }
 
@@ -147,6 +168,7 @@ template<class IVL> class HybridVariablesBoxes
     Box<IVL> euclidean_set(DiscreteLocation loc, const RealSpace& spc) const { return this->continuous_set(loc).euclidean_set(spc); }
 };
 
+/** @brief HybridBoxesSet represents symbolic expression-defined sets in hybrid spaces. */
 class HybridBoxesSet
     // TODO: Support
     : public HybridVariablesBoxes<RealInterval>

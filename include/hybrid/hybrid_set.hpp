@@ -6,24 +6,24 @@
  ****************************************************************************/
 
 /*
- *  This file is part of Ariadne.
+ *  This file is part of Ariadne Hybrid.
  *
- *  Ariadne is free software: you can redistribute it and/or modify
+ *  Ariadne Hybrid is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  Ariadne is distributed in the hope that it will be useful,
+ *  Ariadne Hybrid is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with Ariadne.  If not, see <https://www.gnu.org/licenses/>.
+ *  along with Ariadne Hybrid.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*! \file hybrid/hybrid_set.hpp
- *  \brief Sets in hybrid spaces.
+/** @file hybrid/hybrid_set.hpp
+ *  @brief Sets of states spanning discrete locations and continuous spaces.
  */
 
 #ifndef ARIADNE_HYBRID_SET_HPP
@@ -66,6 +66,7 @@ namespace Ariadne {
 //! \ingroup HybridSetSubModule
 //! \brief A hybrid set defined in a single location obtained from a Euclidean set by naming variables.
 template<class EBS>
+/** @brief HybridBasicSet represents sets of states spanning discrete locations and continuous spaces. */
 class HybridBasicSet
     : public Pair<DiscreteLocation,LabelledSet<EBS>>
 {
@@ -74,9 +75,11 @@ class HybridBasicSet
     //! \brief The type of the Euclidean set used to describe the hybrid set.
     typedef EBS ContinuousSetType;
 
+    /** @brief Construct or destroy an instance. */
     HybridBasicSet() : Base(DiscreteLocation(),LabelledSet<EBS>(RealSpace(),EBS())) { }
     //! \brief Construct a set in location \a loc, with variables ordered by \a spc, defined by Euclidean set \a ebs.
     HybridBasicSet(const DiscreteLocation& loc, const RealSpace& spc, const ContinuousSetType& ebs) : Base(loc,LabelledSet<EBS>(spc,ebs)) { }
+    /** @brief Construct or destroy an instance. */
     HybridBasicSet(const DiscreteLocation& loc, const LabelledSet<EBS>& exbs) : Base(loc,exbs) { }
     //! \brief The location the set is contained in.
     const DiscreteLocation& location() const { return this->Base::first; }
@@ -96,6 +99,7 @@ class HybridBasicSet
     //! \brief Test if the set is inside a union of hybrid boxes, at most one for each location.
     template<class IVL> decltype(auto) inside(HybridBoxes<IVL> const& hbxs) const {
         return (hbxs.has_location(this->location()))
+            /** @brief Perform the hybrid-system operation. */
             ? this->euclidean_set().inside(hbxs.euclidean_set(this->location(),this->space())) : this->euclidean_set().is_empty(); }
     //! \brief Test if the set is inside a hybrid box. Returns true if the set is empty when the locations do not match.
     template<class IVL> decltype(auto) inside(HybridBox<IVL> const& hbx) const {
@@ -134,6 +138,7 @@ class HybridBasicSet
 // NOTE: Must be out-of-function for case that EBS has no EqualityType
 template<class EBS> EqualsType<EBS> operator==(const HybridBasicSet<EBS>& hset1, const HybridBasicSet<EBS>& hset2) {
     if(hset1.location()==hset2.location()) {
+        /** @brief Construct or destroy an instance. */
         ARIADNE_PRECONDITION(hset1.space()==hset2.space());
         return hset1.continuous_set() == hset2.continuous_set();
     } else {
@@ -144,6 +149,7 @@ template<class EBS> EqualsType<EBS> operator==(const HybridBasicSet<EBS>& hset1,
 //! \ingroup HybridSetSubModule
 //! \brief A hybrid set defined in a single location obtained from a Euclidean set by naming variables.
 template<class EDS>
+/** @brief HybridDenotableSet represents sets of states spanning discrete locations and continuous spaces. */
 class HybridDenotableSet
     : public Map<DiscreteLocation,LabelledSet<EDS>>
 {
@@ -182,11 +188,15 @@ template<class X> class HybridPoint
     : public HybridBasicSet<Point<X>>
 {
   public:
+    /** @brief Construct or destroy an instance. */
     HybridPoint() : HybridBasicSet<Point<X>>() { }
+    /** @brief Construct or destroy an instance. */
     HybridPoint(const DiscreteLocation& q, const RealSpace& spc, const Point<X>& pt) : HybridBasicSet<Point<X>>(q,spc,pt) { }
     HybridPoint(const DiscreteLocation& q, const Map<RealVariable,X>& val)
         : HybridBasicSet<Point<X>>(q,LabelledSet<Point<X>>(VariablesPoint<X>(val))) { }
+    /** @brief Construct or destroy an instance. */
     HybridPoint(const DiscreteLocation& q, const List<Assignment<RealVariable,X>>& val);
+    /** @brief Construct or destroy an instance. */
     HybridPoint(const DiscreteLocation& q, const InitializerList<Assignment<RealVariable,X>>& val);
 
     template<class XX> requires Convertible<XX,X> HybridPoint(HybridPoint<XX> hpt)
@@ -196,6 +206,7 @@ template<class X> class HybridPoint
 
     Point<X>& point() { return this->euclidean_set(); }
     const Point<X>& point() const { return this->euclidean_set(); }
+    /** @brief Return the requested property or representation. */
     Map<RealVariable,X> values() const;
 };
 
@@ -220,6 +231,7 @@ template<class IVL> class HybridBox
     HybridBox(const DiscreteLocation& loc, const LabelledSet<Box<IVL>>& ebx)
         : HybridBasicSet<Box<IVL>>(loc,ebx.space(),ebx.euclidean_set()) { }
 
+    /** @brief Perform the hybrid-system operation. */
     Box<IVL> euclidean_set() const {
         return this->HybridBasicSet<Box<IVL>>::euclidean_set(); }
 
@@ -231,12 +243,17 @@ template<class IVL> class HybridBox
 
     IVL operator[](const RealVariable& v) const { return VariablesBox<IVL>(this->space(),this->euclidean_set())[v]; }
 
+    /** @brief Render the object. */
     virtual Void draw(CanvasInterface& c, const Set<DiscreteLocation>& q, const Variables2d& v) const override;
   private:
+    /** @brief Perform the hybrid-system operation. */
     static LabelledSet<Box<IVL>> _make_box(List<VariableInterval<UB>> const& bnds) {
+        /** @brief Perform the hybrid-system operation. */
         RealSpace spc; Box<IVL> bx(bnds.size());
         for(SizeType i=0; i!=bnds.size(); ++i) {
+            /** @brief Perform the hybrid-system operation. */
             spc.append(bnds[i].variable());
+            /** @brief Perform the hybrid-system operation. */
             bx[i]=bnds[i].interval();
         }
         return LabelledSet<Box<IVL>>(spc,bx);
@@ -269,6 +286,7 @@ template<class IVL> class HybridBoxes
     //! \brief The ordering of variables used to define the Euclidean box in location \a loc.
     RealSpace const& space(const DiscreteLocation& loc) const {
         return this->Base::operator[](loc).space(); }
+    /** @brief Perform the hybrid-system operation. */
     Box<IVL> const& euclidean_set(const DiscreteLocation& loc) const {
         return this->Base::operator[](loc).euclidean_set(); }
 
@@ -279,6 +297,7 @@ template<class IVL> class HybridBoxes
     Box<IVL> const euclidean_set(const DiscreteLocation& loc, const RealSpace& spc) const {
         return this->Base::operator[](loc).euclidean_set(spc); }
 
+    /** @brief Render the object. */
     virtual Void draw(CanvasInterface&, const Set<DiscreteLocation>&, const Variables2d&) const override;
 };
 
@@ -294,49 +313,65 @@ class HybridValidatedConstrainedImageSet
   public:
     using HybridBasicSet<ValidatedConstrainedImageSet>::HybridBasicSet;
 
+    /** @brief Perform the hybrid-system operation. */
     HybridValidatedConstrainedImageSet* clone() const {
         return new HybridValidatedConstrainedImageSet(*this); }
 
+    /** @brief Return the requested property or representation. */
     virtual Set<RealVariable> variables(DiscreteLocation loc) const override {
         static_cast<void>(loc);
         ARIADNE_PRECONDITION(loc==this->location()); return this->Base::variables(); }
+    /** @brief Return the requested property or representation. */
     virtual Set<DiscreteLocation> locations() const override {
         return {this->Base::location()}; }
 
+    /** @brief Perform the hybrid-system operation. */
     virtual ValidatedLowerKleenean overlaps(const HybridExactBoxType& hbx) const override {
         return this->Base::overlaps(hbx); }
+    /** @brief Perform the hybrid-system operation. */
     inline ValidatedLowerKleenean inside(const HybridExactBoxesType& hbxs) const override {
         return this->Base::inside(hbxs); }
+    /** @brief Perform the hybrid-system operation. */
     virtual ValidatedLowerKleenean separated(const HybridExactBoxType& hbx) const override {
         return this->Base::separated(hbx); }
+    /** @brief Perform the hybrid-system operation. */
     virtual HybridUpperBoxes bounding_box() const override;
 
+    /** @brief Perform the hybrid-system operation. */
     virtual OutputStream& _write(OutputStream& os) const override {
         return os << static_cast<const Base&>(*this); }
+    /** @brief Render the object. */
     virtual Void draw(CanvasInterface& cnvs, const Set<DiscreteLocation>& locs, const Variables2d& vars) const override {
         return this->Base::draw(cnvs,locs,vars); }
 
     friend OutputStream& operator<<(OutputStream& os, const HybridValidatedConstrainedImageSet& hset) { return os << static_cast<const Base&>(hset); }
   protected:
     HybridSetInterfaceBase* _clone() const override { return this->clone(); }
+    /** @brief Perform the hybrid-system operation. */
     virtual EuclideanSetInterfaceBase* _euclidean_set(DiscreteLocation loc, RealSpace spc) const override {
         static_cast<void>(loc);
         static_cast<void>(spc);
+        /** @brief Construct or destroy an instance. */
         ARIADNE_PRECONDITION(loc==this->location());
+        /** @brief Construct or destroy an instance. */
         ARIADNE_PRECONDITION(spc==this->space());
         return new ValidatedConstrainedImageSet(this->Base::euclidean_set()); }
 };
 
+/** @brief Perform the hybrid-system operation. */
 template<class EBS> HybridUpperBox HybridBasicSet<EBS>::bounding_box() const {
     return HybridUpperBox(this->location(),this->space(),this->euclidean_set().bounding_box());
 }
 
+/** @brief Perform the hybrid-system operation. */
 template<class EBS> HybridUpperBoxes HybridBasicSet<EBS>::bounding_boxes() const {
+    /** @brief Perform the hybrid-system operation. */
     HybridUpperBoxes res; res.insert(this->location(),this->space(),this->euclidean_set().bounding_box()); return res;
 }
 
 
 template<class ES>
+/** @brief HybridListSetConstIterator represents sets of states spanning discrete locations and continuous spaces. */
 class HybridListSetConstIterator
     : public IteratorFacade<
                 HybridListSetConstIterator<ES>,
@@ -349,11 +384,16 @@ class HybridListSetConstIterator
   public:
     typedef HybridBasicSet<ES> const& Reference;
   public:
+    /** @brief Construct or destroy an instance. */
     HybridListSetConstIterator(const Map<DiscreteLocation,Pair<RealSpace,ListSet<ES> > >& map, Bool);
+    /** @brief Perform the hybrid-system operation. */
     Bool equal(const HybridListSetConstIterator<ES>&) const;
+    /** @brief Perform the hybrid-system operation. */
     const HybridBasicSet<ES>& dereference() const;
+    /** @brief Perform the hybrid-system operation. */
     Void increment();
   private:
+    /** @brief Perform the hybrid-system operation. */
     Void _increment_loc();
   private:
     typedef typename Map< DiscreteLocation,Pair<RealSpace,ListSet<ES>>>::ConstIterator LocationsIterator;
@@ -369,6 +409,7 @@ class HybridListSetConstIterator
 //! \ingroup HybridSetSubModule
 //! A set comprising a %ListSet in each location.
 template<class ES>
+/** @brief HybridListSet represents sets of states spanning discrete locations and continuous spaces. */
 class HybridListSet
 {
     Map<DiscreteLocation, Pair< RealSpace, ListSet<ES> > > _locations;
@@ -380,13 +421,17 @@ class HybridListSet
     HybridListSet() { }
     HybridListSet(const HybridBasicSet<ES>& hes) { this->adjoin(hes); }
 
+    /** @brief Perform the hybrid-system operation. */
     ConstIterator begin() const {
         return ConstIterator(this->_locations,false); }
+    /** @brief Perform the hybrid-system operation. */
     ConstIterator end() const {
         return ConstIterator(this->_locations,true); }
 
+    /** @brief Return the requested property or representation. */
     LocationsConstIterator locations_begin() const {
         return this->_locations.begin(); }
+    /** @brief Return the requested property or representation. */
     LocationsConstIterator locations_end() const {
         return this->_locations.end(); }
 
@@ -394,38 +439,51 @@ class HybridListSet
     SizeType size() const {
         SizeType s = 0;
         for(LocationsConstIterator _loc_iter=this->locations_begin();
+            /** @brief Return the requested property or representation. */
             _loc_iter!=this->locations_end(); ++_loc_iter) {
+            /** @brief Return the requested property or representation. */
             s += _loc_iter->second.second.size();
         }
         return s;
     }
 
     const ListSet<ES>& operator[](const DiscreteLocation& q) const {
+        /** @brief Construct or destroy an instance. */
         ARIADNE_ASSERT_MSG(this->_locations.find(q)!=this->locations_end(),(*this)<<" has no location "<<q);
         return this->_locations.find(q)->second->second; }
 
+    /** @brief Perform the hybrid-system operation. */
     Void insert(const DiscreteLocation& loc, const RealSpace& spc) {
         this->_locations.insert(loc, make_pair(spc,ListSet<ES>())); }
+    /** @brief Perform the hybrid-system operation. */
     Void adjoin(const DiscreteLocation& loc, const RealSpace& spc, const ES& es) {
+        /** @brief Perform the hybrid-system operation. */
         LocationsIterator loc_iter=this->_locations.find(loc);
         if(loc_iter!=this->_locations.end()) {
             ARIADNE_PRECONDITION_MSG(loc_iter->second.first==spc,
                                "Space "<<loc_iter->second.first<<" of location "<<loc_iter->first<<" differs from "<<spc); }
         else { this->insert(loc,spc); loc_iter=this->_locations.find(loc); }
         loc_iter->second.second.adjoin(es); }
+    /** @brief Perform the hybrid-system operation. */
     Void adjoin(const DiscreteLocation& loc, const ES& es) {
+        /** @brief Construct or destroy an instance. */
         ARIADNE_ASSERT_MSG(this->_locations.find(loc)!=this->_locations.end(),(*this)<<" has no location "<<loc);
         this->_locations[loc].second.adjoin(es); }
+    /** @brief Perform the hybrid-system operation. */
     Void adjoin(const HybridBasicSet<ES>& hes) {
         this->adjoin(hes.location(),hes.space(),hes.euclidean_set()); }
+    /** @brief Perform the hybrid-system operation. */
     Void adjoin(const HybridListSet<ES>& hls) {
         for(LocationsConstIterator _loc_iter=hls.locations_begin();
+            /** @brief Return the requested property or representation. */
             _loc_iter!=hls.locations_end(); ++_loc_iter) {
             (*this)[_loc_iter->first].adjoin(_loc_iter->second); } }
 
+    /** @brief Perform the hybrid-system operation. */
     HybridUpperBoxes bounding_boxes() const {
         HybridUpperBoxes result;
         for(LocationsConstIterator _loc_iter=this->locations_begin();
+            /** @brief Return the requested property or representation. */
             _loc_iter!=this->locations_end(); ++_loc_iter) {
             result[_loc_iter->first]=_loc_iter->second.bounding_boxes(); }
         return result; }
@@ -435,6 +493,7 @@ class HybridListSet
 };
 
 template<class ES>
+/** @brief ListSet represents sets of states spanning discrete locations and continuous spaces. */
 class ListSet<HybridBasicSet<ES>>
     : public HybridListSet<ES>
 {
@@ -450,7 +509,9 @@ HybridListSetConstIterator(const Map<DiscreteLocation,Pair<RealSpace,ListSet<ES>
       _loc_iter(end?_loc_end:_loc_begin)
 {
     if(_loc_iter!=_loc_end) {
+        /** @brief Perform the hybrid-system operation. */
         _bs_iter=_loc_iter->second.second.begin();
+        /** @brief Perform the hybrid-system operation. */
         this->_increment_loc();
     }
 }
@@ -478,6 +539,7 @@ Void
 HybridListSetConstIterator<ES>::increment()
 {
     ++this->_bs_iter;
+    /** @brief Perform the hybrid-system operation. */
     this->_increment_loc();
 }
 
@@ -488,6 +550,7 @@ HybridListSetConstIterator<ES>::_increment_loc()
     while(_bs_iter==_loc_iter->second.second.end()) {
         ++_loc_iter;
         if(_loc_iter==_loc_end) { return; }
+        /** @brief Perform the hybrid-system operation. */
         _bs_iter=_loc_iter->second.second.begin();
     }
 }
@@ -502,7 +565,9 @@ class HybridGridCell
     : public HybridBasicSet<GridCell>
 {
   public:
+    /** @brief Construct or destroy an instance. */
     HybridGridCell() : HybridBasicSet<GridCell>() { }
+    /** @brief Construct or destroy an instance. */
     HybridGridCell(DiscreteLocation q, const RealSpace& s, const GridCell& gc) : HybridBasicSet<GridCell>(q,s,gc) { }
     HybridExactBox box() const { return HybridExactBox(this->location(),this->space(),this->euclidean_set().box()); }
 };
@@ -510,6 +575,7 @@ class HybridGridCell
 
 
 template<class DS, class HBS>
+/** @brief HybridSpaceSetConstIterator represents sets of states spanning discrete locations and continuous spaces. */
 class HybridSpaceSetConstIterator
     : public IteratorFacade<HybridSpaceSetConstIterator<DS,HBS>,
                             const HBS,
@@ -521,11 +587,16 @@ class HybridSpaceSetConstIterator
   public:
     typedef HBS const& Reference;
   public:
+    /** @brief Construct or destroy an instance. */
     HybridSpaceSetConstIterator(const Map<DiscreteLocation,DS>&, const HybridSpace& hspc, Bool);
+    /** @brief Perform the hybrid-system operation. */
     Bool equal(const HybridSpaceSetConstIterator<DS,HBS>&) const;
+    /** @brief Perform the hybrid-system operation. */
     const HBS& dereference() const;
+    /** @brief Perform the hybrid-system operation. */
     Void increment();
   private:
+    /** @brief Perform the hybrid-system operation. */
     Void increment_loc();
   private:
     typename Map<DiscreteLocation,DS>::ConstIterator _loc_begin;
@@ -550,6 +621,7 @@ template<class DS, class HBS> inline
 HBS const&
 HybridSpaceSetConstIterator<DS,HBS>::dereference() const
 {
+    /** @brief Construct or destroy an instance. */
     this->hybrid_set=HBS(_loc_iter->first,this->hspc[_loc_iter->first],**this->_bs_iter);
     return this->hybrid_set;
 }
@@ -560,6 +632,7 @@ Void
 HybridSpaceSetConstIterator<DS,HBS>::increment()
 {
     ++(*this->_bs_iter);
+    /** @brief Perform the hybrid-system operation. */
     this->increment_loc();
 }
 

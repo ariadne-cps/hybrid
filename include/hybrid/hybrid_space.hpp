@@ -6,24 +6,24 @@
  ****************************************************************************/
 
 /*
- *  This file is part of Ariadne.
+ *  This file is part of Ariadne Hybrid.
  *
- *  Ariadne is free software: you can redistribute it and/or modify
+ *  Ariadne Hybrid is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  Ariadne is distributed in the hope that it will be useful,
+ *  Ariadne Hybrid is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with Ariadne.  If not, see <https://www.gnu.org/licenses/>.
+ *  along with Ariadne Hybrid.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*! \file hybrid/hybrid_space.hpp
- *  \brief Sets in hybrid spaces.
+/** @file hybrid/hybrid_space.hpp
+ *  @brief Hybrid spaces with discrete locations and continuous variables.
  */
 
 #ifndef ARIADNE_HYBRID_SPACE_HPP
@@ -39,19 +39,26 @@
 
 namespace Ariadne {
 
+/** @brief LocationException represents hybrid spaces with discrete locations and continuous variables. */
 class LocationException : public std::runtime_error {
   public:
+    /** @brief Construct or destroy an instance. */
     LocationException(const StringType& what) : std::runtime_error(what) { }
 };
 
+/** @brief HybridSpaceInterface represents hybrid spaces with discrete locations and continuous variables. */
 class HybridSpaceInterface
 {
   public:
+    /** @brief Construct or destroy an instance. */
     virtual ~HybridSpaceInterface() = default;
+    /** @brief Return the requested property or representation. */
     virtual Bool has_location(const DiscreteLocation& q) const  = 0;
     virtual RealSpace operator[](const DiscreteLocation& q) const = 0;
   public:
+    /** @brief Perform the hybrid-system operation. */
     virtual HybridSpaceInterface* clone() const = 0;
+    /** @brief Perform the hybrid-system operation. */
     virtual OutputStream& _write(OutputStream& os) const = 0;
     virtual ValidatedKleenean operator==(const HybridSpaceInterface& other) const = 0;
   public:
@@ -64,7 +71,9 @@ class HybridSpace
 {
   public:
   public:
+    /** @brief Construct or destroy an instance. */
     HybridSpace(const HybridSpaceInterface& hspc) : _ptr(hspc.clone()) { }
+    /** @brief Construct or destroy an instance. */
     HybridSpace(const HybridSpaceInterface* hspc_ptr) : _ptr(hspc_ptr) { }
 
     Bool has_location(const DiscreteLocation& q) const { return this->_ptr->has_location(q); }
@@ -88,8 +97,10 @@ class MonolithicHybridSpace
   public:
     typedef Map<DiscreteLocation, RealSpace >::ConstIterator ConstIterator;
 
+    /** @brief Construct or destroy an instance. */
     MonolithicHybridSpace() : _locations() { }
 
+    /** @brief Construct or destroy an instance. */
     explicit MonolithicHybridSpace(const Map< DiscreteLocation, RealSpace >& locations) : _locations(locations) { }
 
     MonolithicHybridSpace* clone() const { return new MonolithicHybridSpace(*this); }
@@ -107,6 +118,7 @@ class MonolithicHybridSpace
     }
 
     RealSpace operator[](const DiscreteLocation& q) const {
+        /** @brief Perform the hybrid-system operation. */
         ConstIterator iter = this->_locations.find(q);
         if(iter==this->_locations.end()) {
             ARIADNE_THROW(LocationException,"HybridSpace[DiscreteLocation q]","Space has no location "<<q); }

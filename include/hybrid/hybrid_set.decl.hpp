@@ -6,24 +6,24 @@
  ****************************************************************************/
 
 /*
- *  This file is part of Ariadne.
+ *  This file is part of Ariadne Hybrid.
  *
- *  Ariadne is free software: you can redistribute it and/or modify
+ *  Ariadne Hybrid is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  Ariadne is distributed in the hope that it will be useful,
+ *  Ariadne Hybrid is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with Ariadne.  If not, see <https://www.gnu.org/licenses/>.
+ *  along with Ariadne Hybrid.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*! \file hybrid_set.decl.hpp
- *  \brief Forward declarations of sets in hybrid spaces.
+/** @file hybrid/hybrid_set.decl.hpp
+ *  @brief Declarations of hybrid set abstractions.
  */
 
 #ifndef ARIADNE_HYBRID_SET_DECL_HPP
@@ -32,6 +32,7 @@
 
 namespace Ariadne {
 
+/** @brief HybridSetBase represents declarations of hybrid set abstractions. */
 class HybridSetBase;
 
 template<class P> class HybridBoundedSet;
@@ -51,8 +52,11 @@ using FloatVariableInterval = VariableInterval<FloatDP>;
 template<class UB> class HybridVariableInterval;
 template<class IVL> class HybridVariablesBox;
 
+/** @brief HybridBoxSet represents declarations of hybrid set abstractions. */
 class HybridBoxSet;
+/** @brief HybridConstraintSet represents declarations of hybrid set abstractions. */
 class HybridConstraintSet;
+/** @brief HybridBoundedConstraintSet represents declarations of hybrid set abstractions. */
 class HybridBoundedConstraintSet;
 using HybridSet = HybridBoundedConstraintSet;
 
@@ -78,6 +82,7 @@ using HybridExactBoxesType = HybridExactBoxes;
 using HybridUpperBoxesType = HybridUpperBoxes;
 
 template<class EBS> class HybridListSet;
+/** @brief HybridPaving represents declarations of hybrid set abstractions. */
 class HybridPaving;
 
 } // namespace Ariadne
