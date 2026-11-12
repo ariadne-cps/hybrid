@@ -1,3 +1,31 @@
+/***************************************************************************
+ *            hybrid/hybrid_bounded_constraint_set.hpp
+ *
+ *  Copyright  2026  Luca Geretti
+ *
+ ****************************************************************************/
+
+/** @file hybrid/hybrid_bounded_constraint_set.hpp
+ *  @brief Bounded constraints over hybrid states.
+ */
+
+/*
+ *  This file is part of Ariadne Hybrid.
+ *
+ *  Ariadne Hybrid is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Ariadne Hybrid is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Ariadne Hybrid. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 // Bounded symbolic sets in hybrid state spaces.
 #ifndef ARIADNE_SYSTEM_HYBRID_BOUNDED_CONSTRAINT_SET_HPP
 #define ARIADNE_SYSTEM_HYBRID_BOUNDED_CONSTRAINT_SET_HPP
@@ -18,6 +46,7 @@ class HybridBoundedConstraintSet
 {
     Map<DiscreteLocation, RealExpressionBoundedConstraintSet> _sets;
   public:
+    /** @brief Construct or destroy an instance. */
     HybridBoundedConstraintSet();
     HybridBoundedConstraintSet(const DiscreteLocation& loc,
                                const RealVariablesBox& bx);
@@ -32,8 +61,10 @@ class HybridBoundedConstraintSet
     HybridBoundedConstraintSet(const Set<DiscreteLocation>& locations,
                                const RealExpressionBoundedConstraintSet& constraint_set);
 
+    /** @brief Perform the hybrid-system operation. */
     HybridBoundedConstraintSet& adjoin(const DiscreteLocation& loc, const RealExpressionBoundedConstraintSet& set);
 
+    /** @brief Perform the hybrid-system operation. */
     HybridBoundedConstraintSet* clone() const;
 
     //! \brief If the set only has a single location, returns this, otherwise fails. DEPRECATED
@@ -48,17 +79,25 @@ class HybridBoundedConstraintSet
     //! \brief The subset of \f$\mathbb{R}^n\f$ obtained by restricting to location \a loc and ordering the variables as defined by \a spc.
     BoundedConstraintSet const euclidean_set(DiscreteLocation loc, RealSpace spc) const;
 
+    /** @brief Perform the hybrid-system operation. */
     virtual LowerKleenean overlaps(const HybridExactBox& bx) const override;
+    /** @brief Perform the hybrid-system operation. */
     virtual LowerKleenean inside(const HybridExactBoxes& bx) const override;
 
+    /** @brief Perform the hybrid-system operation. */
     virtual LowerKleenean separated(const HybridExactBox& bx) const override;
+    /** @brief Perform the hybrid-system operation. */
     virtual LowerKleenean covers(const HybridExactBox& bx) const override;
+    /** @brief Perform the hybrid-system operation. */
     virtual HybridUpperBoxes bounding_box() const override;
 
+    /** @brief Perform the hybrid-system operation. */
     virtual OutputStream& _write(OutputStream& os) const override;
+    /** @brief Render the object. */
     virtual Void draw(CanvasInterface&, const Set<DiscreteLocation>&, const Variables2d&) const override;
   protected:
     HybridSetInterfaceBase* _clone() const override { return this->clone(); }
+    /** @brief Perform the hybrid-system operation. */
     virtual EuclideanSetInterfaceBase* _euclidean_set(DiscreteLocation loc, RealSpace spc) const override;
 };
 

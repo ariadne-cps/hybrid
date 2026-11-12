@@ -6,24 +6,24 @@
  ****************************************************************************/
 
 /*
- *  This file is part of Ariadne.
+ *  This file is part of Ariadne Hybrid.
  *
- *  Ariadne is free software: you can redistribute it and/or modify
+ *  Ariadne Hybrid is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  Ariadne is distributed in the hope that it will be useful,
+ *  Ariadne Hybrid is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with Ariadne.  If not, see <https://www.gnu.org/licenses/>.
+ *  along with Ariadne Hybrid.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*! \file hybrid/discrete_location.hpp
- *  \brief Class representing a discrete location of a hybrid automaton.
+/** @file hybrid/discrete_location.hpp
+ *  @brief Discrete locations and state specifications in hybrid systems.
  */
 
 #ifndef ARIADNE_DISCRETE_LOCATION_HPP
@@ -38,14 +38,17 @@
 
 namespace Ariadne {
 
+/** @brief StateSpecificationError represents discrete locations and state specifications in hybrid systems. */
 class StateSpecificationError : public std::runtime_error {
   public:
+    /** @brief Construct or destroy an instance. */
     StateSpecificationError(const StringType& what) : std::runtime_error(what) { }
 };
 
 //! \brief Two discrete locations define different variables, but variables defined in both locations differ.
 class IndistinguishableLocationsError : public StateSpecificationError {
   public:
+    /** @brief Construct or destroy an instance. */
     IndistinguishableLocationsError(const StringType& what) : StateSpecificationError(what) { }
 };
 
@@ -60,11 +63,17 @@ class DiscreteLocation
     DiscreteLocation() : StringValuation() { }
     //! \brief Construct the location q|n.
     DiscreteLocation(Int n);
+    /** @brief Construct or destroy an instance. */
     DiscreteLocation(StringVariable var, String val) : DiscreteLocation({var|val}) { }
+    /** @brief Construct or destroy an instance. */
     DiscreteLocation(Pair<StringVariable,String> svarstr) : StringValuation({svarstr}) { }
+    /** @brief Construct or destroy an instance. */
     DiscreteLocation(const StringValuation& val) : StringValuation(val) { }
+    /** @brief Construct or destroy an instance. */
     DiscreteLocation(const Map<Identifier,String>& sm) : StringValuation(sm) { }
+    /** @brief Construct or destroy an instance. */
     DiscreteLocation(const Map<StringVariable,String>& sm) : StringValuation(sm) { }
+    /** @brief Construct or destroy an instance. */
     DiscreteLocation(const InitializerList<Pair<StringVariable,String>>& salst) : StringValuation(salst) { }
     Void adjoin(const DiscreteLocation& loc) { this->_values.adjoin(loc._values); }
 };

@@ -6,24 +6,24 @@
  ****************************************************************************/
 
 /*
- *  This file is part of Ariadne.
+ *  This file is part of Ariadne Hybrid.
  *
- *  Ariadne is free software: you can redistribute it and/or modify
+ *  Ariadne Hybrid is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  Ariadne is distributed in the hope that it will be useful,
+ *  Ariadne Hybrid is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with Ariadne.  If not, see <https://www.gnu.org/licenses/>.
+ *  along with Ariadne Hybrid.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*! \file hybrid/hybrid_auxiliary_mapping.hpp
- *  \brief Lazy location-indexed labelled auxiliary mappings.
+/** @file hybrid/hybrid_auxiliary_mapping.hpp
+ *  @brief Location-dependent auxiliary variable mappings.
  */
 #ifndef ARIADNE_REASONING_HYBRID_AUXILIARY_MAPPING_HPP
 #define ARIADNE_REASONING_HYBRID_AUXILIARY_MAPPING_HPP
@@ -38,6 +38,7 @@ namespace Ariadne {
 //! Location-indexed auxiliary functions, evaluated lazily and independent of an automaton.
 class HybridAuxiliaryMapping {
     // Destroy the hybrid space before the provider, which may own its backing system.
+    /** @brief Construct or destroy an instance. */
     std::function<LabelledMapping(DiscreteLocation const&)> _mapping;
     HybridSpace _state_auxiliary_space;
   public:

@@ -6,24 +6,24 @@
  ****************************************************************************/
 
 /*
- *  This file is part of Ariadne.
+ *  This file is part of Ariadne Hybrid.
  *
- *  Ariadne is free software: you can redistribute it and/or modify
+ *  Ariadne Hybrid is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  Ariadne is distributed in the hope that it will be useful,
+ *  Ariadne Hybrid is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with Ariadne.  If not, see <https://www.gnu.org/licenses/>.
+ *  along with Ariadne Hybrid.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*! \file hybrid/hybrid_augmented_paving.hpp
- *  \brief Grid-tree pavings augmented with location-dependent auxiliary functions
+/** @file hybrid/hybrid_augmented_paving.hpp
+ *  @brief Hybrid pavings with auxiliary variables and mappings.
  */
 
 #ifndef ARIADNE_HYBRID_AUGMENTED_PAVING_HPP
@@ -56,16 +56,23 @@ namespace Ariadne {
 
 template<class X> class Vector;
 
+/** @brief AugmentedPaving represents hybrid pavings with auxiliary variables and mappings. */
 class AugmentedPaving;
+/** @brief BinaryTreePaving represents hybrid pavings with auxiliary variables and mappings. */
 class BinaryTreePaving;
+/** @brief HybridAugmentedPaving represents hybrid pavings with auxiliary variables and mappings. */
 class HybridAugmentedPaving;
 
 // FIXME: Replace this proxy with a direct mutable view of a labelled augmented paving.
+/** @brief HybridAugmentedPavingElementReference represents hybrid pavings with auxiliary variables and mappings. */
 class HybridAugmentedPavingElementReference {
     HybridAugmentedPaving* _hstorage; DiscreteLocation _loc;
   public:
+    /** @brief Construct or destroy an instance. */
     HybridAugmentedPavingElementReference(HybridAugmentedPaving* hstorage, DiscreteLocation const& loc) : _hstorage(hstorage), _loc(loc) { }
+    /** @brief Construct or destroy an instance. */
     inline operator const LabelledAugmentedPaving () const;
+    /** @brief Perform the hybrid-system operation. */
     inline Void clear();
 };
 
@@ -85,6 +92,7 @@ class HybridAugmentedPaving
         : _state_set(hgtp), _auxiliary_mapping(aux) { }
 
     HybridAuxiliaryMapping const& auxiliary_data() const { return _auxiliary_mapping; }
+    /** @brief Perform the hybrid-system operation. */
     LabelledMapping auxiliary_mapping(DiscreteLocation const& loc) const {
         return _auxiliary_mapping(loc); }
 
@@ -94,6 +102,7 @@ class HybridAugmentedPaving
     //! Compatibility aliases for analysis clients.
     HybridPaving& state_set() { return this->state_paving(); }
     HybridPaving const& state_set() const { return this->state_paving(); }
+    /** @brief Perform the hybrid-system operation. */
     HybridPaving state_auxiliary_paving() const;
 
     Bool is_empty() const { return this->_state_set.is_empty(); }
@@ -106,15 +115,20 @@ class HybridAugmentedPaving
     Void remove(HybridAugmentedPaving const& other) { return this->_state_set.remove(other._state_set); }
     Void restrict(HybridAugmentedPaving const& other) { return this->_state_set.restrict(other._state_set); }
 
+    /** @brief Perform the hybrid-system operation. */
     friend Bool subset(HybridAugmentedPaving const& set1, HybridAugmentedPaving const& set2) {
         return subset(set1._state_set,set2._state_set); }
+    /** @brief Perform the hybrid-system operation. */
     friend Bool intersect(HybridAugmentedPaving const& set1, HybridAugmentedPaving const& set2) {
         return intersect(set1._state_set,set2._state_set); }
 
+    /** @brief Perform the hybrid-system operation. */
     Void adjoin_lower_approximation(EffectiveHybridOvertSetInterface const& set, Nat extent, Nat fineness) {
         this->_state_set.adjoin_lower_approximation(set,extent,fineness); }
+    /** @brief Perform the hybrid-system operation. */
     Void adjoin_outer_approximation(EffectiveHybridCompactSetInterface const& set, Nat fineness) {
         this->_state_set.adjoin_outer_approximation(set,fineness); }
+    /** @brief Perform the hybrid-system operation. */
     Void adjoin_outer_approximation(HybridExactBoxes const& bx, Nat fineness) {
         this->_state_set.adjoin_outer_approximation(bx,fineness); }
 
@@ -137,6 +151,7 @@ class HybridAugmentedPaving
 inline const LabelledAugmentedPaving HybridAugmentedPaving::operator[](DiscreteLocation const& q) const {
     return LabelledAugmentedPaving(this->_state_set[q],this->auxiliary_mapping(q));
 }
+/** @brief Construct or destroy an instance. */
 HybridAugmentedPavingElementReference::operator const LabelledAugmentedPaving () const {
     return LabelledAugmentedPaving(_hstorage->_state_set[_loc],_hstorage->auxiliary_mapping(_loc)); }
 Void HybridAugmentedPavingElementReference::clear() { return _hstorage->state_paving()[_loc].clear(); }
