@@ -33,54 +33,55 @@
 #include <string>
 #include <vector>
 
-#include "rendering/colour.hpp"
-#include "symbolic/variable.hpp"
-#include "labelled/graphics_interface.hpp"
-#include "labelled/figure.hpp"
-#include "rendering/figure.hpp"
-#include "logging/logging.hpp"
-
-#include "expression-set/expression_set.hpp"
 #include "hybrid/discrete_location.hpp"
 #include "hybrid/hybrid_graphics_interface.hpp"
+#include "labelled/figure.hpp"
+#include "labelled/graphics_interface.hpp"
+#include "logging/logging.hpp"
+#include "rendering/colour.hpp"
+#include "rendering/figure.hpp"
+#include "symbolic/variable.hpp"
 
+#include "expression-set/expression_set.hpp"
 
 namespace Ariadne {
 
 /** @brief HybridGraphicsObject represents rendering of hybrid sets and figures. */
 struct HybridGraphicsObject {
     HybridGraphicsObject(const RenderingProperties& gp, const HybridDrawableInterface& sh)
-        : properties(gp), shape_ptr(&sh) { }
+        : properties(gp), shape_ptr(&sh) {}
     RenderingProperties properties;
     const HybridDrawableInterface* shape_ptr;
 };
 
 //! \brief Class for plotting figures of hybrid sets.
-class HybridFigure
-{
+class HybridFigure {
   public:
     /** @brief Construct or destroy an instance. */
     ~HybridFigure();
     /** @brief Construct or destroy an instance. */
     HybridFigure();
 
-    Void set_locations(const List<DiscreteLocation>& l) { locations=Set<DiscreteLocation>(l); }
-    Void set_axes(const Axes2d& axes) { bounds=axes.bounds; variables=axes.variables; }
-    Void set_bounds(const RealVariable& x, const ApproximateDouble& l, const ApproximateDouble& u) { bounds.insert(x,ApproximateDoubleInterval(l,u)); }
-    Void set_bounds(const RealVariable& x, const ApproximateDoubleInterval& ivl) { bounds.insert(x,ivl); }
+    Void set_locations(const List<DiscreteLocation>& l) { locations = Set<DiscreteLocation>(l); }
+    Void set_axes(const Axes2d& axes) {
+        bounds = axes.bounds;
+        variables = axes.variables;
+    }
+    Void set_bounds(const RealVariable& x, const ApproximateDouble& l, const ApproximateDouble& u) { bounds.insert(x, ApproximateDoubleInterval(l, u)); }
+    Void set_bounds(const RealVariable& x, const ApproximateDoubleInterval& ivl) { bounds.insert(x, ivl); }
     /** @brief Return the requested property or representation. */
-    Void set_bounds(const Map<RealVariable,ApproximateDoubleInterval>& b) { bounds=b; };
-    Void set_variables(const RealVariable& x, const RealVariable& y) { variables=Variables2d(x,y); }
+    Void set_bounds(const Map<RealVariable, ApproximateDoubleInterval>& b) { bounds = b; };
+    Void set_variables(const RealVariable& x, const RealVariable& y) { variables = Variables2d(x, y); }
 
-    Void set_line_style(Bool ls) { properties.line_style=ls; }
-    Void set_line_width(double lw) { properties.line_width=lw; }
-    Void set_line_colour(Colour lc) { properties.line_colour=lc; }
-    Void set_fill_style(Bool fs) { properties.fill_style=fs; }
-    Void set_fill_colour(Colour fc) { properties.fill_colour=fc; }
+    Void set_line_style(Bool ls) { properties.line_style = ls; }
+    Void set_line_width(double lw) { properties.line_width = lw; }
+    Void set_line_colour(Colour lc) { properties.line_colour = lc; }
+    Void set_fill_style(Bool fs) { properties.fill_style = fs; }
+    Void set_fill_colour(Colour fc) { properties.fill_colour = fc; }
 
-    Void set_fill_opacity(double fo) { properties.fill_colour.opacity=fo; }
-    Void set_line_colour(double r, double g, double b) { properties.line_colour=Colour(r,g,b); }
-    Void set_fill_colour(double r, double g, double b) { properties.fill_colour=Colour(r,g,b,properties.fill_colour.opacity); }
+    Void set_fill_opacity(double fo) { properties.fill_colour.opacity = fo; }
+    Void set_line_colour(double r, double g, double b) { properties.line_colour = Colour(r, g, b); }
+    Void set_fill_colour(double r, double g, double b) { properties.fill_colour = Colour(r, g, b, properties.fill_colour.opacity); }
 
     Bool get_line_style() const { return properties.line_style; }
     double get_line_width() const { return properties.line_width; }
@@ -88,7 +89,7 @@ class HybridFigure
     Bool get_fill_style() const { return properties.fill_style; }
     Colour get_fill_colour() const { return properties.fill_colour; }
 
-    Void draw(const HybridDrawableInterface& shape) { objects.append(HybridGraphicsObject(this->properties,shape)); }
+    Void draw(const HybridDrawableInterface& shape) { objects.append(HybridGraphicsObject(this->properties, shape)); }
     Void clear() { objects.clear(); }
     /** @brief Render the object. */
     Void write(const char* filename) const;
@@ -98,39 +99,69 @@ class HybridFigure
   public:
     /** @brief Perform the hybrid-system operation. */
     Void _paint_all(CanvasInterface& canvas) const; // Writes all shapes to the canvas
+
   private:
+
   public:
-    Map<RealVariable,ApproximateDoubleInterval> bounds;
+    Map<RealVariable, ApproximateDoubleInterval> bounds;
     Set<DiscreteLocation> locations;
     Variables2d variables;
     RenderingProperties properties;
     List<HybridGraphicsObject> objects;
 };
 
-inline HybridFigure& operator<<(HybridFigure& g, const LineStyle& ls) { g.set_line_style(ls); return g; }
-inline HybridFigure& operator<<(HybridFigure& g, const LineWidth& lw) { g.set_line_width(lw); return g; }
-inline HybridFigure& operator<<(HybridFigure& g, const LineColour& lc) { g.set_line_colour(lc); return g; }
-inline HybridFigure& operator<<(HybridFigure& g, const FillStyle& fs) { g.set_fill_style(fs); return g; }
-inline HybridFigure& operator<<(HybridFigure& g, const FillOpacity& fo) { g.set_fill_opacity(fo); return g; }
-inline HybridFigure& operator<<(HybridFigure& g, const FillColour& fc) { g.set_fill_colour(fc); return g; }
+inline HybridFigure& operator<<(HybridFigure& g, const LineStyle& ls) {
+    g.set_line_style(ls);
+    return g;
+}
+inline HybridFigure& operator<<(HybridFigure& g, const LineWidth& lw) {
+    g.set_line_width(lw);
+    return g;
+}
+inline HybridFigure& operator<<(HybridFigure& g, const LineColour& lc) {
+    g.set_line_colour(lc);
+    return g;
+}
+inline HybridFigure& operator<<(HybridFigure& g, const FillStyle& fs) {
+    g.set_fill_style(fs);
+    return g;
+}
+inline HybridFigure& operator<<(HybridFigure& g, const FillOpacity& fo) {
+    g.set_fill_opacity(fo);
+    return g;
+}
+inline HybridFigure& operator<<(HybridFigure& g, const FillColour& fc) {
+    g.set_fill_colour(fc);
+    return g;
+}
 
-inline Void draw(CanvasInterface& canvas, const Set<DiscreteLocation>& locations, const Variables2d& variables, const HybridDrawableInterface& shape) { shape.draw(canvas,locations,variables); }
+inline Void draw(CanvasInterface& canvas, const Set<DiscreteLocation>& locations, const Variables2d& variables, const HybridDrawableInterface& shape) { shape.draw(canvas, locations, variables); }
 inline Void draw(HybridFigure& fig, const HybridDrawableInterface& shape) { fig.draw(shape); }
 
-inline HybridFigure& operator<<(HybridFigure& fig, const HybridDrawableInterface& shape) { fig.draw(shape); return fig; }
+inline HybridFigure& operator<<(HybridFigure& fig, const HybridDrawableInterface& shape) {
+    fig.draw(shape);
+    return fig;
+}
 
-inline Void draw(HybridFigure&) { }
+inline Void draw(HybridFigure&) {}
 
 template<class SET, class... CSETS>
 /** @brief Render the object. */
 inline Void draw(HybridFigure& g, const Colour& fc1, const SET& set1, CSETS const&... csets) {
-    g.set_fill_colour(fc1); draw(g,set1); draw(g,csets...); }
+    g.set_fill_colour(fc1);
+    draw(g, set1);
+    draw(g, csets...);
+}
 
 template<class... CSETS>
 /** @brief Perform the hybrid-system operation. */
 Void plot(const char* filename, const Axes2d& axes, CSETS const&... csets) {
     LOGGING_SCOPE_CREATE;
-    HybridFigure g;  g.set_axes(axes); draw(g,csets...); g.write(filename); }
+    HybridFigure g;
+    g.set_axes(axes);
+    draw(g, csets...);
+    g.write(filename);
+}
 
 } // namespace Ariadne
 

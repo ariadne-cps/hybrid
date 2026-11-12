@@ -26,21 +26,22 @@
  *  @brief Implement graphical representations of hybrid sets.
  */
 
-#include "function/functional.hpp"
+#include "hybrid/hybrid_graphics.hpp"
 
+#include "function/functional.hpp"
+#include "geometry/box.hpp"
+#include "geometry/point.hpp"
+#include "hybrid/discrete_location.hpp"
+#include "numeric/numeric.hpp"
+#include "rendering/figure.hpp"
+#include "rendering/geometry2d.hpp"
+#include "rendering/rendering_manager.hpp"
+#include "set/function_set.hpp"
+#include "symbolic/space.hpp"
 #include "utility/macros.hpp"
 #include "utility/stlio.hpp"
-#include "numeric/numeric.hpp"
-#include "symbolic/space.hpp"
-#include "geometry/point.hpp"
-#include "geometry/box.hpp"
-#include "rendering/geometry2d.hpp"
-#include "rendering/figure.hpp"
-#include "rendering/rendering_manager.hpp"
-#include "hybrid/discrete_location.hpp"
-#include "set/function_set.hpp"
+
 #include "expression-set/expression_set.hpp"
-#include "hybrid/hybrid_graphics.hpp"
 
 namespace Ariadne {
 
@@ -50,52 +51,41 @@ static const Nat HYBRID_DEFAULT_HEIGHT = 800;
 HybridFigure::~HybridFigure() {
 }
 
-
 HybridFigure::HybridFigure()
-    : variables(RealVariable("x"),RealVariable("y"))
-{
+    : variables(RealVariable("x"), RealVariable("y")) {
 }
 
-Void
-HybridFigure::write(const char* cfilename) const
-{
+Void HybridFigure::write(const char* cfilename) const {
     this->write(cfilename, HYBRID_DEFAULT_WIDTH, HYBRID_DEFAULT_HEIGHT);
 }
 
-
-Void
-HybridFigure::write(const char* cfilename, Nat drawing_width, Nat drawing_height) const
-{
+Void HybridFigure::write(const char* cfilename, Nat drawing_width, Nat drawing_height) const {
     // RenderingManager owns the configured backend, including the portable
     // raster backend. No Cairo-specific capability is needed at this layer.
-    SharedPointer<CanvasInterface> canvas=RenderingManager::instance().backend().make_canvas(
-        cfilename,drawing_width,drawing_height,this->properties.is_animated);
+    SharedPointer<CanvasInterface> canvas = RenderingManager::instance().backend().make_canvas(
+        cfilename, drawing_width, drawing_height, this->properties.is_animated);
     this->_paint_all(*canvas);
     canvas->write(cfilename);
 }
 
-Void HybridFigure::_paint_all(CanvasInterface& canvas) const
-{
+Void HybridFigure::_paint_all(CanvasInterface& canvas) const {
     // Project the bounding box onto the canvas
-    double xl=numeric_cast<double>(bounds[variables.x()].lower_bound());
-    double xu=numeric_cast<double>(bounds[variables.x()].upper_bound());
-    double yl=numeric_cast<double>(bounds[variables.y()].lower_bound());
-    double yu=numeric_cast<double>(bounds[variables.y()].upper_bound());
+    double xl = numeric_cast<double>(bounds[variables.x()].lower_bound());
+    double xu = numeric_cast<double>(bounds[variables.x()].upper_bound());
+    double yl = numeric_cast<double>(bounds[variables.y()].lower_bound());
+    double yu = numeric_cast<double>(bounds[variables.y()].upper_bound());
 
-    canvas.initialise(variables.x().name(),variables.y().name(),xl,xu,yl,yu);
+    canvas.initialise(variables.x().name(), variables.y().name(), xl, xu, yl, yu);
 
     // Draw shapes
-    for(SizeType i=0; i!=objects.size(); ++i) {
-        const HybridDrawableInterface& shape=*objects[i].shape_ptr;
+    for (SizeType i = 0; i != objects.size(); ++i) {
+        const HybridDrawableInterface& shape = *objects[i].shape_ptr;
         set_properties(canvas, objects[i].properties);
-        shape.draw(canvas,this->locations,this->variables);
+        shape.draw(canvas, this->locations, this->variables);
     }
 
     canvas.finalise();
 }
 
-
-
 } // namespace Ariadne
-
 

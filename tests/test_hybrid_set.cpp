@@ -26,22 +26,21 @@
  *  @brief Exercise test hybrid set behavior.
  */
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
+
+#include "algebra/matrix.hpp"
+#include "algebra/vector.hpp"
+#include "function/function.hpp"
+#include "hybrid/hybrid_bounded_constraint_set.hpp"
+#include "hybrid/hybrid_constraint_set.hpp"
+#include "hybrid/hybrid_paving.hpp"
+#include "hybrid/hybrid_set.hpp"
+#include "labelled/figure.hpp"
+#include "numeric/rational.hpp"
+#include "set/function_set.hpp"
 
 #include "ariadne-testing.hpp"
-
-#include "numeric/rational.hpp"
-#include "algebra/vector.hpp"
-#include "algebra/matrix.hpp"
-#include "function/function.hpp"
-
-#include "set/function_set.hpp"
-#include "hybrid/hybrid_constraint_set.hpp"
-#include "hybrid/hybrid_bounded_constraint_set.hpp"
-#include "hybrid/hybrid_set.hpp"
-#include "hybrid/hybrid_paving.hpp"
-#include "labelled/figure.hpp"
 
 using namespace std;
 using namespace Ariadne;
@@ -50,14 +49,12 @@ using namespace Ariadne;
 // Check the represented values when testing the exact logical outcome.
 namespace {
 bool same_logical_value(LogicalValue actual, LogicalValue expected) {
-    return static_cast<ComparableEnumerationType>(actual)
-        == static_cast<ComparableEnumerationType>(expected);
+    return static_cast<ComparableEnumerationType>(actual) == static_cast<ComparableEnumerationType>(expected);
 }
-}
-
+} // namespace
 
 class TestHybridSet : public Ariadne::Testing::ContextFixture {
-public:
+  public:
     using ContextFixture::ContextFixture;
 
     Void test_hybrid_list_set() {
@@ -68,14 +65,24 @@ public:
         RealSpace spc1({x});
         RealSpace spc2({x, y});
 
-        ExactBoxType bx1 = {{0, 1}};
-        ExactBoxType bx2 = {{2, 3}};
-        ExactBoxType bx3 = {{1, 2},
-                            {2, 3}};
-        ExactBoxType bx4 = {{4, 5},
-                            {5, 6}};
-        ExactBoxType bx5 = {{6, 7},
-                            {8, 9}};
+        ExactBoxType bx1 = {
+            {0, 1}
+        };
+        ExactBoxType bx2 = {
+            {2, 3}
+        };
+        ExactBoxType bx3 = {
+            {1, 2},
+            {2, 3}
+        };
+        ExactBoxType bx4 = {
+            {4, 5},
+            {5, 6}
+        };
+        ExactBoxType bx5 = {
+            {6, 7},
+            {8, 9}
+        };
         ARIADNE_TESTING_EXPECT_NO_THROW(hls.adjoin(loc1, spc1, bx1));
         ARIADNE_TESTING_EXPECT_EXCEPTION(hls.adjoin(loc1, bx3)); // Should fail due to incompatible dimensions
         ARIADNE_TESTING_EXPECT_EXCEPTION(hls.adjoin(loc2, bx3)); // Should fail due to unspecified space
@@ -127,9 +134,11 @@ public:
         RealVariable x("x");
         RealSpace state_space({x});
         MonolithicHybridSpace hybrid_space;
-        hybrid_space.new_location(loc,state_space);
+        hybrid_space.new_location(loc, state_space);
         HybridPaving paving{HybridGrid(hybrid_space)};
-        HybridExactBox box(loc,state_space,ExactBoxType({{0,1}}));
+        HybridExactBox box(loc, state_space, ExactBoxType({
+                                                 {0, 1}
+        }));
         ARIADNE_TESTING_PROVE(definitely(paving.separated(box)));
         ARIADNE_TESTING_PROVE(same_logical_value(paving.overlaps(box).repr(), LogicalValue::UNLIKELY));
         ARIADNE_TESTING_PROVE(same_logical_value(paving.covers(box).repr(), LogicalValue::UNLIKELY));
@@ -145,44 +154,44 @@ public:
     Void test_hybrid_initial_outer_approximation() {
         DiscreteLocation loc;
         RealVariable x("x"), v("v");
-        RealSpace state_space({x,v});
+        RealSpace state_space({x, v});
         MonolithicHybridSpace hybrid_space;
-        hybrid_space.new_location(loc,state_space);
-        Dyadic height=2;
-        Dyadic radius=1/pow(two,6);
+        hybrid_space.new_location(loc, state_space);
+        Dyadic height = 2;
+        Dyadic radius = 1 / pow(two, 6);
         HybridBoundedConstraintSet initial(loc,
-            {height-radius<=x<=height+radius,-radius<=v<=radius});
+                                           {height - radius <= x <= height + radius, -radius <= v <= radius});
         // Probe the effective Euclidean interface before the paving call.
-        const auto euclidean=initial.euclidean_set(loc,state_space);
-        ARIADNE_TESTING_EXPECT_EQUAL(euclidean.dimension(),2u);
+        const auto euclidean = initial.euclidean_set(loc, state_space);
+        ARIADNE_TESTING_EXPECT_EQUAL(euclidean.dimension(), 2u);
         ARIADNE_TESTING_NOTE(euclidean.bounding_box());
         // Exercise each abstract view of the same multiply inherited
         // object. This used to dispatch via incompatible covariant thunks
         // on MSVC Debug, before reaching the paving implementation.
-        const HybridSetInterfaceBase& as_base=initial;
-        const EffectiveHybridBoundedSetInterface& as_bounded=initial;
-        const EffectiveHybridClosedSetInterface& as_closed=initial;
-        const EffectiveHybridCompactSetInterface& as_compact=initial;
-        const EffectiveHybridLocatedSetInterface& as_located=initial;
-        const EffectiveHybridSetInterface& as_full=initial;
-        ARIADNE_TESTING_EXPECT_EQUAL(as_base.euclidean_set(loc,state_space).dimension(),2u);
-        ARIADNE_TESTING_EXPECT_EQUAL(as_bounded.euclidean_set(loc,state_space).dimension(),2u);
-        ARIADNE_TESTING_EXPECT_EQUAL(as_closed.euclidean_set(loc,state_space).dimension(),2u);
-        auto from_compact=as_compact.euclidean_set(loc,state_space);
-        ARIADNE_TESTING_EXPECT_EQUAL(from_compact.dimension(),2u);
+        const HybridSetInterfaceBase& as_base = initial;
+        const EffectiveHybridBoundedSetInterface& as_bounded = initial;
+        const EffectiveHybridClosedSetInterface& as_closed = initial;
+        const EffectiveHybridCompactSetInterface& as_compact = initial;
+        const EffectiveHybridLocatedSetInterface& as_located = initial;
+        const EffectiveHybridSetInterface& as_full = initial;
+        ARIADNE_TESTING_EXPECT_EQUAL(as_base.euclidean_set(loc, state_space).dimension(), 2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(as_bounded.euclidean_set(loc, state_space).dimension(), 2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(as_closed.euclidean_set(loc, state_space).dimension(), 2u);
+        auto from_compact = as_compact.euclidean_set(loc, state_space);
+        ARIADNE_TESTING_EXPECT_EQUAL(from_compact.dimension(), 2u);
         // Upper bounds have three-valued geometric equality. We need
         // identical endpoint representations across the two conversions.
-        ARIADNE_TESTING_PROVE(same(from_compact.bounding_box(),euclidean.bounding_box()));
-        ARIADNE_TESTING_EXPECT_EQUAL(as_located.euclidean_set(loc,state_space).dimension(),2u);
-        ARIADNE_TESTING_EXPECT_EQUAL(as_full.euclidean_set(loc,state_space).dimension(),2u);
+        ARIADNE_TESTING_PROVE(same(from_compact.bounding_box(), euclidean.bounding_box()));
+        ARIADNE_TESTING_EXPECT_EQUAL(as_located.euclidean_set(loc, state_space).dimension(), 2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(as_full.euclidean_set(loc, state_space).dimension(), 2u);
         HybridPaving paving{HybridGrid(hybrid_space)};
-        paving.adjoin_outer_approximation(initial,4u);
+        paving.adjoin_outer_approximation(initial, 4u);
         ARIADNE_TESTING_PROVE(paving.nontrivial_location(loc));
-        ARIADNE_TESTING_PROVE(paving.size()>0u);
+        ARIADNE_TESTING_PROVE(paving.size() > 0u);
         // The domain is a RealBox; use an outward enclosure before
         // converting to an exact box for the paving containment check.
-        const HybridUpperBoxes bounds=initial.bounding_box();
-        ExactBoxType initial_box=cast_exact_box(bounds.euclidean_set(loc,state_space));
+        const HybridUpperBoxes bounds = initial.bounding_box();
+        ExactBoxType initial_box = cast_exact_box(bounds.euclidean_set(loc, state_space));
         ARIADNE_TESTING_PROVE(paving.euclidean_set(loc).superset(initial_box));
     }
 
@@ -200,10 +209,11 @@ public:
         hgts.has_location(loc);
         // HybridPaving exposes the selected backend as a polymorphic
         // Paving. Build a tree view only for this legacy Figure draw check.
-        Paving const& slice=hgts[loc];
+        const Paving& slice = hgts[loc];
         BinaryTreePaving drawable(slice.grid());
-        for(auto const& cell : slice) drawable.adjoin(cell);
-        draw(fig,drawable);
+        for (const auto& cell: slice)
+            drawable.adjoin(cell);
+        draw(fig, drawable);
     }
 };
 

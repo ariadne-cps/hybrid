@@ -26,30 +26,30 @@
  *  @brief Bind hybrid objects and functions to Python.
  */
 
-#include "pybind11.hpp"
-#include "function-utilities.hpp"
-
 #include "hybrid/discrete_location.hpp"
-#include "hybrid/hybrid_space.hpp"
-#include "hybrid/hybrid_grid.hpp"
-#include "hybrid/hybrid_set.hpp"
-#include "hybrid/hybrid_paving.hpp"
 #include "hybrid/hybrid_graphics_interface.hpp"
+#include "hybrid/hybrid_grid.hpp"
+#include "hybrid/hybrid_paving.hpp"
+#include "hybrid/hybrid_set.hpp"
+#include "hybrid/hybrid_space.hpp"
+#include "pybind11.hpp"
+
+#include "function-utilities.hpp"
 
 using namespace Ariadne;
 
-void hybrid_submodule(pybind11::module& module) {
+void hybrid_submodule(pybind11::module &module) {
     pybind11::class_<DiscreteLocation> location_class(module, "DiscreteLocation");
     location_class.def(pybind11::init<>());
     location_class.def(pybind11::init<Int>());
     location_class.def(pybind11::init<StringVariable, String>());
     location_class.def("adjoin", &DiscreteLocation::adjoin);
-    location_class.def("__eq__", [](DiscreteLocation const& a, DiscreteLocation const& b) { return a == b; });
-    location_class.def("__ne__", [](DiscreteLocation const& a, DiscreteLocation const& b) { return a != b; });
+    location_class.def("__eq__", [](const DiscreteLocation &a, const DiscreteLocation &b) { return a == b; });
+    location_class.def("__ne__", [](const DiscreteLocation &a, const DiscreteLocation &b) { return a != b; });
     location_class.def("__str__", &__cstr__<DiscreteLocation>);
     location_class.def("__repr__", &__cstr__<DiscreteLocation>);
 
-    module.def("join", (DiscreteLocation(*)(DiscreteLocation const&, DiscreteLocation const&)) &join);
+    module.def("join", (DiscreteLocation (*)(const DiscreteLocation &, const DiscreteLocation &))&join);
     module.def("are_same", &are_same);
     module.def("are_distinguishable", &are_distinguishable);
     module.def("is_restriction", &is_restriction);
@@ -60,19 +60,19 @@ void hybrid_submodule(pybind11::module& module) {
     monolithic_class.def(pybind11::init<>());
     monolithic_class.def("new_location", &MonolithicHybridSpace::new_location);
     monolithic_class.def("has_location", &MonolithicHybridSpace::has_location);
-    monolithic_class.def("space", [](MonolithicHybridSpace const& s, DiscreteLocation const& q) { return s[q]; });
+    monolithic_class.def("space", [](const MonolithicHybridSpace &s, const DiscreteLocation &q) { return s[q]; });
     monolithic_class.def("__str__", &__cstr__<MonolithicHybridSpace>);
     monolithic_class.def("__repr__", &__cstr__<MonolithicHybridSpace>);
 
     pybind11::class_<HybridSpace> space_class(module, "HybridSpace");
-    space_class.def(pybind11::init<HybridSpaceInterface const&>());
+    space_class.def(pybind11::init<const HybridSpaceInterface &>());
     space_class.def("has_location", &HybridSpace::has_location);
-    space_class.def("space", [](HybridSpace const& s, DiscreteLocation const& q) { return s[q]; });
+    space_class.def("space", [](const HybridSpace &s, const DiscreteLocation &q) { return s[q]; });
     space_class.def("__str__", &__cstr__<HybridSpace>);
     space_class.def("__repr__", &__cstr__<HybridSpace>);
 
     pybind11::class_<HybridGrid> grid_class(module, "HybridGrid");
-    grid_class.def(pybind11::init<HybridSpace const&>());
+    grid_class.def(pybind11::init<const HybridSpace &>());
     grid_class.def("has_location", &HybridGrid::has_location);
     grid_class.def("grid", &HybridGrid::grid);
     grid_class.def("__str__", &__cstr__<HybridGrid>);
@@ -82,17 +82,17 @@ void hybrid_submodule(pybind11::module& module) {
 
     pybind11::class_<HybridRealBox, pybind11::bases<HybridDrawableInterface>>
         box_class(module, "HybridRealBox");
-    box_class.def(pybind11::init<DiscreteLocation const&, RealSpace const&, RealBox const&>());
+    box_class.def(pybind11::init<const DiscreteLocation &, const RealSpace &, const RealBox &>());
     box_class.def("location", &HybridRealBox::location);
     box_class.def("space", &HybridRealBox::space);
     box_class.def("dimension", &HybridRealBox::dimension);
-    box_class.def("euclidean_set", [](HybridRealBox const& b) { return b.euclidean_set(); });
+    box_class.def("euclidean_set", [](const HybridRealBox &b) { return b.euclidean_set(); });
     box_class.def("__str__", &__cstr__<HybridRealBox>);
     box_class.def("__repr__", &__cstr__<HybridRealBox>);
 
     pybind11::class_<HybridPaving, pybind11::bases<HybridDrawableInterface>>
         paving_class(module, "HybridPaving");
-    paving_class.def(pybind11::init<HybridGrid const&>());
+    paving_class.def(pybind11::init<const HybridGrid &>());
     paving_class.def("has_location", &HybridPaving::has_location);
     paving_class.def("is_empty", &HybridPaving::is_empty);
     paving_class.def("size", &HybridPaving::size);

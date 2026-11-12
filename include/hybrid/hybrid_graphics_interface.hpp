@@ -29,16 +29,18 @@
 #ifndef ARIADNE_HYBRID_GRAPHICS_INTERFACE_HPP
 #define ARIADNE_HYBRID_GRAPHICS_INTERFACE_HPP
 
-#include "labelled/graphics_interface.hpp"
 #include "hybrid/hybrid_drawable_interface.hpp"
+#include "labelled/graphics_interface.hpp"
 
 namespace Ariadne {
 
 /** @brief Real represents interfaces for hybrid graphics. */
 class Real;
-template<class T> class Variable;
+template<class T>
+class Variable;
 typedef Variable<Real> RealVariable;
-template<class T> class Space;
+template<class T>
+class Space;
 typedef Space<Real> RealSpace;
 /** @brief DiscreteLocation represents interfaces for hybrid graphics. */
 class DiscreteLocation;
@@ -50,6 +52,5 @@ struct Variables2d;
 Bool valid_axis_variables(const RealSpace& space, const Variables2d& variables);
 
 } // namespace Ariadne
-
 
 #endif // ARIADNE_HYBRID_GRAPHICS_INTERFACE_HPP

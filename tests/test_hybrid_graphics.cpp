@@ -26,17 +26,16 @@
  *  @brief Exercise hybrid graphics behavior.
  */
 
-#include "ariadne-testing.hpp"
-
-#include "foundation/logical.hpp"
-#include "numeric/real.hpp"
-#include "symbolic/variable.hpp"
-#include "symbolic/assignment.hpp"
-
-#include "hybrid/hybrid_graphics.hpp"
-#include "hybrid/hybrid_set.hpp"
-#include "hybrid/hybrid_paving.hpp"
 #include "drawing/drawing_command_line_interface.hpp"
+#include "foundation/logical.hpp"
+#include "hybrid/hybrid_graphics.hpp"
+#include "hybrid/hybrid_paving.hpp"
+#include "hybrid/hybrid_set.hpp"
+#include "numeric/real.hpp"
+#include "symbolic/assignment.hpp"
+#include "symbolic/variable.hpp"
+
+#include "ariadne-testing.hpp"
 
 using namespace Ariadne;
 
@@ -44,19 +43,21 @@ class TestHybridGraphics : public Ariadne::Testing::ContextFixture {
   public:
     using ContextFixture::ContextFixture;
 
-        Void test_boxes() {
-
-        RealVariable x("x"),y("y"),z("z");
+    Void test_boxes() {
+        RealVariable x("x"), y("y"), z("z");
         DiscreteLocation location(1);
-        HybridRealBox hbx1(location,{0<=x<=1,2<=y<=3,5<=z<=7});
-        HybridExactBox hbx2(location,{x,y,z},ExactBoxType{{1.0_x,2.0_x},{3.0_x,4.0_x},{6.0_x,8.0_x}});
+        HybridRealBox hbx1(location, {0 <= x <= 1, 2 <= y <= 3, 5 <= z <= 7});
+        HybridExactBox hbx2(location, {
+                                          x, y, z
+        },
+                            ExactBoxType{{1.0_x, 2.0_x}, {3.0_x, 4.0_x}, {6.0_x, 8.0_x}});
 
         HybridFigure hfig;
         hfig.set_locations({location});
-        hfig.set_bounds(x,-8,8);
-        hfig.set_bounds(y,-8,8);
-        hfig.set_bounds(z,-8,8);
-        hfig.set_variables(x,y);
+        hfig.set_bounds(x, -8, 8);
+        hfig.set_bounds(y, -8, 8);
+        hfig.set_bounds(z, -8, 8);
+        hfig.set_variables(x, y);
 
         hfig << fill_colour(red) << fill_opacity(1.0) << line_colour(black) << line_width(1.0) << hbx1;
         hfig.write("test_hybrid_graphics1");
@@ -67,7 +68,8 @@ class TestHybridGraphics : public Ariadne::Testing::ContextFixture {
 };
 
 int main(int argc, char** argv) {
-    if (not DrawingCommandLineInterface().acquire(argc, argv)) return -1;
+    if (not DrawingCommandLineInterface().acquire(argc, argv))
+        return -1;
     ARIADNE_TESTING_SUITE("test_hybrid_graphics");
     ARIADNE_TESTING_ADD_TEST(TestHybridGraphics, test_boxes);
     return ARIADNE_TESTING_RUN_TESTS();

@@ -32,52 +32,50 @@
 #include <map>
 #include <memory>
 
-#include "utility/macros.hpp"
-#include "utility/stlio.hpp"
-#include "numeric/declarations.hpp"
 #include "algebra/declarations.hpp"
 #include "function/declarations.hpp"
+#include "geometry/box.hpp"
 #include "geometry/declarations.hpp"
-#include "utility/container.hpp"
-#include "set/function_set.hpp"
-#include "set/list_set.hpp"
-#include "paving/binary_tree_paving.hpp"
-#include "set/curve.hpp"
-
-#include "expression-set/expression_set.hpp"
-
+#include "geometry/point.hpp"
+#include "hybrid/hybrid_bounded_constraint_set.hpp"
+#include "hybrid/hybrid_constraint_set.hpp"
+#include "hybrid/hybrid_graphics_interface.hpp"
+#include "hybrid/hybrid_grid.hpp"
 #include "hybrid/hybrid_set.decl.hpp"
 #include "hybrid/hybrid_set_interface.hpp"
 #include "hybrid/hybrid_space.hpp"
-#include "hybrid/hybrid_grid.hpp"
-#include "geometry/point.hpp"
-#include "geometry/box.hpp"
+#include "numeric/declarations.hpp"
+#include "paving/binary_tree_paving.hpp"
+#include "set/curve.hpp"
+#include "set/function_set.hpp"
+#include "set/list_set.hpp"
+#include "utility/container.hpp"
+#include "utility/macros.hpp"
+#include "utility/stlio.hpp"
 
-#include "hybrid/hybrid_graphics_interface.hpp"
-#include "hybrid/hybrid_constraint_set.hpp"
-#include "hybrid/hybrid_bounded_constraint_set.hpp"
+#include "expression-set/expression_set.hpp"
 
 namespace Ariadne {
-
 
 //! \ingroup ExpressionSetSubModule
 //! \ingroup HybridSetSubModule
 //! \brief A hybrid set defined by a box in a single location.
 //! \details Does not assume a canonical order of the real variables.
-template<class IVL> class HybridVariablesBox
-    : public Pair<DiscreteLocation,VariablesBox<IVL>>
-{
-    typedef Pair<DiscreteLocation,VariablesBox<IVL>> Base;
+template<class IVL>
+class HybridVariablesBox
+    : public Pair<DiscreteLocation, VariablesBox<IVL>> {
+    typedef Pair<DiscreteLocation, VariablesBox<IVL>> Base;
+
   public:
     HybridVariablesBox(const DiscreteLocation& loc, const VariablesBox<IVL>& bx)
-        : Base(loc,bx) { }
+        : Base(loc, bx) {}
     HybridVariablesBox(const DiscreteLocation& loc, const RealSpace& spc, const Box<IVL>& bx)
-        : Base(loc,VariablesBox<IVL>(spc,bx)) { }
+        : Base(loc, VariablesBox<IVL>(spc, bx)) {}
 
     //! \brief The location in which the box is defined.
     DiscreteLocation location() const { return this->Base::first; }
     //! \brief The location in which the box is defined.
-    VariablesBox<IVL> const& continuous_set() const { return this->Base::second; }
+    const VariablesBox<IVL>& continuous_set() const { return this->Base::second; }
     //! \brief The active variables in the location \a loc.
     Set<RealVariable> variables() const { return this->Base::second.variables(); }
     //! \brief The subset of \f$\mathbb{R}^n\f$ obtained by ordering the variables as defined by \a spc.
@@ -86,10 +84,9 @@ template<class IVL> class HybridVariablesBox
 
 /** @brief HybridBoxSet represents symbolic expression-defined sets in hybrid spaces. */
 class HybridBoxSet
-    : public virtual EffectiveHybridSetInterface
-    , public virtual HybridDrawableInterface
-    , public HybridVariablesBox<RealInterval>
-{
+    : public virtual EffectiveHybridSetInterface,
+      public virtual HybridDrawableInterface,
+      public HybridVariablesBox<RealInterval> {
   public:
     using HybridVariablesBox<RealInterval>::HybridVariablesBox;
     using HybridVariablesBox<RealInterval>::variables;
@@ -116,7 +113,7 @@ class HybridBoxSet
     virtual LowerKleenean covers(const HybridExactBox& bx) const override;
     /** @brief Perform the hybrid-system operation. */
     virtual LowerKleenean inside(const HybridExactBox& bx) const;
-//    virtual HybridUpperBox bounding_box() const;
+    //    virtual HybridUpperBox bounding_box() const;
 
     /** @brief Perform the hybrid-system operation. */
     virtual LowerKleenean inside(const HybridExactBoxes& bx) const override;
@@ -127,6 +124,7 @@ class HybridBoxSet
     virtual OutputStream& _write(OutputStream& os) const override;
     /** @brief Render the object. */
     virtual Void draw(CanvasInterface&, const Set<DiscreteLocation>&, const Variables2d&) const override;
+
   private:
     // Return the exact interface pointer type to avoid covariant-return
     // adjustment across the virtual-inheritance hierarchy on MSVC.
@@ -140,28 +138,37 @@ class HybridBoxSet
 //! \ingroup HybridSetSubModule
 //! \brief A hybrid set defined by a box in each of a set of locations.
 //! \details Does not assume a canonical order of the real variables.
-template<class IVL> class HybridVariablesBoxes
-    : public Map<DiscreteLocation,VariablesBox<IVL>>
-{
-    typedef Map<DiscreteLocation,VariablesBox<IVL>> Base;
+template<class IVL>
+class HybridVariablesBoxes
+    : public Map<DiscreteLocation, VariablesBox<IVL>> {
+    typedef Map<DiscreteLocation, VariablesBox<IVL>> Base;
+
   public:
     /** @brief Construct or destroy an instance. */
-    HybridVariablesBoxes() : Base() { }
+    HybridVariablesBoxes() : Base() {}
     /** @brief Construct or destroy an instance. */
-    HybridVariablesBoxes(Set<DiscreteLocation> locs, VariablesBox<IVL> const& box) {
-        for(auto loc : locs) { this->Base::insert(loc,box); } }
+    HybridVariablesBoxes(Set<DiscreteLocation> locs, const VariablesBox<IVL>& box) {
+        for (auto loc: locs) {
+            this->Base::insert(loc, box);
+        }
+    }
     /** @brief Construct or destroy an instance. */
-    HybridVariablesBoxes(List<HybridVariablesBox<IVL>> const& hboxes) {
-        for(auto hbox : hboxes) { this->adjoin(hbox); } }
+    HybridVariablesBoxes(const List<HybridVariablesBox<IVL>>& hboxes) {
+        for (auto hbox: hboxes) {
+            this->adjoin(hbox);
+        }
+    }
 
     /** @brief Perform the hybrid-system operation. */
-    HybridVariablesBoxes<IVL>& adjoin(HybridVariablesBox<IVL> const& hbox){
-        this->Base::insert(hbox.location(),hbox.continuous_set()); return *this; }
+    HybridVariablesBoxes<IVL>& adjoin(const HybridVariablesBox<IVL>& hbox) {
+        this->Base::insert(hbox.location(), hbox.continuous_set());
+        return *this;
+    }
 
     //! \brief The location in which the box is defined.
     Set<DiscreteLocation> locations() const { return this->Base::keys(); }
     //! \brief The location in which the box is defined.
-    VariablesBox<IVL> const& continuous_set(DiscreteLocation loc) const { return (*this)[loc]; }
+    const VariablesBox<IVL>& continuous_set(DiscreteLocation loc) const { return (*this)[loc]; }
     //! \brief The active variables in the location \a loc.
     Set<RealVariable> variables(DiscreteLocation loc) const { return this->continuous_set(loc).variables(); }
     //! \brief The subset of \f$\mathbb{R}^n\f$ obtained by ordering the variables as defined by \a spc.
@@ -171,12 +178,10 @@ template<class IVL> class HybridVariablesBoxes
 /** @brief HybridBoxesSet represents symbolic expression-defined sets in hybrid spaces. */
 class HybridBoxesSet
     // TODO: Support
-    : public HybridVariablesBoxes<RealInterval>
-{
+    : public HybridVariablesBoxes<RealInterval> {
   public:
     using HybridVariablesBoxes<RealInterval>::HybridVariablesBoxes;
 };
-
 
 } // namespace Ariadne
 

@@ -35,22 +35,23 @@
 
 namespace Ariadne {
 
-inline Void draw(CanvasInterface& canvas, Set<DiscreteLocation> const& locations,
-                 Variables2d const& axes, HybridAugmentedPaving const& paving) {
+inline Void draw(CanvasInterface& canvas, const Set<DiscreteLocation>& locations,
+                 const Variables2d& axes, const HybridAugmentedPaving& paving) {
     /** @brief Perform the hybrid-system operation. */
-    paving.state_auxiliary_paving().draw(canvas,locations,axes);
+    paving.state_auxiliary_paving().draw(canvas, locations, axes);
 }
 
 /** @brief HybridAugmentedPavingDrawable represents drawing adapters for hybrid augmented pavings. */
 class HybridAugmentedPavingDrawable final : public HybridDrawableInterface {
   public:
     /** @brief Construct or destroy an instance. */
-    explicit HybridAugmentedPavingDrawable(HybridAugmentedPaving const& paving) : _paving(paving) { }
-    Void draw(CanvasInterface& canvas, Set<DiscreteLocation> const& locations,
-              Variables2d const& axes) const override {
+    explicit HybridAugmentedPavingDrawable(const HybridAugmentedPaving& paving) : _paving(paving) {}
+    Void draw(CanvasInterface& canvas, const Set<DiscreteLocation>& locations,
+              const Variables2d& axes) const override {
         /** @brief Render the object. */
-        Ariadne::draw(canvas,locations,axes,_paving);
+        Ariadne::draw(canvas, locations, axes, _paving);
     }
+
   private:
     HybridAugmentedPaving _paving;
 };

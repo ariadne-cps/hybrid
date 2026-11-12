@@ -26,46 +26,46 @@
  *  @brief Implement hybrid constraint sets.
  */
 
-#include "function/functional.hpp"
 #include "hybrid/hybrid_constraint_set.hpp"
+
+#include "function/functional.hpp"
 #include "set/function_set.hpp"
 #include "utility/stlio.hpp"
 
 namespace Ariadne {
 
 HybridConstraintSet::HybridConstraintSet()
-    : _sets()
-{
+    : _sets() {
 }
 
 HybridConstraintSet::HybridConstraintSet(const DiscreteLocation& loc,
-                                         const List<ContinuousPredicate>& cnstr)
-{
-    this->adjoin(loc,RealExpressionConstraintSet(cnstr));
+                                         const List<ContinuousPredicate>& cnstr) {
+    this->adjoin(loc, RealExpressionConstraintSet(cnstr));
 }
 
 HybridConstraintSet::HybridConstraintSet(const DiscreteLocation& loc,
-                                         const RealExpressionConstraintSet& cs)
-{
-    this->adjoin(loc,cs);
+                                         const RealExpressionConstraintSet& cs) {
+    this->adjoin(loc, cs);
 }
 
 HybridConstraintSet::HybridConstraintSet(const Set<DiscreteLocation>& locs,
-                                         const RealExpressionConstraintSet& cs)
-{
-    for(auto loc : locs) { this->adjoin(loc,cs); }
+                                         const RealExpressionConstraintSet& cs) {
+    for (auto loc: locs) {
+        this->adjoin(loc, cs);
+    }
 }
 
 HybridConstraintSet* HybridConstraintSet::clone() const {
     return new HybridConstraintSet(*this);
 }
 
-HybridConstraintSet& HybridConstraintSet::adjoin(const DiscreteLocation& loc, RealExpressionConstraintSet const& cs) {
-    this->_sets.insert(loc,cs); return *this;
+HybridConstraintSet& HybridConstraintSet::adjoin(const DiscreteLocation& loc, const RealExpressionConstraintSet& cs) {
+    this->_sets.insert(loc, cs);
+    return *this;
 }
 
-HybridConstraintSet& HybridConstraintSet::adjoin(const DiscreteLocation& loc, List<ContinuousPredicate> const& cnstr) {
-    return this->adjoin(loc,RealExpressionConstraintSet(cnstr));
+HybridConstraintSet& HybridConstraintSet::adjoin(const DiscreteLocation& loc, const List<ContinuousPredicate>& cnstr) {
+    return this->adjoin(loc, RealExpressionConstraintSet(cnstr));
 }
 
 Set<DiscreteLocation> HybridConstraintSet::locations() const {
@@ -81,24 +81,22 @@ Set<RealVariable> HybridConstraintSet::variables(DiscreteLocation loc) const {
     return _sets[loc].variables();
 }
 
-RealExpressionConstraintSet const& HybridConstraintSet::continuous_set(DiscreteLocation loc) const {
+const RealExpressionConstraintSet& HybridConstraintSet::continuous_set(DiscreteLocation loc) const {
     ARIADNE_PRECONDITION(this->_sets.has_key(loc));
     return this->_sets[loc];
 }
 
-ConstraintSet const HybridConstraintSet::euclidean_set(DiscreteLocation loc, RealSpace spc) const {
+const ConstraintSet HybridConstraintSet::euclidean_set(DiscreteLocation loc, RealSpace spc) const {
     ARIADNE_PRECONDITION(this->_sets.has_key(loc));
     return ConstraintSet(this->_sets[loc].euclidean_set(spc));
 }
 
 EuclideanSetInterfaceBase* HybridConstraintSet::_euclidean_set(DiscreteLocation loc, RealSpace spc) const {
-    return new ConstraintSet(this->euclidean_set(loc,spc));
+    return new ConstraintSet(this->euclidean_set(loc, spc));
 }
 
 OutputStream& HybridConstraintSet::_write(OutputStream& os) const {
-    return os << "HybridConstraintSet( "<< this->_sets << " )";
+    return os << "HybridConstraintSet( " << this->_sets << " )";
 }
-
-
 
 } // namespace Ariadne

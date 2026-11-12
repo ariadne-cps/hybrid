@@ -29,9 +29,10 @@
 #define ARIADNE_REASONING_HYBRID_AUXILIARY_MAPPING_HPP
 #include <functional>
 #include <utility>
-#include "labelled/labelled_mapping.hpp"
-#include "hybrid/hybrid_space.hpp"
+
 #include "hybrid/discrete_location.hpp"
+#include "hybrid/hybrid_space.hpp"
+#include "labelled/labelled_mapping.hpp"
 
 namespace Ariadne {
 
@@ -39,16 +40,16 @@ namespace Ariadne {
 class HybridAuxiliaryMapping {
     // Destroy the hybrid space before the provider, which may own its backing system.
     /** @brief Construct or destroy an instance. */
-    std::function<LabelledMapping(DiscreteLocation const&)> _mapping;
+    std::function<LabelledMapping(const DiscreteLocation &)> _mapping;
     HybridSpace _state_auxiliary_space;
+
   public:
-    HybridAuxiliaryMapping(HybridSpace const& space,
-                           std::function<LabelledMapping(DiscreteLocation const&)> mapping)
-        : _mapping(std::move(mapping)), _state_auxiliary_space(space) { }
-    LabelledMapping operator()(DiscreteLocation const& q) const { return _mapping(q); }
+    HybridAuxiliaryMapping(const HybridSpace &space,
+                           std::function<LabelledMapping(const DiscreteLocation &)> mapping)
+        : _mapping(std::move(mapping)), _state_auxiliary_space(space) {}
+    LabelledMapping operator()(const DiscreteLocation &q) const { return _mapping(q); }
     HybridSpace state_auxiliary_space() const { return _state_auxiliary_space; }
 };
-
 
 } // namespace Ariadne
 #endif // ARIADNE_REASONING_HYBRID_AUXILIARY_MAPPING_HPP

@@ -52,7 +52,6 @@ class HybridDrawableInterface {
     virtual Void draw(CanvasInterface& c, const Set<DiscreteLocation>& q, const Variables2d& v) const = 0;
 };
 
-
 } // namespace Ariadne
 
 #endif // ARIADNE_HYBRID_DRAWABLE_INTERFACE_HPP

@@ -31,11 +31,10 @@
 
 #include <iostream>
 
-#include "symbolic/space.hpp"
-#include "hybrid/hybrid_space.hpp"
 #include "hybrid/hybrid_scalings.hpp"
-
+#include "hybrid/hybrid_space.hpp"
 #include "paving/grid.hpp"
+#include "symbolic/space.hpp"
 
 namespace Ariadne {
 
@@ -45,17 +44,18 @@ class HybridPaving;
 
 //! \ingroup HybridModule
 //! \brief A grid in a hybrid space
-class HybridGrid
-{
+class HybridGrid {
     // NOTE: The use of the system is to allow the "Grid" of a compositional
     // hybrid automaton to be computed on-the-fly since it might not be
     // feasible to compute the reachable states.
     HybridSpace _space;
     HybridScalings _scalings;
+
   public:
     //! Test whether the grid has location \a q.
     Bool has_location(const DiscreteLocation& q) const {
-        return this->_space.has_location(q); }
+        return this->_space.has_location(q);
+    }
     //! The grid in location \a loc.
     Grid operator[](const DiscreteLocation& loc) const;
     //! The underlying hybrid space.
@@ -66,27 +66,27 @@ class HybridGrid
     HybridScalings& scalings() { return this->_scalings; }
     //! The grid in location \a loc.
     Grid grid(const DiscreteLocation& loc) const { return this->operator[](loc); }
+
   public:
     //! The grid corresponding to unit resolution on each dimension.
-    HybridGrid(const HybridSpace& hsp) : _space(hsp), _scalings(SimpleHybridScalings()) { }
+    HybridGrid(const HybridSpace& hsp) : _space(hsp), _scalings(SimpleHybridScalings()) {}
     //! The grid corresponding to scalings each variable in each location according to the policy \a hsc.
     HybridGrid(const HybridSpace& hsp, const HybridScalings& hsc)
-        : _space(hsp), _scalings(hsc) { }
+        : _space(hsp), _scalings(hsc) {}
     HybridGrid* clone() const { return new HybridGrid(*this); }
     //!
     friend OutputStream& operator<<(OutputStream& os, const HybridGrid& hgrid);
 };
 
-inline Grid HybridGrid::operator[](const DiscreteLocation& loc) const
-{
-    return this->_scalings.grid(loc,this->_space[loc]);
+inline Grid HybridGrid::operator[](const DiscreteLocation& loc) const {
+    return this->_scalings.grid(loc, this->_space[loc]);
 }
 
 inline OutputStream& operator<<(OutputStream& os, const HybridGrid& hgrid) {
-    return os << "HybridGrid( space="<<hgrid._space << ", scalings=" << hgrid._scalings << " )";
+    return os << "HybridGrid( space=" << hgrid._space << ", scalings=" << hgrid._scalings << " )";
 }
 
-}
+} // namespace Ariadne
 
 #endif // ARIADNE_HYBRID_GRID_HPP
 

@@ -31,11 +31,10 @@
 
 #include <map>
 
+#include "hybrid/discrete_location.hpp"
+#include "symbolic/space.hpp"
 #include "utility/container.hpp"
 #include "utility/stlio.hpp"
-#include "symbolic/space.hpp"
-#include "hybrid/discrete_location.hpp"
-
 
 namespace Ariadne {
 
@@ -43,76 +42,78 @@ namespace Ariadne {
 class LocationException : public std::runtime_error {
   public:
     /** @brief Construct or destroy an instance. */
-    LocationException(const StringType& what) : std::runtime_error(what) { }
+    LocationException(const StringType& what) : std::runtime_error(what) {}
 };
 
 /** @brief HybridSpaceInterface represents hybrid spaces with discrete locations and continuous variables. */
-class HybridSpaceInterface
-{
+class HybridSpaceInterface {
   public:
     /** @brief Construct or destroy an instance. */
     virtual ~HybridSpaceInterface() = default;
     /** @brief Return the requested property or representation. */
-    virtual Bool has_location(const DiscreteLocation& q) const  = 0;
+    virtual Bool has_location(const DiscreteLocation& q) const = 0;
     virtual RealSpace operator[](const DiscreteLocation& q) const = 0;
+
   public:
     /** @brief Perform the hybrid-system operation. */
     virtual HybridSpaceInterface* clone() const = 0;
     /** @brief Perform the hybrid-system operation. */
     virtual OutputStream& _write(OutputStream& os) const = 0;
     virtual ValidatedKleenean operator==(const HybridSpaceInterface& other) const = 0;
+
   public:
     friend OutputStream& operator<<(OutputStream& os, const HybridSpaceInterface& hsp) { return hsp._write(os); }
 };
 
 //! \ingroup HybridModule
 //! \brief A hybrid space \f$\bigsqcup_{q\in Q} \R^{d_q}\f$ with discrete states \f$Q\f$.
-class HybridSpace
-{
+class HybridSpace {
   public:
+
   public:
     /** @brief Construct or destroy an instance. */
-    HybridSpace(const HybridSpaceInterface& hspc) : _ptr(hspc.clone()) { }
+    HybridSpace(const HybridSpaceInterface& hspc) : _ptr(hspc.clone()) {}
     /** @brief Construct or destroy an instance. */
-    HybridSpace(const HybridSpaceInterface* hspc_ptr) : _ptr(hspc_ptr) { }
+    HybridSpace(const HybridSpaceInterface* hspc_ptr) : _ptr(hspc_ptr) {}
 
     Bool has_location(const DiscreteLocation& q) const { return this->_ptr->has_location(q); }
     RealSpace operator[](const DiscreteLocation& q) const { return this->_ptr->operator[](q); }
 
     ValidatedKleenean operator==(const HybridSpace& other) const { return this->_ptr->operator==(other); }
 
-    operator const HybridSpaceInterface& () const { return *_ptr; }
+    operator const HybridSpaceInterface&() const { return *_ptr; }
 
     friend OutputStream& operator<<(OutputStream& os, const HybridSpace& hsp) { return os << *hsp._ptr; }
+
   private:
     std::shared_ptr<const HybridSpaceInterface> _ptr;
 };
 
-
 //! \ingroup HybridModule
 //! \brief A hybrid space \f$\bigsqcup_{q\in Q} \R^{d_q}\f$ with discrete states \f$Q\f$.
 class MonolithicHybridSpace
-    : public HybridSpaceInterface
-{
+    : public HybridSpaceInterface {
   public:
-    typedef Map<DiscreteLocation, RealSpace >::ConstIterator ConstIterator;
+    typedef Map<DiscreteLocation, RealSpace>::ConstIterator ConstIterator;
 
     /** @brief Construct or destroy an instance. */
-    MonolithicHybridSpace() : _locations() { }
+    MonolithicHybridSpace() : _locations() {}
 
     /** @brief Construct or destroy an instance. */
-    explicit MonolithicHybridSpace(const Map< DiscreteLocation, RealSpace >& locations) : _locations(locations) { }
+    explicit MonolithicHybridSpace(const Map<DiscreteLocation, RealSpace>& locations) : _locations(locations) {}
 
     MonolithicHybridSpace* clone() const { return new MonolithicHybridSpace(*this); }
 
-    Void new_location(const DiscreteLocation& q, const RealSpace& spc) { this->_locations.insert(q,spc); }
+    Void new_location(const DiscreteLocation& q, const RealSpace& spc) { this->_locations.insert(q, spc); }
 
     Bool has_location(const DiscreteLocation& q) const { return _locations.has_key(q); }
 
     ValidatedKleenean operator==(const HybridSpaceInterface& other) const {
-        for (ConstIterator iter=this->_locations.begin(); iter!=this->_locations.end(); ++iter) {
-            if (!other.has_location(iter->first)) return false;
-            if (other[iter->first] != iter->second) return false;
+        for (ConstIterator iter = this->_locations.begin(); iter != this->_locations.end(); ++iter) {
+            if (!other.has_location(iter->first))
+                return false;
+            if (other[iter->first] != iter->second)
+                return false;
         }
         return true;
     }
@@ -120,22 +121,23 @@ class MonolithicHybridSpace
     RealSpace operator[](const DiscreteLocation& q) const {
         /** @brief Perform the hybrid-system operation. */
         ConstIterator iter = this->_locations.find(q);
-        if(iter==this->_locations.end()) {
-            ARIADNE_THROW(LocationException,"HybridSpace[DiscreteLocation q]","Space has no location "<<q); }
-        return iter->second; }
+        if (iter == this->_locations.end()) {
+            ARIADNE_THROW(LocationException, "HybridSpace[DiscreteLocation q]", "Space has no location " << q);
+        }
+        return iter->second;
+    }
 
     Set<DiscreteLocation> locations() const { return this->_locations.keys(); }
     ConstIterator begin() const { return this->_locations.begin(); }
     ConstIterator end() const { return this->_locations.end(); }
 
     OutputStream& _write(OutputStream& os) const { return os << "HybridSpace( " << this->_locations << " )"; }
+
   private:
-    Map< DiscreteLocation, RealSpace > _locations;
+    Map<DiscreteLocation, RealSpace> _locations;
 };
 
-
-
-}
+} // namespace Ariadne
 
 #endif // ARIADNE_HYBRID_SPACE_HPP
 

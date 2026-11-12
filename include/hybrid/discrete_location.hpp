@@ -29,8 +29,9 @@
 #ifndef ARIADNE_DISCRETE_LOCATION_HPP
 #define ARIADNE_DISCRETE_LOCATION_HPP
 
-#include <string>
 #include <stdexcept>
+#include <string>
+
 #include "utility/container.hpp"
 // symbolic/variable.hpp instantiates conversions involving Real; define it first.
 #include "numeric/real.hpp"
@@ -42,39 +43,37 @@ namespace Ariadne {
 class StateSpecificationError : public std::runtime_error {
   public:
     /** @brief Construct or destroy an instance. */
-    StateSpecificationError(const StringType& what) : std::runtime_error(what) { }
+    StateSpecificationError(const StringType& what) : std::runtime_error(what) {}
 };
 
 //! \brief Two discrete locations define different variables, but variables defined in both locations differ.
 class IndistinguishableLocationsError : public StateSpecificationError {
   public:
     /** @brief Construct or destroy an instance. */
-    IndistinguishableLocationsError(const StringType& what) : StateSpecificationError(what) { }
+    IndistinguishableLocationsError(const StringType& what) : StateSpecificationError(what) {}
 };
-
 
 //! \ingroup SystemModule
 //! \brief Type of a  discrete location of a hybrid system.
 class DiscreteLocation
-    : public StringValuation
-{
+    : public StringValuation {
   public:
     //! \brief Construct a location which does not set any discrete variables.
-    DiscreteLocation() : StringValuation() { }
+    DiscreteLocation() : StringValuation() {}
     //! \brief Construct the location q|n.
     DiscreteLocation(Int n);
     /** @brief Construct or destroy an instance. */
-    DiscreteLocation(StringVariable var, String val) : DiscreteLocation({var|val}) { }
+    DiscreteLocation(StringVariable var, String val) : DiscreteLocation({var | val}) {}
     /** @brief Construct or destroy an instance. */
-    DiscreteLocation(Pair<StringVariable,String> svarstr) : StringValuation({svarstr}) { }
+    DiscreteLocation(Pair<StringVariable, String> svarstr) : StringValuation({svarstr}) {}
     /** @brief Construct or destroy an instance. */
-    DiscreteLocation(const StringValuation& val) : StringValuation(val) { }
+    DiscreteLocation(const StringValuation& val) : StringValuation(val) {}
     /** @brief Construct or destroy an instance. */
-    DiscreteLocation(const Map<Identifier,String>& sm) : StringValuation(sm) { }
+    DiscreteLocation(const Map<Identifier, String>& sm) : StringValuation(sm) {}
     /** @brief Construct or destroy an instance. */
-    DiscreteLocation(const Map<StringVariable,String>& sm) : StringValuation(sm) { }
+    DiscreteLocation(const Map<StringVariable, String>& sm) : StringValuation(sm) {}
     /** @brief Construct or destroy an instance. */
-    DiscreteLocation(const InitializerList<Pair<StringVariable,String>>& salst) : StringValuation(salst) { }
+    DiscreteLocation(const InitializerList<Pair<StringVariable, String>>& salst) : StringValuation(salst) {}
     Void adjoin(const DiscreteLocation& loc) { this->_values.adjoin(loc._values); }
 };
 
@@ -100,6 +99,6 @@ Bool is_restriction(const DiscreteLocation& partial_location, const DiscreteLoca
 //! \relates DiscreteLocation \brief Retrict the variables defined in \a location to those of \a variables.
 DiscreteLocation restrict(const DiscreteLocation& location, const Set<Identifier>& variables);
 
-} //namespace Ariadne
+} // namespace Ariadne
 
 #endif /* ARIADNE_DISCRETE_LOCATION_HPP */

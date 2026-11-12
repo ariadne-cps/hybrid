@@ -29,28 +29,36 @@
 #ifndef ARIADNE_HYBRID_SET_DECL_HPP
 #define ARIADNE_HYBRID_SET_DECL_HPP
 
-
 namespace Ariadne {
 
 /** @brief HybridSetBase represents declarations of hybrid set abstractions. */
 class HybridSetBase;
 
-template<class P> class HybridBoundedSet;
-template<class P> class HybridOpenSet;
-template<class P> class HybridClosedSet;
-template<class P> class HybridOvertSet;
-template<class P> class HybridCompactSet;
-template<class P> class HybridRegularSet;
-template<class P> class HybridLocatedSet;
-template<class P> class HybridRegularLocatedSet;
+template<class P>
+class HybridBoundedSet;
+template<class P>
+class HybridOpenSet;
+template<class P>
+class HybridClosedSet;
+template<class P>
+class HybridOvertSet;
+template<class P>
+class HybridCompactSet;
+template<class P>
+class HybridRegularSet;
+template<class P>
+class HybridLocatedSet;
+template<class P>
+class HybridRegularLocatedSet;
 
-
-template<class UB> class VariableInterval;
+template<class UB>
+class VariableInterval;
 using FloatVariableInterval = VariableInterval<FloatDP>;
 
-
-template<class UB> class HybridVariableInterval;
-template<class IVL> class HybridVariablesBox;
+template<class UB>
+class HybridVariableInterval;
+template<class IVL>
+class HybridVariablesBox;
 
 /** @brief HybridBoxSet represents declarations of hybrid set abstractions. */
 class HybridBoxSet;
@@ -60,13 +68,14 @@ class HybridConstraintSet;
 class HybridBoundedConstraintSet;
 using HybridSet = HybridBoundedConstraintSet;
 
-
-template<class X> class HybridPoint;
+template<class X>
+class HybridPoint;
 using HybridRealPoint = HybridPoint<Real>;
 using HybridExactPoint = HybridPoint<FloatDP>;
 using HybridApproximatePoint = HybridPoint<FloatDPApproximation>;
 
-template<class IVL> class HybridBox;
+template<class IVL>
+class HybridBox;
 using HybridRealBox = HybridBox<RealInterval>;
 using HybridExactBox = HybridBox<ExactIntervalType>;
 using HybridUpperBox = HybridBox<UpperIntervalType>;
@@ -74,14 +83,16 @@ using HybridUpperBox = HybridBox<UpperIntervalType>;
 using HybridExactBoxType = HybridExactBox;
 using HybridUpperBoxType = HybridUpperBox;
 
-template<class IVL> class HybridBoxes;
+template<class IVL>
+class HybridBoxes;
 using HybridExactBoxes = HybridBoxes<ExactIntervalType>;
 using HybridUpperBoxes = HybridBoxes<UpperIntervalType>;
 
 using HybridExactBoxesType = HybridExactBoxes;
 using HybridUpperBoxesType = HybridUpperBoxes;
 
-template<class EBS> class HybridListSet;
+template<class EBS>
+class HybridListSet;
 /** @brief HybridPaving represents declarations of hybrid set abstractions. */
 class HybridPaving;
 

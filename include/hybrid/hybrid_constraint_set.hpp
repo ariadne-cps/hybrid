@@ -13,8 +13,9 @@
 #define ARIADNE_SYSTEM_HYBRID_CONSTRAINT_SET_HPP
 
 #include "hybrid/hybrid_set_interface.hpp"
-#include "expression-set/expression_set.hpp"
 #include "utility/container.hpp"
+
+#include "expression-set/expression_set.hpp"
 
 namespace Ariadne {
 
@@ -26,9 +27,9 @@ class HybridBoxesSet;
 //! \brief A hybrid set defined by a constraint system in each location.
 //! NOTE: If a location is not specified, the set is considered empty. This may be changed in future to the set being considered unconstrained (entire).
 class HybridConstraintSet
-    : public virtual EffectiveHybridRegularSetInterface
-{
+    : public virtual EffectiveHybridRegularSetInterface {
     Map<DiscreteLocation, RealExpressionConstraintSet> _sets;
+
   public:
     /** @brief Construct or destroy an instance. */
     HybridConstraintSet();
@@ -46,11 +47,10 @@ class HybridConstraintSet
     HybridConstraintSet& adjoin(const DiscreteLocation& location, const RealExpressionConstraintSet& set);
 
     //! \brief Intersect with a set of boxes, one in each location, to form a bounded set.
-    friend HybridBoundedConstraintSet intersection(const HybridBoxesSet& bounds, HybridConstraintSet const& constraints);
+    friend HybridBoundedConstraintSet intersection(const HybridBoxesSet& bounds, const HybridConstraintSet& constraints);
 
     /** @brief Perform the hybrid-system operation. */
     HybridConstraintSet* clone() const;
-
 
     //! \brief The set of locations in which the set is nonempty.
     Set<DiscreteLocation> locations() const;
@@ -59,9 +59,9 @@ class HybridConstraintSet
     //! \brief The active variables in the location \a loc.
     virtual Set<RealVariable> variables(DiscreteLocation loc) const override;
     //! \brief The subset of \f$\mathbb{R}^V\f$ obtained by restricting to location \a loc.
-    RealExpressionConstraintSet const& continuous_set(DiscreteLocation loc) const;
+    const RealExpressionConstraintSet& continuous_set(DiscreteLocation loc) const;
     //! \brief The subset of \f$\mathbb{R}^n\f$ obtained by restricting to location \a loc and ordering the variables as defined by \a spc.
-    ConstraintSet const euclidean_set(DiscreteLocation loc, RealSpace spc) const;
+    const ConstraintSet euclidean_set(DiscreteLocation loc, RealSpace spc) const;
 
     /** @brief Perform the hybrid-system operation. */
     virtual LowerKleenean overlaps(const HybridExactBox& bx) const override;
@@ -72,6 +72,7 @@ class HybridConstraintSet
 
     /** @brief Perform the hybrid-system operation. */
     virtual OutputStream& _write(OutputStream& os) const override;
+
   protected:
     HybridSetInterfaceBase* _clone() const override { return this->clone(); }
     /** @brief Perform the hybrid-system operation. */

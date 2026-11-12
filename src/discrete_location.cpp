@@ -31,60 +31,70 @@
 namespace Ariadne {
 
 DiscreteLocation join(const DiscreteLocation& loc1, const DiscreteLocation& loc2) {
-    return DiscreteLocation(join(loc1.values(),loc2.values()));
+    return DiscreteLocation(join(loc1.values(), loc2.values()));
 }
 
-DiscreteLocation::DiscreteLocation(Int n) : DiscreteLocation(StringVariable("q")|to_str(n)) {
+DiscreteLocation::DiscreteLocation(Int n) : DiscreteLocation(StringVariable("q") | to_str(n)) {
 }
 
 Bool operator==(const DiscreteLocation& q1, const DiscreteLocation& q2) {
-    Bool identical=true;
-    const Map<Identifier,String>& q1sm=q1.values();
-    const Map<Identifier,String>& q2sm=q2.values();
-    Map<Identifier,String>::ConstIterator q1iter=q1sm.begin();
-    Map<Identifier,String>::ConstIterator q2iter=q2sm.begin();
+    Bool identical = true;
+    const Map<Identifier, String>& q1sm = q1.values();
+    const Map<Identifier, String>& q2sm = q2.values();
+    Map<Identifier, String>::ConstIterator q1iter = q1sm.begin();
+    Map<Identifier, String>::ConstIterator q2iter = q2sm.begin();
 
-    while(q1iter!=q1sm.end() && q2iter!=q2sm.end()) {
-        if(q1iter->first==q2iter->first) {
-            if(q1iter->second != q2iter->second) { return false; }
-            ++q1iter; ++q2iter;
-        } else if(q1iter->first<q2iter->first) {
-            identical=false; ++q1iter;
+    while (q1iter != q1sm.end() && q2iter != q2sm.end()) {
+        if (q1iter->first == q2iter->first) {
+            if (q1iter->second != q2iter->second) {
+                return false;
+            }
+            ++q1iter;
+            ++q2iter;
+        } else if (q1iter->first < q2iter->first) {
+            identical = false;
+            ++q1iter;
         } else {
-            identical=false; ++q2iter;
+            identical = false;
+            ++q2iter;
         }
     }
-    if(q1iter!=q1sm.end() || q2iter!=q2sm.end()) { identical=false; }
-    if(!identical) { ARIADNE_THROW(IndistinguishableLocationsError,"operator==(DiscreteLocation,DiscreteLocation)",
-                               "Locations "<<q1<<" and "<<q2<<" are not identical, but no values differ."); }
+    if (q1iter != q1sm.end() || q2iter != q2sm.end()) {
+        identical = false;
+    }
+    if (!identical) {
+        ARIADNE_THROW(IndistinguishableLocationsError, "operator==(DiscreteLocation,DiscreteLocation)",
+                      "Locations " << q1 << " and " << q2 << " are not identical, but no values differ.");
+    }
     return true;
 }
 
 Bool operator!=(const DiscreteLocation& q1, const DiscreteLocation& q2) {
-    return !(q1==q2);
+    return !(q1 == q2);
 }
 
 Bool operator<(const DiscreteLocation& q1, const DiscreteLocation& q2) {
-    const Map<Identifier,String>& q1sm=q1.values();
-    const Map<Identifier,String>& q2sm=q2.values();
-    Map<Identifier,String>::ConstIterator q1iter=q1sm.begin();
-    Map<Identifier,String>::ConstIterator q2iter=q2sm.begin();
+    const Map<Identifier, String>& q1sm = q1.values();
+    const Map<Identifier, String>& q2sm = q2.values();
+    Map<Identifier, String>::ConstIterator q1iter = q1sm.begin();
+    Map<Identifier, String>::ConstIterator q2iter = q2sm.begin();
 
-    while(q1iter!=q1sm.end() && q2iter!=q2sm.end()) {
-        if(q1iter->first!=q2iter->first) {
-            return (q1iter->first<q2iter->first);
-        } else if(q1iter->second != q2iter->second) {
+    while (q1iter != q1sm.end() && q2iter != q2sm.end()) {
+        if (q1iter->first != q2iter->first) {
+            return (q1iter->first < q2iter->first);
+        } else if (q1iter->second != q2iter->second) {
             return q1iter->second < q2iter->second;
         } else {
-            ++q1iter; ++q2iter;
+            ++q1iter;
+            ++q2iter;
         }
     }
-    return q2iter!=q2sm.end();
+    return q2iter != q2sm.end();
 }
 
 Bool are_distinguishable(const DiscreteLocation& location1, const DiscreteLocation& location2) {
-    for(Map<Identifier,String>::ConstIterator iter1=location1._values.begin(); iter1!=location1._values.end(); ++iter1) {
-        if(location2._values.has_key(iter1->first) && location2._values[iter1->first] != iter1->second) {
+    for (Map<Identifier, String>::ConstIterator iter1 = location1._values.begin(); iter1 != location1._values.end(); ++iter1) {
+        if (location2._values.has_key(iter1->first) && location2._values[iter1->first] != iter1->second) {
             return true;
         }
     }
@@ -96,8 +106,8 @@ Bool are_same(const DiscreteLocation& location1, const DiscreteLocation& locatio
 }
 
 Bool is_restriction(const DiscreteLocation& partial_location, const DiscreteLocation& full_location) {
-    for(Map<Identifier,String>::ConstIterator value_iter=partial_location._values.begin(); value_iter!=partial_location._values.end(); ++value_iter) {
-        if(!full_location._values.has_key(value_iter->first) || full_location[StringVariable(value_iter->first)]!=value_iter->second) {
+    for (Map<Identifier, String>::ConstIterator value_iter = partial_location._values.begin(); value_iter != partial_location._values.end(); ++value_iter) {
+        if (!full_location._values.has_key(value_iter->first) || full_location[StringVariable(value_iter->first)] != value_iter->second) {
             return false;
         }
     }
@@ -106,8 +116,7 @@ Bool is_restriction(const DiscreteLocation& partial_location, const DiscreteLoca
 
 DiscreteLocation restrict(const DiscreteLocation& location, const Set<Identifier>& variables) {
     // Restriction selects the requested keys; asking for a strict subset is valid.
-    return restrict_keys(location._values,variables);
+    return restrict_keys(location._values, variables);
 }
 
-
-} //namespace Ariadne
+} // namespace Ariadne

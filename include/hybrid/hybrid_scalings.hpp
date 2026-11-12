@@ -33,24 +33,21 @@
 #include <map>
 #include <memory>
 
-#include "utility/container.hpp"
-#include "utility/stlio.hpp"
-
-#include "symbolic/variable.hpp"
-#include "symbolic/space.hpp"
 #include "hybrid/discrete_location.hpp"
 #include "paving/grid.hpp"
+#include "symbolic/space.hpp"
+#include "symbolic/variable.hpp"
+#include "utility/container.hpp"
+#include "utility/stlio.hpp"
 
 namespace Ariadne {
 
 typedef void Void;
 typedef std::ostream OutputStream;
 
-
 //! \ingroup HybridModule
 //! \brief A class which defines the state space grid to use in location \a loc given the continuous state variables \a spc.
-class HybridScalingsInterface
-{
+class HybridScalingsInterface {
   public:
     //!
     virtual ~HybridScalingsInterface() = default;
@@ -61,72 +58,79 @@ class HybridScalingsInterface
     /** @brief Perform the hybrid-system operation. */
     virtual Void _write(OutputStream& os) const = 0;
 };
-inline OutputStream& operator<<(OutputStream& os, const HybridScalingsInterface& hsc) { hsc._write(os); return os; }
-
+inline OutputStream& operator<<(OutputStream& os, const HybridScalingsInterface& hsc) {
+    hsc._write(os);
+    return os;
+}
 
 //! \ingroup HybridModule
 //! \brief A class which defines the state space grid to use in location \a loc given the continuous state variables \a spc.
-class HybridScalings
-{
+class HybridScalings {
     std::shared_ptr<HybridScalingsInterface> _ptr;
+
   public:
     /** @brief Construct or destroy an instance. */
-    HybridScalings(const HybridScalingsInterface& ref) : _ptr(ref.clone()) { }
-    operator const HybridScalingsInterface& () const { return *this->_ptr; }
-    operator HybridScalingsInterface& () { return *this->_ptr; }
-    ExactDouble scaling(const DiscreteLocation& loc, const RealVariable& var) const { return this->_ptr->scaling(loc,var); }
+    HybridScalings(const HybridScalingsInterface& ref) : _ptr(ref.clone()) {}
+    operator const HybridScalingsInterface&() const { return *this->_ptr; }
+    operator HybridScalingsInterface&() { return *this->_ptr; }
+    ExactDouble scaling(const DiscreteLocation& loc, const RealVariable& var) const { return this->_ptr->scaling(loc, var); }
     /** @brief Return the requested property or representation. */
     Grid grid(const DiscreteLocation& loc, const RealSpace& spc) const;
+
   public:
     /** @brief Construct or destroy an instance. */
-    HybridScalings(const Map<Identifier,ExactDouble>& scalings);
+    HybridScalings(const Map<Identifier, ExactDouble>& scalings);
     /** @brief Construct or destroy an instance. */
-    HybridScalings(const InitializerList<Pair<RealVariable,ApproximateDouble>>& scalings);
+    HybridScalings(const InitializerList<Pair<RealVariable, ApproximateDouble>>& scalings);
 };
 
 /** @brief SimpleHybridScalings represents scaling of continuous variables in hybrid locations. */
 class SimpleHybridScalings
-    : public HybridScalingsInterface
-{
+    : public HybridScalingsInterface {
     ExactDouble _default_scaling;
-    Map<Identifier,ExactDouble> _scalings;
+    Map<Identifier, ExactDouble> _scalings;
+
   public:
     /** @brief Construct or destroy an instance. */
-    SimpleHybridScalings() : _default_scaling(1.0_x), _scalings() { }
-    SimpleHybridScalings(ExactDouble default_scaling, const Map<Identifier,ExactDouble>& scalings)
-        : _default_scaling(default_scaling), _scalings(scalings) { }
+    SimpleHybridScalings() : _default_scaling(1.0_x), _scalings() {}
+    SimpleHybridScalings(ExactDouble default_scaling, const Map<Identifier, ExactDouble>& scalings)
+        : _default_scaling(default_scaling), _scalings(scalings) {}
     /** @brief Construct or destroy an instance. */
-    SimpleHybridScalings(const InitializerList<Pair<RealVariable,ApproximateDouble>>& scalings);
+    SimpleHybridScalings(const InitializerList<Pair<RealVariable, ApproximateDouble>>& scalings);
     /** @brief Return the requested property or representation. */
     Void set_scaling(const RealVariable& var, ApproximateDouble scal) {
-        ARIADNE_PRECONDITION(decide(scal>0)); _scalings[var.name()]=cast_exact(scal); }
+        ARIADNE_PRECONDITION(decide(scal > 0));
+        _scalings[var.name()] = cast_exact(scal);
+    }
     virtual SimpleHybridScalings* clone() const { return new SimpleHybridScalings(*this); }
     /** @brief Perform the hybrid-system operation. */
     virtual ExactDouble scaling(const DiscreteLocation&, const RealVariable& var) const {
-        return (this->_scalings.has_key(var.name())) ? this->_scalings[var.name()] : this->_default_scaling; }
+        return (this->_scalings.has_key(var.name())) ? this->_scalings[var.name()] : this->_default_scaling;
+    }
     virtual Void _write(OutputStream& os) const { os << "HybridScalings( " << this->_scalings << " )"; }
 };
 
-inline Pair<RealVariable,ExactDouble> operator|(const RealVariable& var, ApproximateDouble scal) {
-    return Pair<RealVariable,ExactDouble>(var,cast_exact(scal)); }
+inline Pair<RealVariable, ExactDouble> operator|(const RealVariable& var, ApproximateDouble scal) {
+    return Pair<RealVariable, ExactDouble>(var, cast_exact(scal));
+}
 
-inline HybridScalings::HybridScalings(const Map<Identifier,ExactDouble>& scalings)
-    : _ptr(new SimpleHybridScalings(1.0_x,scalings)) { }
+inline HybridScalings::HybridScalings(const Map<Identifier, ExactDouble>& scalings)
+    : _ptr(new SimpleHybridScalings(1.0_x, scalings)) {}
 
-inline HybridScalings::HybridScalings(const InitializerList<Pair<RealVariable,ApproximateDouble>>& scalings)
-    : _ptr(new SimpleHybridScalings(scalings)) { }
+inline HybridScalings::HybridScalings(const InitializerList<Pair<RealVariable, ApproximateDouble>>& scalings)
+    : _ptr(new SimpleHybridScalings(scalings)) {}
 
-inline SimpleHybridScalings::SimpleHybridScalings(const InitializerList<Pair<RealVariable,ApproximateDouble>>& scalings)
+inline SimpleHybridScalings::SimpleHybridScalings(const InitializerList<Pair<RealVariable, ApproximateDouble>>& scalings)
     /** @brief Perform the hybrid-system operation. */
     : _default_scaling(1.0_x), _scalings() {
     // Unlisted variables retain the same unit scaling as the default policy.
-    for(auto iter=scalings.begin(); iter!=scalings.end(); ++iter) {
+    for (auto iter = scalings.begin(); iter != scalings.end(); ++iter) {
         /** @brief Perform the hybrid-system operation. */
-        this->_scalings.insert(iter->first.name(),cast_exact(iter->second));
+        this->_scalings.insert(iter->first.name(), cast_exact(iter->second));
     }
 }
 
-}
+} // namespace Ariadne
 
 #endif // ARIADNE_HYBRID_SCALINGS_HPP
 

@@ -30,10 +30,11 @@
 #ifndef ARIADNE_SYSTEM_HYBRID_BOUNDED_CONSTRAINT_SET_HPP
 #define ARIADNE_SYSTEM_HYBRID_BOUNDED_CONSTRAINT_SET_HPP
 
-#include "hybrid/hybrid_set_interface.hpp"
 #include "hybrid/hybrid_drawable_interface.hpp"
-#include "expression-set/expression_set.hpp"
+#include "hybrid/hybrid_set_interface.hpp"
 #include "utility/container.hpp"
+
+#include "expression-set/expression_set.hpp"
 
 namespace Ariadne {
 
@@ -41,10 +42,10 @@ namespace Ariadne {
 //! \ingroup HybridSetSubModule
 //! \brief A hybrid set defined by the intersection of a box and a constraint system in each location.
 class HybridBoundedConstraintSet
-    : public virtual EffectiveHybridSetInterface
-    , public virtual HybridDrawableInterface
-{
+    : public virtual EffectiveHybridSetInterface,
+      public virtual HybridDrawableInterface {
     Map<DiscreteLocation, RealExpressionBoundedConstraintSet> _sets;
+
   public:
     /** @brief Construct or destroy an instance. */
     HybridBoundedConstraintSet();
@@ -75,9 +76,9 @@ class HybridBoundedConstraintSet
     //! \brief The active variables in the location \a loc.
     virtual Set<RealVariable> variables(DiscreteLocation loc) const override;
     //! \brief The subset of \f$\mathbb{R}^V\f$ obtained by restricting to location \a loc.
-    RealExpressionBoundedConstraintSet const& continuous_set(DiscreteLocation loc) const;
+    const RealExpressionBoundedConstraintSet& continuous_set(DiscreteLocation loc) const;
     //! \brief The subset of \f$\mathbb{R}^n\f$ obtained by restricting to location \a loc and ordering the variables as defined by \a spc.
-    BoundedConstraintSet const euclidean_set(DiscreteLocation loc, RealSpace spc) const;
+    const BoundedConstraintSet euclidean_set(DiscreteLocation loc, RealSpace spc) const;
 
     /** @brief Perform the hybrid-system operation. */
     virtual LowerKleenean overlaps(const HybridExactBox& bx) const override;
@@ -95,6 +96,7 @@ class HybridBoundedConstraintSet
     virtual OutputStream& _write(OutputStream& os) const override;
     /** @brief Render the object. */
     virtual Void draw(CanvasInterface&, const Set<DiscreteLocation>&, const Variables2d&) const override;
+
   protected:
     HybridSetInterfaceBase* _clone() const override { return this->clone(); }
     /** @brief Perform the hybrid-system operation. */
