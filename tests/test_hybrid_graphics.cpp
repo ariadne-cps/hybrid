@@ -6,20 +6,24 @@
  ****************************************************************************/
 
 /*
- *  This file is part of Ariadne.
+ *  This file is part of Ariadne Hybrid.
  *
- *  Ariadne is free software: you can redistribute it and/or modify
+ *  Ariadne Hybrid is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  Ariadne is distributed in the hope that it will be useful,
+ *  Ariadne Hybrid is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with Ariadne.  If not, see <https://www.gnu.org/licenses/>.
+ *  along with Ariadne Hybrid.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/** @file tests/test_hybrid_graphics.cpp
+ *  @brief Exercise hybrid graphics behavior.
  */
 
 #include "ariadne-testing.hpp"
