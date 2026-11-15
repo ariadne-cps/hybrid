@@ -33,6 +33,7 @@
 #include "hybrid/hybrid_graphics.hpp"
 #include "hybrid/hybrid_paving.hpp"
 #include "hybrid/hybrid_set.hpp"
+#include "logging/test_runner.hpp"
 #include "rendering/rendering_interface.hpp"
 #include "rendering/rendering_manager.hpp"
 
@@ -396,5 +397,5 @@ int main(int argc, char** argv) {
     ARIADNE_TESTING_ADD_TEST(TestHybridDrawingAdapters, test_figure_write_backend);
     ARIADNE_TESTING_ADD_TEST(TestHybridDrawingAdapters, test_remaining_drawable_adapters);
     ARIADNE_TESTING_ADD_TEST(TestHybridDrawingAdapters, test_outer_approximation_adapters);
-    return ARIADNE_TESTING_RUN_TESTS_WITH_ARGS(argc, argv);
+    return Ariadne::Testing::run_logging_suite(ariadne_test_suite, argc, argv);
 }

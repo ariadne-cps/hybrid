@@ -33,6 +33,7 @@
 #include "hybrid/hybrid_bounded_constraint_set.hpp"
 #include "hybrid/hybrid_constraint_set.hpp"
 #include "hybrid/hybrid_set.hpp"
+#include "logging/test_runner.hpp"
 
 #include "ariadne-testing.hpp"
 
@@ -224,5 +225,5 @@ int main(int argc, char** argv) {
     ARIADNE_TESTING_ADD_TEST(TestHybridInterfaces, test_validated_views);
     ARIADNE_TESTING_ADD_TEST(TestHybridInterfaces, test_failed_cast_ownership);
     ARIADNE_TESTING_ADD_TEST(TestHybridInterfaces, test_location_contracts);
-    return ARIADNE_TESTING_RUN_TESTS_WITH_ARGS(argc, argv);
+    return Ariadne::Testing::run_logging_suite(ariadne_test_suite, argc, argv);
 }

@@ -33,6 +33,7 @@
 
 #include "hybrid/hybrid_paving.hpp"
 #include "hybrid/hybrid_set.hpp"
+#include "logging/test_runner.hpp"
 
 #include "ariadne-testing.hpp"
 
@@ -307,5 +308,5 @@ int main(int argc, char** argv) {
     ARIADNE_TESTING_ADD_TEST(TestHybridPrimitives, test_validated_image);
     ARIADNE_TESTING_ADD_TEST(TestHybridPrimitives, test_cell_and_curve_descriptions);
     ARIADNE_TESTING_ADD_TEST(TestHybridPrimitives, test_equality_and_list_iteration);
-    return ARIADNE_TESTING_RUN_TESTS_WITH_ARGS(argc, argv);
+    return Ariadne::Testing::run_logging_suite(ariadne_test_suite, argc, argv);
 }

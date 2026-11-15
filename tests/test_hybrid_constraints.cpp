@@ -36,6 +36,7 @@
 #include "hybrid/hybrid_constraint_set.hpp"
 #include "hybrid/hybrid_expression_set.hpp"
 #include "hybrid/hybrid_set.hpp"
+#include "logging/test_runner.hpp"
 
 #include "ariadne-testing.hpp"
 
@@ -173,5 +174,5 @@ int main(int argc, char** argv) {
     ARIADNE_TESTING_ADD_TEST(TestHybridConstraints, test_constraints);
     ARIADNE_TESTING_ADD_TEST(TestHybridConstraints, test_bounded_sets);
     ARIADNE_TESTING_ADD_TEST(TestHybridConstraints, test_intersection_with_missing_constraint);
-    return ARIADNE_TESTING_RUN_TESTS_WITH_ARGS(argc, argv);
+    return Ariadne::Testing::run_logging_suite(ariadne_test_suite, argc, argv);
 }

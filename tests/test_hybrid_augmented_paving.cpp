@@ -33,6 +33,7 @@
 #include "hybrid/hybrid_augmented_paving_draw.hpp"
 #include "hybrid/hybrid_bounded_constraint_set.hpp"
 #include "labelled/figure.hpp"
+#include "logging/test_runner.hpp"
 #include "rendering/null_rendering.hpp"
 
 #include "ariadne-testing.hpp"
@@ -136,5 +137,5 @@ int main(int argc, char **argv) {
     ARIADNE_TESTING_SUITE("test_hybrid_augmented_paving");
     ARIADNE_TESTING_ADD_TEST(TestHybridAugmentedPaving, test_lazy_auxiliary_and_drawing);
     ARIADNE_TESTING_ADD_TEST(TestHybridAugmentedPaving, test_augmented_paving_mutation_and_views);
-    return ARIADNE_TESTING_RUN_TESTS_WITH_ARGS(argc, argv);
+    return Ariadne::Testing::run_logging_suite(ariadne_test_suite, argc, argv);
 }

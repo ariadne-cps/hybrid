@@ -29,6 +29,7 @@
 // Targeted behavioral coverage for hybrid discrete locations.
 // Tests public contracts rather than constructing invalid internal states.
 #include "hybrid/discrete_location.hpp"
+#include "logging/test_runner.hpp"
 #include "symbolic/valuation.hpp"
 
 #include "ariadne-testing.hpp"
@@ -149,5 +150,5 @@ int main(int argc, char** argv) {
     ARIADNE_TESTING_ADD_TEST(TestDiscreteLocation, test_construction_and_combination);
     ARIADNE_TESTING_ADD_TEST(TestDiscreteLocation, test_equality_and_order);
     ARIADNE_TESTING_ADD_TEST(TestDiscreteLocation, test_distinguishability_and_restriction);
-    return ARIADNE_TESTING_RUN_TESTS_WITH_ARGS(argc, argv);
+    return Ariadne::Testing::run_logging_suite(ariadne_test_suite, argc, argv);
 }

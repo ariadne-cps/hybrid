@@ -31,6 +31,7 @@
 #include "hybrid/hybrid_graphics.hpp"
 #include "hybrid/hybrid_paving.hpp"
 #include "hybrid/hybrid_set.hpp"
+#include "logging/test_runner.hpp"
 #include "numeric/real.hpp"
 #include "symbolic/assignment.hpp"
 #include "symbolic/variable.hpp"
@@ -72,5 +73,6 @@ int main(int argc, char** argv) {
         return -1;
     ARIADNE_TESTING_SUITE("test_hybrid_graphics");
     ARIADNE_TESTING_ADD_TEST(TestHybridGraphics, test_boxes);
-    return ARIADNE_TESTING_RUN_TESTS();
+    // DrawingCommandLineInterface already consumed the graphics arguments.
+    return Ariadne::Testing::run_logging_suite(ariadne_test_suite, 1, argv);
 }

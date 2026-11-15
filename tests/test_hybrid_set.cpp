@@ -37,6 +37,7 @@
 #include "hybrid/hybrid_paving.hpp"
 #include "hybrid/hybrid_set.hpp"
 #include "labelled/figure.hpp"
+#include "logging/test_runner.hpp"
 #include "numeric/rational.hpp"
 #include "set/function_set.hpp"
 
@@ -222,5 +223,5 @@ int main(int argc, char** argv) {
     ARIADNE_TESTING_ADD_TEST(TestHybridSet, test_hybrid_list_set);
     ARIADNE_TESTING_ADD_TEST(TestHybridSet, test_hybrid_paving_separation);
     ARIADNE_TESTING_ADD_TEST(TestHybridSet, test_hybrid_initial_outer_approximation);
-    return ARIADNE_TESTING_RUN_TESTS_WITH_ARGS(argc, argv);
+    return Ariadne::Testing::run_logging_suite(ariadne_test_suite, argc, argv);
 }

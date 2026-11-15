@@ -34,6 +34,7 @@
 
 #include "hybrid/hybrid_bounded_constraint_set.hpp"
 #include "hybrid/hybrid_paving.hpp"
+#include "logging/test_runner.hpp"
 
 #include "ariadne-testing.hpp"
 
@@ -406,5 +407,5 @@ int main(int argc, char** argv) {
     ARIADNE_TESTING_ADD_TEST(TestHybridPavingOperations, test_inner_and_outer_approximation);
     ARIADNE_TESTING_ADD_TEST(TestHybridPavingOperations, test_empty_slice_relations);
     ARIADNE_TESTING_ADD_TEST(TestHybridPavingOperations, test_contracts_and_iterator_comparisons);
-    return ARIADNE_TESTING_RUN_TESTS_WITH_ARGS(argc, argv);
+    return Ariadne::Testing::run_logging_suite(ariadne_test_suite, argc, argv);
 }

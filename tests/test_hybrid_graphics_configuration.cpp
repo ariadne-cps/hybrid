@@ -30,6 +30,7 @@
 // composition.  No renderer or file output is needed for these contracts.
 #include "hybrid/hybrid_graphics.hpp"
 #include "hybrid/hybrid_set.hpp"
+#include "logging/test_runner.hpp"
 
 #include "ariadne-testing.hpp"
 
@@ -124,5 +125,5 @@ int main(int argc, char** argv) {
     ARIADNE_TESTING_SUITE("test_hybrid_graphics_configuration");
     ARIADNE_TESTING_ADD_TEST(TestHybridGraphicsConfiguration, test_figure_properties);
     ARIADNE_TESTING_ADD_TEST(TestHybridGraphicsConfiguration, test_graphic_objects);
-    return ARIADNE_TESTING_RUN_TESTS_WITH_ARGS(argc, argv);
+    return Ariadne::Testing::run_logging_suite(ariadne_test_suite, argc, argv);
 }
