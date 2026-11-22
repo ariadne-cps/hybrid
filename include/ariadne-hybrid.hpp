@@ -45,6 +45,7 @@
 #include "hybrid/hybrid_set.hpp"
 #include "hybrid/hybrid_set_interface.hpp"
 #include "hybrid/hybrid_space.hpp"
+#include "hybrid/value.hpp"
 
 #include "ariadne-labelled.hpp"
 
