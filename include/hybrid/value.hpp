@@ -129,6 +129,30 @@ class Hybrid {
     ConstIterator end() const { return _values.end(); }
 };
 
+// Select a located continuous value, with explicit variable ordering.
+// Location is metadata; no rendering or paving knowledge belongs here.
+template<class T, class Visitor>
+Void with_location(const Located<T>& item, const RealSpace& space, Visitor&& visitor) {
+    visitor(space, item.value());
+}
+
+// Select an already-materialised member without triggering lazy construction.
+template<class T, class Visitor>
+Void with_location(const Hybrid<T>& family, const DiscreteLocation& location,
+                   const RealSpace& space, Visitor&& visitor) {
+    ARIADNE_PRECONDITION(family.has_value(location));
+    visitor(space, family[location]);
+}
+
+// Infer the continuous variable ordering from the declared hybrid space.
+template<class T, class Visitor>
+Void with_location(const Hybrid<T>& family, const DiscreteLocation& location,
+                   Visitor&& visitor) {
+    ARIADNE_PRECONDITION(family.has_value(location));
+    const RealSpace space = family.space()[location];
+    with_location(family, location, space, std::forward<Visitor>(visitor));
+}
+
 } // namespace Ariadne
 
 #endif // ARIADNE_HYBRID_VALUE_HPP
