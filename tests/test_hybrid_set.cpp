@@ -32,6 +32,7 @@
 #include "algebra/matrix.hpp"
 #include "algebra/vector.hpp"
 #include "function/function.hpp"
+#include "drawing/box_draw.hpp"
 #include "hybrid/hybrid_bounded_constraint_set.hpp"
 #include "hybrid/hybrid_constraint_set.hpp"
 #include "hybrid/hybrid_paving.hpp"
@@ -209,12 +210,15 @@ class TestHybridSet : public Ariadne::Testing::ContextFixture {
 
         hgts.has_location(loc);
         // HybridPaving exposes the selected backend as a polymorphic
-        // Paving. Build a tree view only for this legacy Figure draw check.
+        // Paving. Preserve the tree materialization and draw every cell box
+        // through the generic Drawing API rather than the removed paving
+        // overload. This is the same cell geometry and iteration order.
         const Paving& slice = hgts[loc];
         BinaryTreePaving drawable(slice.grid());
         for (const auto& cell: slice)
             drawable.adjoin(cell);
-        draw(fig, drawable);
+        for (const auto& cell: drawable)
+            draw(fig, cell.box());
     }
 };
 
