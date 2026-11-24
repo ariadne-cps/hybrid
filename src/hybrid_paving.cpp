@@ -28,7 +28,7 @@
 
 #include "hybrid/hybrid_paving.hpp"
 
-#include "drawing/binary_tree_paving_draw.hpp"
+#include "drawing/box_draw.hpp"
 #include "function/functional.hpp"
 #include "hybrid/hybrid_expression_set.hpp"
 #include "hybrid/hybrid_graphics.hpp"
@@ -289,7 +289,13 @@ Void HybridPaving::draw(CanvasInterface& canvas, const Set<DiscreteLocation>& lo
             BinaryTreePaving tree(loc_iter->second.grid());
             for (auto it = loc_iter->second.begin(), end = loc_iter->second.end(); it != end; ++it)
                 tree.adjoin(*it);
-            Ariadne::draw(canvas, projection, tree);
+            // The former Drawing-specific BinaryTreePaving adapter iterated
+            // these same cells and rendered their boxes in the same order.
+            // Keep this tree snapshot so the graphical decomposition and the
+            // authoritative tree/ROBDD storage semantics stay unchanged.
+            for (auto cell = tree.begin(), end = tree.end(); cell != end; ++cell) {
+                Ariadne::draw(canvas, projection, cell->box());
+            }
         }
     }
 }
