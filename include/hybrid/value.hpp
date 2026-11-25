@@ -123,6 +123,13 @@ class Hybrid {
     }
 
     SizeType size() const { return _values.size(); }
+    Iterator find(const DiscreteLocation& location) { return _values.find(location); }
+    ConstIterator find(const DiscreteLocation& location) const { return _values.find(location); }
+
+    // Print the materialized family as a map, without forcing lazy values.
+    friend OutputStream& operator<<(OutputStream& os, const Hybrid& family) {
+        return os << family._values;
+    }
     Iterator begin() { return _values.begin(); }
     Iterator end() { return _values.end(); }
     ConstIterator begin() const { return _values.begin(); }

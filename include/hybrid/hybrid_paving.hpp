@@ -46,6 +46,7 @@
 #include "hybrid/hybrid_set.hpp"
 #include "hybrid/hybrid_set_interface.hpp"
 #include "hybrid/hybrid_space.hpp"
+#include "hybrid/value.hpp"
 #include "numeric/declarations.hpp"
 #include "paving/binary_tree_paving.hpp"
 #include "paving/robdd_paving.hpp"
@@ -66,15 +67,22 @@ class HybridPaving : public HybridDrawableInterface {
   public:
     using Factory = std::function<Paving(const Grid &)>;
     using GridType = HybridGrid;
-    using LocationsIterator = Map<DiscreteLocation, Paving>::Iterator;
-    using LocationsConstIterator = Map<DiscreteLocation, Paving>::ConstIterator;
+    using LocationsIterator = Hybrid<Paving>::Iterator;
+    using LocationsConstIterator = Hybrid<Paving>::ConstIterator;
     using ConstIterator = HybridSpaceSetConstIterator<Paving, HybridGridCell>;
     explicit HybridPaving(const HybridGrid &grid)
         : HybridPaving(grid, [](const Grid &g) { return Paving(new BinaryTreePaving(g)); }) {}
     HybridPaving(const HybridGrid &grid, Factory factory)
         /** @brief Perform the hybrid-system operation. */
-        : _hgrid(grid), _map(), _factory(std::move(factory)) {
-        /** @brief Construct or destroy an instance. */
+        : _hgrid(grid),
+          _values(grid.space(), [grid, factory](
+              const DiscreteLocation& location, const RealSpace&) -> Paving {
+              Paving selected = factory(grid[location]);
+              ARIADNE_PRECONDITION_MSG(selected.grid() == grid[location],
+                                       "Selected backend uses an incompatible grid");
+              return selected;
+          }),
+          _factory(std::move(factory)) {
         ARIADNE_PRECONDITION_MSG(static_cast<Bool>(_factory), "Empty HybridPaving factory");
     }
     HybridPaving(const HybridGrid &grid, std::shared_ptr<RobddManager> manager)
@@ -92,13 +100,15 @@ class HybridPaving : public HybridDrawableInterface {
     HybridSpace space() const { return _hgrid.space(); }
     RealSpace space(DiscreteLocation q) const { return _hgrid.space(q); }
     Bool has_location(DiscreteLocation q) const { return _hgrid.has_location(q); }
-    Bool nontrivial_location(DiscreteLocation q) const { return _map.has_key(q); }
-    LocationsIterator locations_begin() { return _map.begin(); }
-    LocationsIterator locations_end() { return _map.end(); }
-    LocationsConstIterator locations_begin() const { return _map.begin(); }
-    LocationsConstIterator locations_end() const { return _map.end(); }
-    ConstIterator begin() const { return ConstIterator(_map, _hgrid.space(), false); }
-    ConstIterator end() const { return ConstIterator(_map, _hgrid.space(), true); }
+    Bool nontrivial_location(DiscreteLocation q) const { return _values.has_value(q); }
+    /** @brief Observe generic backing storage without permitting unsynchronized mutations. */
+    const Hybrid<Paving>& values() const { return _values; }
+    LocationsIterator locations_begin() { return _values.begin(); }
+    LocationsIterator locations_end() { return _values.end(); }
+    LocationsConstIterator locations_begin() const { return _values.begin(); }
+    LocationsConstIterator locations_end() const { return _values.end(); }
+    ConstIterator begin() const { return ConstIterator(_values.begin(), _values.end(), _hgrid.space(), false); }
+    ConstIterator end() const { return ConstIterator(_values.begin(), _values.end(), _hgrid.space(), true); }
     Paving &operator[](DiscreteLocation q);
     const Paving &operator[](DiscreteLocation q) const;
     const Paving &euclidean_set(DiscreteLocation q) const { return (*this)[q]; }
@@ -161,14 +171,14 @@ class HybridPaving : public HybridDrawableInterface {
     /** @brief Perform the hybrid-system operation. */
     friend Bool intersect(const HybridPaving &, const HybridPaving &);
     friend OutputStream &operator<<(OutputStream &os, const HybridPaving &p) {
-        return os << "HybridPaving(" << p._map << ")";
+        return os << "HybridPaving(" << p._values << ")";
     }
 
   private:
     /** @brief Perform the hybrid-system operation. */
     Paving &_provide_location(const DiscreteLocation &);
     HybridGrid _hgrid;
-    Map<DiscreteLocation, Paving> _map;
+    Hybrid<Paving> _values;
     Factory _factory;
 };
 

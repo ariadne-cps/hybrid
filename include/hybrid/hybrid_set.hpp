@@ -636,6 +636,11 @@ class HybridSpaceSetConstIterator
   public:
     /** @brief Construct or destroy an instance. */
     HybridSpaceSetConstIterator(const Map<DiscreteLocation, DS>&, const HybridSpace& hspc, Bool);
+    // Accept generic location-indexed storage without exposing its map.
+    HybridSpaceSetConstIterator(
+        typename Map<DiscreteLocation, DS>::ConstIterator first_iter,
+        typename Map<DiscreteLocation, DS>::ConstIterator last_iter,
+        const HybridSpace& hspc, Bool at_end);
     /** @brief Perform the hybrid-system operation. */
     Bool equal(const HybridSpaceSetConstIterator<DS, HBS>&) const;
     /** @brief Perform the hybrid-system operation. */

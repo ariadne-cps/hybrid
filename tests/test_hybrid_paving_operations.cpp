@@ -44,6 +44,55 @@ class TestHybridPavingOperations : public Ariadne::Testing::ContextFixture {
   public:
     using ContextFixture::ContextFixture;
 
+    Void test_generic_backing_storage_identity_and_lazy() {
+        const DiscreteLocation first(1), second(2), absent(3);
+        const RealVariable x("x");
+        MonolithicHybridSpace spaces;
+        spaces.new_location(first, RealSpace({x}));
+        spaces.new_location(second, RealSpace({x}));
+        const HybridGrid grid(spaces);
+        auto manager = std::make_shared<RobddManager>();
+        std::weak_ptr<RobddManager> weak = manager;
+        HybridPaving original(grid, manager);
+        manager.reset();
+        const HybridPaving& observed = original;
+
+        ARIADNE_TESTING_PROVE(observed.values().has_location(first));
+        ARIADNE_TESTING_PROVE(observed.values().has_location(second));
+        ARIADNE_TESTING_PROVE(not observed.values().has_location(absent));
+        ARIADNE_TESTING_PROVE(not observed.values().has_value(first));
+        ARIADNE_TESTING_PROVE(not observed.values().has_value(second));
+        ARIADNE_TESTING_EXPECT_EQUAL(observed.values().size(), 0u);
+        const GridCell cell(grid[first], 0u, BinaryWord("0"));
+        original[first].adjoin(cell);
+        ARIADNE_TESTING_PROVE(observed.values().has_value(first));
+        ARIADNE_TESTING_PROVE(not observed.values().has_value(second));
+        ARIADNE_TESTING_PROVE(&observed.values()[first] == &observed[first]);
+        ARIADNE_TESTING_PROVE(observed.values()[first].superset(cell));
+        ARIADNE_TESTING_EXPECT_EXCEPTION(observed.values()[second]);
+        ARIADNE_TESTING_EXPECT_EXCEPTION(observed.values()[absent]);
+        ARIADNE_TESTING_EXPECT_EQUAL(observed.values().size(), 1u);
+        ARIADNE_TESTING_PROVE(not weak.expired());
+
+        HybridPaving copy(original);
+        ARIADNE_TESTING_PROVE(copy.values().has_value(first));
+        ARIADNE_TESTING_PROVE(not copy.values().has_value(second));
+        ARIADNE_TESTING_PROVE(copy.values()[first].superset(cell));
+        copy[first].clear();
+        ARIADNE_TESTING_PROVE(not copy.values()[first].superset(cell));
+        ARIADNE_TESTING_PROVE(observed.values()[first].superset(cell));
+
+        HybridPaving new_grid = original.with_grid(grid);
+        ARIADNE_TESTING_PROVE(not new_grid.values().has_value(first));
+        ARIADNE_TESTING_PROVE(not new_grid.values().has_value(second));
+        new_grid[second].adjoin(GridCell(grid[second], 0u, BinaryWord("1")));
+        ARIADNE_TESTING_PROVE(not weak.expired());
+        ARIADNE_TESTING_PROVE(dynamic_cast<const RobddPaving*>(
+            &static_cast<const PavingInterface&>(new_grid.values()[second])) != nullptr);
+        ARIADNE_TESTING_PROVE(not observed.values().has_value(second));
+        ARIADNE_TESTING_PROVE(not copy.values().has_value(second));
+    }
+
     Void test_generic_shared_manager_locations() {
         DiscreteLocation first(1), second(2);
         RealVariable x("x");
@@ -401,6 +450,7 @@ class TestHybridPavingOperations : public Ariadne::Testing::ContextFixture {
 
 int main(int argc, char** argv) {
     ARIADNE_TESTING_SUITE("test_hybrid_paving_operations");
+    ARIADNE_TESTING_ADD_TEST(TestHybridPavingOperations, test_generic_backing_storage_identity_and_lazy);
     ARIADNE_TESTING_ADD_TEST(TestHybridPavingOperations, test_generic_shared_manager_locations);
     ARIADNE_TESTING_ADD_TEST(TestHybridPavingOperations, test_generic_location_relations_and_contracts);
     ARIADNE_TESTING_ADD_TEST(TestHybridPavingOperations, test_paving_operations);

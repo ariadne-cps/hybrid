@@ -79,8 +79,8 @@ Void HybridPaving::restrict(const HybridPaving& hgts) {
     // Iterating the left map preserves its locations and cannot introduce
     // unrelated locations from the restricting paving.
     for (LocationsIterator iter = this->locations_begin(); iter != this->locations_end(); ++iter) {
-        auto other = hgts._map.find(iter->first);
-        if (other == hgts._map.end())
+        auto other = hgts._values.find(iter->first);
+        if (other == hgts._values.end())
             iter->second.clear();
         else
             iter->second.restrict(other->second);
@@ -147,9 +147,8 @@ Paving& HybridPaving::operator[](DiscreteLocation q) {
 
 const Paving& HybridPaving::operator[](DiscreteLocation q) const {
     ARIADNE_PRECONDITION_MSG(this->has_location(q), "q=" << q);
-    auto found = _map.find(q);
-    ARIADNE_PRECONDITION_MSG(found != _map.end(), "Location has no materialized paving: " << q);
-    return found->second;
+    ARIADNE_PRECONDITION_MSG(_values.has_value(q), "Location has no materialized paving: " << q);
+    return _values[q];
 }
 
 Bool HybridPaving::is_empty() const {
@@ -193,7 +192,7 @@ Void HybridPaving::recombine() {
 }
 
 ValidatedLowerKleenean HybridPaving::separated(const HybridExactBox& hbx) const {
-    LocationsConstIterator loc_iter = this->_map.find(hbx.location());
+    LocationsConstIterator loc_iter = this->_values.find(hbx.location());
     // ValidatedLowerKleenean overloads operator||, so it does not short-circuit.
     if (loc_iter == this->locations_end()) {
         return true;
@@ -202,7 +201,7 @@ ValidatedLowerKleenean HybridPaving::separated(const HybridExactBox& hbx) const 
 }
 
 ValidatedLowerKleenean HybridPaving::overlaps(const HybridExactBox& hbx) const {
-    LocationsConstIterator loc_iter = this->_map.find(hbx.location());
+    LocationsConstIterator loc_iter = this->_values.find(hbx.location());
     // Do not evaluate the predicate on an absent location (overloaded &&).
     if (loc_iter == this->locations_end()) {
         return false;
@@ -211,7 +210,7 @@ ValidatedLowerKleenean HybridPaving::overlaps(const HybridExactBox& hbx) const {
 }
 
 ValidatedLowerKleenean HybridPaving::covers(const HybridExactBox& hbx) const {
-    LocationsConstIterator loc_iter = this->_map.find(hbx.location());
+    LocationsConstIterator loc_iter = this->_values.find(hbx.location());
     if (loc_iter == this->locations_end()) {
         return false;
     }
@@ -277,7 +276,7 @@ Bool intersect(const HybridPaving& hgts1, const HybridPaving& hgts2) {
 }
 
 OutputStream& HybridPaving::_write(OutputStream& os) const {
-    return os << this->_map;
+    return os << this->_values;
 }
 
 Void HybridPaving::draw(CanvasInterface& canvas, const Set<DiscreteLocation>& locations, const Variables2d& axis_variables) const {
@@ -303,15 +302,7 @@ Void HybridPaving::draw(CanvasInterface& canvas, const Set<DiscreteLocation>& lo
 Paving& HybridPaving::_provide_location(const DiscreteLocation& q) {
     ARIADNE_PRECONDITION_MSG(_hgrid.has_location(q),
                              "HybridPaving location does not belong to grid");
-    auto found = _map.find(q);
-    if (found == _map.end()) {
-        Paving selected = _factory(_hgrid[q]);
-        ARIADNE_PRECONDITION_MSG(selected.grid() == _hgrid[q],
-                                 "Selected backend uses an incompatible grid");
-        _map.insert(std::make_pair(q, std::move(selected)));
-        found = _map.find(q);
-    }
-    return found->second;
+    return _values[q];
 }
 
 Grid HybridScalings::grid(const DiscreteLocation& loc, const RealSpace& space) const {
