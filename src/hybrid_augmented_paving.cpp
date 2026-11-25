@@ -27,10 +27,20 @@
  */
 
 #include "hybrid/hybrid_augmented_paving.hpp"
+#include "labelled/labelled_augmented_paving.hpp"
 
 #include "function/functional.hpp"
 
 namespace Ariadne {
+
+const LabelledAugmentedPaving HybridAugmentedPaving::operator[](const DiscreteLocation& q) const {
+    return LabelledAugmentedPaving(this->_state_set[q], this->auxiliary_mapping(q));
+}
+/** @brief Construct or destroy an instance. */
+HybridAugmentedPavingElementReference::operator const LabelledAugmentedPaving() const {
+    return LabelledAugmentedPaving(_hstorage->_state_set[_loc], _hstorage->auxiliary_mapping(_loc));
+}
+
 HybridPaving HybridAugmentedPaving::state_auxiliary_paving() const {
     HybridGrid state_grid = this->state_paving().grid();
     HybridScalings scalings = state_grid.scalings();

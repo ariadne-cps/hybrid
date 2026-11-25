@@ -30,6 +30,11 @@
 #include <sstream>
 
 #include "hybrid/hybrid_augmented_paving.hpp"
+// The provider interface must not import the concrete legacy labelled slice.
+#ifdef ARIADNE_REASONING_LABELLED_AUGMENTED_PAVING_HPP
+#error "HybridAugmentedPaving header imports LabelledAugmentedPaving transitively"
+#endif
+#include "labelled/labelled_augmented_paving.hpp"
 #include "hybrid/hybrid_augmented_paving_draw.hpp"
 #include "hybrid/hybrid_bounded_constraint_set.hpp"
 #include "labelled/figure.hpp"

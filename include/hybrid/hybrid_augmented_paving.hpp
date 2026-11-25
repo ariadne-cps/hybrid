@@ -47,7 +47,8 @@
 // HybridAugmentedPaving owns a HybridPaving by value, so the type must be complete.
 #include "hybrid/hybrid_auxiliary_mapping.hpp"
 #include "hybrid/hybrid_paving.hpp"
-#include "labelled/labelled_augmented_paving.hpp"
+// The legacy labelled result is forward-declared; its concrete implementation
+// belongs in the translation unit, not in this public header.
 
 namespace Ariadne {
 
@@ -58,6 +59,8 @@ class Vector;
 class AugmentedPaving;
 /** @brief BinaryTreePaving represents hybrid pavings with auxiliary variables and mappings. */
 class BinaryTreePaving;
+/** @brief Legacy snapshot type; only declarations are required in this header. */
+class LabelledAugmentedPaving;
 /** @brief HybridAugmentedPaving represents hybrid pavings with auxiliary variables and mappings. */
 class HybridAugmentedPaving;
 
@@ -71,7 +74,7 @@ class HybridAugmentedPavingElementReference {
     /** @brief Construct or destroy an instance. */
     HybridAugmentedPavingElementReference(HybridAugmentedPaving* hstorage, const DiscreteLocation& loc) : _hstorage(hstorage), _loc(loc) {}
     /** @brief Construct or destroy an instance. */
-    inline operator const LabelledAugmentedPaving() const;
+    operator const LabelledAugmentedPaving() const;
     /** @brief Perform the hybrid-system operation. */
     inline Void clear();
 };
@@ -155,13 +158,6 @@ class HybridAugmentedPaving {
     friend class HybridAugmentedPavingElementReference;
 };
 
-inline const LabelledAugmentedPaving HybridAugmentedPaving::operator[](const DiscreteLocation& q) const {
-    return LabelledAugmentedPaving(this->_state_set[q], this->auxiliary_mapping(q));
-}
-/** @brief Construct or destroy an instance. */
-HybridAugmentedPavingElementReference::operator const LabelledAugmentedPaving() const {
-    return LabelledAugmentedPaving(_hstorage->_state_set[_loc], _hstorage->auxiliary_mapping(_loc));
-}
 Void HybridAugmentedPavingElementReference::clear() { return _hstorage->state_paving()[_loc].clear(); }
 
 } // namespace Ariadne
