@@ -26,6 +26,7 @@
  *  @brief Materialize a concrete grid from a location's scaling policy.
  */
 
+#include "algebra/vector.hpp"
 #include "hybrid/hybrid_grid.hpp"
 
 namespace Ariadne {

@@ -34,6 +34,7 @@
 #include <memory>
 
 #include "hybrid/discrete_location.hpp"
+#include "numeric/builtin.hpp"
 #include "symbolic/space.hpp"
 #include "symbolic/variable.hpp"
 #include "utility/container.hpp"
