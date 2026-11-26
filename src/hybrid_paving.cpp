@@ -38,6 +38,8 @@
 #include "labelled/graphics_interface.hpp"
 #include "numeric/real.hpp"
 #include "numeric/rounding.hpp"
+#include "paving/binary_tree_paving.hpp"
+#include "paving/robdd_paving.hpp"
 #include "rendering/figure.hpp"
 #include "set/function_set.hpp"
 #include "symbolic/assignment.hpp"
@@ -45,6 +47,27 @@
 #include "expression-set/expression_set.hpp"
 
 namespace Ariadne {
+
+HybridPaving::HybridPaving(const HybridGrid &grid)
+    : HybridPaving(grid, [](const Grid &g) { return Paving(new BinaryTreePaving(g)); }) {}
+
+HybridPaving::HybridPaving(const HybridGrid &grid, Factory factory)
+    : _hgrid(grid),
+      _values(grid.space(), [grid, factory](
+          const DiscreteLocation& location, const RealSpace&) -> Paving {
+          Paving selected = factory(grid[location]);
+          ARIADNE_PRECONDITION_MSG(selected.grid() == grid[location],
+                                   "Selected backend uses an incompatible grid");
+          return selected;
+      }),
+      _factory(std::move(factory)) {
+    ARIADNE_PRECONDITION_MSG(static_cast<Bool>(_factory), "Empty HybridPaving factory");
+}
+
+HybridPaving::HybridPaving(const HybridGrid &grid, std::shared_ptr<RobddManager> manager)
+    : HybridPaving(grid, [manager = std::move(manager)](const Grid &g) {
+          return Paving(new RobddPaving(manager, g));
+      }) {}
 
 Void HybridPaving::clear() {
     for (HybridPaving::LocationsIterator _loc_iter = this->locations_begin(); _loc_iter != this->locations_end(); ++_loc_iter) {

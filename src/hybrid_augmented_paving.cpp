@@ -28,6 +28,7 @@
 
 #include "hybrid/hybrid_augmented_paving.hpp"
 #include "labelled/labelled_augmented_paving.hpp"
+#include "paving/binary_tree_paving.hpp"
 
 #include "function/functional.hpp"
 

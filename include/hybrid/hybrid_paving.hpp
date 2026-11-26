@@ -48,8 +48,7 @@
 #include "hybrid/hybrid_space.hpp"
 #include "hybrid/value.hpp"
 #include "numeric/declarations.hpp"
-#include "paving/binary_tree_paving.hpp"
-#include "paving/robdd_paving.hpp"
+#include "paving/paving_interface.hpp"
 #include "set/curve.hpp"
 #include "set/function_set.hpp"
 #include "set/list_set.hpp"
@@ -61,6 +60,8 @@
 
 namespace Ariadne {
 
+class RobddManager;
+
 //! \ingroup HybridSetSubModule
 //! A backend-independent location-indexed paving of hybrid states.
 class HybridPaving : public HybridDrawableInterface {
@@ -70,25 +71,9 @@ class HybridPaving : public HybridDrawableInterface {
     using LocationsIterator = Hybrid<Paving>::Iterator;
     using LocationsConstIterator = Hybrid<Paving>::ConstIterator;
     using ConstIterator = HybridSpaceSetConstIterator<Paving, HybridGridCell>;
-    explicit HybridPaving(const HybridGrid &grid)
-        : HybridPaving(grid, [](const Grid &g) { return Paving(new BinaryTreePaving(g)); }) {}
-    HybridPaving(const HybridGrid &grid, Factory factory)
-        /** @brief Perform the hybrid-system operation. */
-        : _hgrid(grid),
-          _values(grid.space(), [grid, factory](
-              const DiscreteLocation& location, const RealSpace&) -> Paving {
-              Paving selected = factory(grid[location]);
-              ARIADNE_PRECONDITION_MSG(selected.grid() == grid[location],
-                                       "Selected backend uses an incompatible grid");
-              return selected;
-          }),
-          _factory(std::move(factory)) {
-        ARIADNE_PRECONDITION_MSG(static_cast<Bool>(_factory), "Empty HybridPaving factory");
-    }
-    HybridPaving(const HybridGrid &grid, std::shared_ptr<RobddManager> manager)
-        : HybridPaving(grid, [manager = std::move(manager)](const Grid &g) {
-              return Paving(new RobddPaving(manager, g));
-          }) {}
+    explicit HybridPaving(const HybridGrid &grid);
+    HybridPaving(const HybridGrid &grid, Factory factory);
+    HybridPaving(const HybridGrid &grid, std::shared_ptr<RobddManager> manager);
     HybridPaving *clone() const { return new HybridPaving(*this); }
     // Create another hybrid paving on a different hybrid grid while
     // preserving the selected backend factory and shared ROBDD manager.

@@ -54,4 +54,24 @@ static_assert(std::is_abstract_v<Ariadne::EffectiveHybridSetInterface>);
 static_assert(std::is_abstract_v<Ariadne::ValidatedHybridSetInterface>);
 static_assert(std::is_base_of_v<Ariadne::EffectiveHybridSetInterface, Ariadne::HybridBoxSet>);
 
+// The generic Hybrid set still exposes GridCell, but not tree/ROBDD backends.
+#include "hybrid/hybrid_set.hpp"
+
+#ifdef ARIADNE_PAVING_BINARY_TREE_PAVING_HPP
+#error Hybrid set header must not import the binary tree paving backend
+#endif
+#ifdef ARIADNE_PAVING_ROBDD_PAVING_HPP
+#error Hybrid set header must not import the ROBDD paving backend
+#endif
+
+// HybridPaving selects concrete backends in its implementation, not its API.
+#include "hybrid/hybrid_paving.hpp"
+
+#ifdef ARIADNE_PAVING_BINARY_TREE_PAVING_HPP
+#error HybridPaving header must not import the binary tree paving backend
+#endif
+#ifdef ARIADNE_PAVING_ROBDD_PAVING_HPP
+#error HybridPaving header must not import the ROBDD paving backend
+#endif
+
 int main() { return 0; }

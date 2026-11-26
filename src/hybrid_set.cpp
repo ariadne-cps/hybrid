@@ -34,6 +34,7 @@
 #include "numeric/casts.hpp"
 #include "numeric/real.hpp"
 #include "numeric/rounding.hpp"
+#include "paving/binary_tree_paving.hpp"
 #include "paving/paving_interface.hpp"
 #include "set/function_set.hpp"
 #include "symbolic/assignment.hpp"

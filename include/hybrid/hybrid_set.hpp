@@ -46,7 +46,7 @@
 #include "hybrid/hybrid_space.hpp"
 #include "labelled/set.hpp"
 #include "numeric/declarations.hpp"
-#include "paving/binary_tree_paving.hpp"
+#include "paving/grid_cell.hpp"
 #include "set/curve.hpp"
 #include "set/function_set.hpp"
 #include "set/list_set.hpp"

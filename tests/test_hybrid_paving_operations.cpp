@@ -35,6 +35,8 @@
 #include "hybrid/hybrid_bounded_constraint_set.hpp"
 #include "hybrid/hybrid_paving.hpp"
 #include "logging/test_runner.hpp"
+#include "paving/binary_tree_paving.hpp"
+#include "paving/robdd_paving.hpp"
 
 #include "ariadne-testing.hpp"
 

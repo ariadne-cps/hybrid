@@ -37,6 +37,7 @@
 #include "hybrid/hybrid_constraint_set.hpp"
 #include "hybrid/hybrid_paving.hpp"
 #include "hybrid/hybrid_set.hpp"
+#include "paving/binary_tree_paving.hpp"
 #include "labelled/figure.hpp"
 #include "logging/test_runner.hpp"
 #include "numeric/rational.hpp"
