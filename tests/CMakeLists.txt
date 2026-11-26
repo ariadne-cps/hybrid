@@ -12,6 +12,7 @@ set(UNIT_TESTS
     test_hybrid_augmented_paving
     test_hybrid_graphics_configuration
     test_hybrid_box_set
+    test_hybrid_header_boundaries
     test_hybrid_drawing_adapters
 )
 foreach(TEST IN LISTS UNIT_TESTS)
