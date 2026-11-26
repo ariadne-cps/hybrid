@@ -66,9 +66,6 @@ static_assert(std::is_abstract_v<Ariadne::HybridSetInterfaceBase>);
 static_assert(std::is_abstract_v<Ariadne::EffectiveHybridSetInterface>);
 static_assert(std::is_abstract_v<Ariadne::ValidatedHybridSetInterface>);
 static_assert(std::is_base_of_v<Ariadne::EffectiveHybridSetInterface, Ariadne::HybridBoxSet>);
-static_assert(std::is_base_of_v<Ariadne::HybridBasicSet<Ariadne::GridCell>, Ariadne::HybridGridCell>);
-static_assert(std::is_base_of_v<Ariadne::ValidatedHybridLocatedSetInterface, Ariadne::HybridValidatedConstrainedImageSet>);
-
 // Generic hybrid sets do not expose tree/ROBDD backends.
 
 #ifdef ARIADNE_PAVING_BINARY_TREE_PAVING_HPP
@@ -81,6 +78,9 @@ static_assert(std::is_base_of_v<Ariadne::ValidatedHybridLocatedSetInterface, Ari
 // Import the concrete value types explicitly, without pulling the backends.
 #include "hybrid/hybrid_grid_cell.hpp"
 #include "hybrid/hybrid_validated_constrained_image_set.hpp"
+
+static_assert(std::is_base_of_v<Ariadne::HybridBasicSet<Ariadne::GridCell>, Ariadne::HybridGridCell>);
+static_assert(std::is_base_of_v<Ariadne::ValidatedHybridLocatedSetInterface, Ariadne::HybridValidatedConstrainedImageSet>);
 
 // HybridPaving selects concrete backends in its implementation, not its API.
 #include "hybrid/hybrid_paving.hpp"
