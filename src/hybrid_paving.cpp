@@ -305,12 +305,4 @@ Paving& HybridPaving::_provide_location(const DiscreteLocation& q) {
     return _values[q];
 }
 
-Grid HybridScalings::grid(const DiscreteLocation& loc, const RealSpace& space) const {
-    Vector<ExactDouble> lengths(space.size());
-    for (SizeType i = 0; i != space.size(); ++i) {
-        lengths[i] = (this->scaling(loc, space.variable(i)));
-    }
-    return Grid(lengths);
-}
-
 } // namespace Ariadne

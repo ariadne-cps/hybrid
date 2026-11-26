@@ -34,7 +34,6 @@
 #include <memory>
 
 #include "hybrid/discrete_location.hpp"
-#include "paving/grid.hpp"
 #include "symbolic/space.hpp"
 #include "symbolic/variable.hpp"
 #include "utility/container.hpp"
@@ -74,8 +73,6 @@ class HybridScalings {
     operator const HybridScalingsInterface&() const { return *this->_ptr; }
     operator HybridScalingsInterface&() { return *this->_ptr; }
     ExactDouble scaling(const DiscreteLocation& loc, const RealVariable& var) const { return this->_ptr->scaling(loc, var); }
-    /** @brief Return the requested property or representation. */
-    Grid grid(const DiscreteLocation& loc, const RealSpace& spc) const;
 
   public:
     /** @brief Construct or destroy an instance. */

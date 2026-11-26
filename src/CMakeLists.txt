@@ -5,6 +5,7 @@ add_library(HYBRID_SRC OBJECT
     hybrid_set.cpp
     hybrid_set_adapters.cpp
     hybrid_paving.cpp
+    hybrid_grid.cpp
     hybrid_augmented_paving.cpp
     hybrid_graphics.cpp
 )

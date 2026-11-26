@@ -112,7 +112,16 @@ class TestHybridSpace : public Ariadne::Testing::ContextFixture {
         HybridScalings scalings(policy);
         HybridGrid scaled(hspc, scalings);
         ARIADNE_TESTING_EXPECT_EQUAL(scaled.grid(q).dimension(), 2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(scaled.grid(q).lengths(), unit.grid(q).lengths());
         ARIADNE_TESTING_EXPECT_EQUAL(scaled.space(q).dimension(), 2u);
+        // Distinct scaling factors and coordinate orders are materialized by
+        // HybridGrid, not by the underlying HybridScalings policy.
+        const Map<Identifier, ExactDouble> custom_values{{x.name(), 2.0_x}, {y.name(), 3.0_x}};
+        HybridGrid custom_grid(hspc, HybridScalings(custom_values));
+        ARIADNE_TESTING_EXPECT_EQUAL(custom_grid[q].dimension(), 2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(custom_grid[q].lengths(),
+                                     Grid(Vector<ExactDouble>{2.0_x, 3.0_x}).lengths());
+        ARIADNE_TESTING_EXPECT_EXCEPTION(static_cast<void>(custom_grid[missing]));
         std::unique_ptr<HybridGrid> cloned_grid(scaled.clone());
         ARIADNE_TESTING_EXPECT_EQUAL(cloned_grid->grid(q).dimension(), 2u);
         std::ostringstream output;

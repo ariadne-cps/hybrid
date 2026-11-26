@@ -78,10 +78,6 @@ class HybridGrid {
     friend OutputStream& operator<<(OutputStream& os, const HybridGrid& hgrid);
 };
 
-inline Grid HybridGrid::operator[](const DiscreteLocation& loc) const {
-    return this->_scalings.grid(loc, this->_space[loc]);
-}
-
 inline OutputStream& operator<<(OutputStream& os, const HybridGrid& hgrid) {
     return os << "HybridGrid( space=" << hgrid._space << ", scalings=" << hgrid._scalings << " )";
 }

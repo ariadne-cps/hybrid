@@ -32,6 +32,13 @@
 #include <string>
 
 #include "hybrid/hybrid_scalings.hpp"
+
+// HybridScalings is only a scaling policy: including it must never load the
+// concrete paving grid API, even through a transitive include.
+#ifdef ARIADNE_GRID_HPP
+#error hybrid_scalings.hpp must not import paving/grid.hpp
+#endif
+
 #include "logging/test_runner.hpp"
 
 #include "ariadne-testing.hpp"
