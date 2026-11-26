@@ -121,6 +121,14 @@ class TestHybridSpace : public Ariadne::Testing::ContextFixture {
         ARIADNE_TESTING_EXPECT_EQUAL(custom_grid[q].dimension(), 2u);
         ARIADNE_TESTING_EXPECT_EQUAL(custom_grid[q].lengths(),
                                      Grid(Vector<ExactDouble>{2.0_x, 3.0_x}).lengths());
+        // A derived auxiliary grid may have a different dimension and
+        // ordering than the location's state grid. The same scaling policy
+        // must be applied by variable name, not by state coordinate index.
+        const RealSpace auxiliary_order({y, x});
+        const Grid auxiliary_grid =
+            HybridGrid::make_grid(custom_grid.scalings(), q, auxiliary_order);
+        ARIADNE_TESTING_EXPECT_EQUAL(auxiliary_grid.lengths(),
+                                     Grid(Vector<ExactDouble>{3.0_x, 2.0_x}).lengths());
         ARIADNE_TESTING_EXPECT_EXCEPTION(static_cast<void>(custom_grid[missing]));
         std::unique_ptr<HybridGrid> cloned_grid(scaled.clone());
         ARIADNE_TESTING_EXPECT_EQUAL(cloned_grid->grid(q).dimension(), 2u);

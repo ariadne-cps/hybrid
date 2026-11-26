@@ -31,14 +31,18 @@
 
 namespace Ariadne {
 
-Grid HybridGrid::operator[](const DiscreteLocation& loc) const {
-    ARIADNE_PRECONDITION(this->_space.has_location(loc));
-    const RealSpace& space = this->_space[loc];
+Grid HybridGrid::make_grid(const HybridScalings& scalings,
+                           const DiscreteLocation& loc, const RealSpace& space) {
     Vector<ExactDouble> lengths(space.size());
     for (SizeType i = 0; i != space.size(); ++i) {
-        lengths[i] = this->_scalings.scaling(loc, space.variable(i));
+        lengths[i] = scalings.scaling(loc, space.variable(i));
     }
     return Grid(lengths);
+}
+
+Grid HybridGrid::operator[](const DiscreteLocation& loc) const {
+    ARIADNE_PRECONDITION(this->_space.has_location(loc));
+    return make_grid(this->_scalings, loc, this->_space[loc]);
 }
 
 } // namespace Ariadne

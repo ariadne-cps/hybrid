@@ -67,6 +67,13 @@ class HybridGrid {
     //! The grid in location \a loc.
     Grid grid(const DiscreteLocation& loc) const { return this->operator[](loc); }
 
+    /** @brief Materialize a concrete grid using explicit ordered coordinates.
+     *  @details The scaling policy does not depend on paving; HybridGrid owns
+     *  all concrete grid creation, including auxiliary-coordinate products.
+     */
+    static Grid make_grid(const HybridScalings& scalings,
+                          const DiscreteLocation& loc, const RealSpace& space);
+
   public:
     //! The grid corresponding to unit resolution on each dimension.
     HybridGrid(const HybridSpace& hsp) : _space(hsp), _scalings(SimpleHybridScalings()) {}
