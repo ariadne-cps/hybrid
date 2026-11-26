@@ -33,6 +33,8 @@
 
 #include "hybrid/hybrid_paving.hpp"
 #include "hybrid/hybrid_set.hpp"
+#include "hybrid/hybrid_grid_cell.hpp"
+#include "hybrid/hybrid_validated_constrained_image_set.hpp"
 #include "logging/test_runner.hpp"
 
 #include "ariadne-testing.hpp"

@@ -33,6 +33,7 @@
 #include "hybrid/hybrid_graphics.hpp"
 #include "hybrid/hybrid_paving.hpp"
 #include "hybrid/hybrid_set.hpp"
+#include "hybrid/hybrid_validated_constrained_image_set.hpp"
 #include "logging/test_runner.hpp"
 #include "rendering/rendering_interface.hpp"
 #include "rendering/rendering_manager.hpp"

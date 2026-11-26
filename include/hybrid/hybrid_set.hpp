@@ -38,15 +38,12 @@
 #include "geometry/box.hpp"
 #include "geometry/declarations.hpp"
 #include "geometry/point.hpp"
-#include "hybrid/hybrid_expression_set.hpp"
 #include "hybrid/hybrid_graphics_interface.hpp"
-#include "hybrid/hybrid_grid.hpp"
 #include "hybrid/hybrid_set.decl.hpp"
 #include "hybrid/hybrid_set_interface.hpp"
 #include "hybrid/hybrid_space.hpp"
 #include "labelled/set.hpp"
 #include "numeric/declarations.hpp"
-#include "paving/grid_cell.hpp"
 #include "set/curve.hpp"
 #include "set/function_set.hpp"
 #include "set/list_set.hpp"
@@ -54,7 +51,6 @@
 #include "utility/macros.hpp"
 #include "utility/stlio.hpp"
 
-#include "expression-set/expression_set.hpp"
 
 namespace Ariadne {
 
@@ -330,74 +326,6 @@ class HybridBoxes
     virtual Void draw(CanvasInterface&, const Set<DiscreteLocation>&, const Variables2d&) const override;
 };
 
-//! \ingroup LabelledSetSubModule
-//! \ingroup HybridSetSubModule
-//! \brief A hybrid set defined by the intersection of a box and a constraint system in each location.
-class HybridValidatedConstrainedImageSet
-    : public virtual ValidatedHybridLocatedSetInterface,
-      public virtual HybridDrawableInterface,
-      public HybridBasicSet<ValidatedConstrainedImageSet> {
-    typedef HybridBasicSet<ValidatedConstrainedImageSet> Base;
-
-  public:
-    using HybridBasicSet<ValidatedConstrainedImageSet>::HybridBasicSet;
-
-    /** @brief Perform the hybrid-system operation. */
-    HybridValidatedConstrainedImageSet* clone() const {
-        return new HybridValidatedConstrainedImageSet(*this);
-    }
-
-    /** @brief Return the requested property or representation. */
-    virtual Set<RealVariable> variables(DiscreteLocation loc) const override {
-        static_cast<void>(loc);
-        ARIADNE_PRECONDITION(loc == this->location());
-        return this->Base::variables();
-    }
-    /** @brief Return the requested property or representation. */
-    virtual Set<DiscreteLocation> locations() const override {
-        return {this->Base::location()};
-    }
-
-    /** @brief Perform the hybrid-system operation. */
-    virtual ValidatedLowerKleenean overlaps(const HybridExactBoxType& hbx) const override {
-        return this->Base::overlaps(hbx);
-    }
-    /** @brief Perform the hybrid-system operation. */
-    inline ValidatedLowerKleenean inside(const HybridExactBoxesType& hbxs) const override {
-        return this->Base::inside(hbxs);
-    }
-    /** @brief Perform the hybrid-system operation. */
-    virtual ValidatedLowerKleenean separated(const HybridExactBoxType& hbx) const override {
-        return this->Base::separated(hbx);
-    }
-    /** @brief Perform the hybrid-system operation. */
-    virtual HybridUpperBoxes bounding_box() const override;
-
-    /** @brief Perform the hybrid-system operation. */
-    virtual OutputStream& _write(OutputStream& os) const override {
-        return os << static_cast<const Base&>(*this);
-    }
-    /** @brief Render the object. */
-    virtual Void draw(CanvasInterface& cnvs, const Set<DiscreteLocation>& locs, const Variables2d& vars) const override {
-        return this->Base::draw(cnvs, locs, vars);
-    }
-
-    friend OutputStream& operator<<(OutputStream& os, const HybridValidatedConstrainedImageSet& hset) { return os << static_cast<const Base&>(hset); }
-
-  protected:
-    HybridSetInterfaceBase* _clone() const override { return this->clone(); }
-    /** @brief Perform the hybrid-system operation. */
-    virtual EuclideanSetInterfaceBase* _euclidean_set(DiscreteLocation loc, RealSpace spc) const override {
-        static_cast<void>(loc);
-        static_cast<void>(spc);
-        /** @brief Construct or destroy an instance. */
-        ARIADNE_PRECONDITION(loc == this->location());
-        /** @brief Construct or destroy an instance. */
-        ARIADNE_PRECONDITION(spc == this->space());
-        return new ValidatedConstrainedImageSet(this->Base::euclidean_set());
-    }
-};
-
 /** @brief Perform the hybrid-system operation. */
 template<class EBS>
 HybridUpperBox HybridBasicSet<EBS>::bounding_box() const {
@@ -608,18 +536,6 @@ inline Void
         _bs_iter = _loc_iter->second.second.begin();
     }
 }
-
-//! \ingroup HybridSetModule
-//! \brief A cell associated with a grid in a hybrid space.
-class HybridGridCell
-    : public HybridBasicSet<GridCell> {
-  public:
-    /** @brief Construct or destroy an instance. */
-    HybridGridCell() : HybridBasicSet<GridCell>() {}
-    /** @brief Construct or destroy an instance. */
-    HybridGridCell(DiscreteLocation q, const RealSpace& s, const GridCell& gc) : HybridBasicSet<GridCell>(q, s, gc) {}
-    HybridExactBox box() const { return HybridExactBox(this->location(), this->space(), this->euclidean_set().box()); }
-};
 
 template<class DS, class HBS>
 /** @brief HybridSpaceSetConstIterator represents sets of states spanning discrete locations and continuous spaces. */

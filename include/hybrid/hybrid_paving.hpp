@@ -42,6 +42,7 @@
 #include "hybrid/hybrid_expression_set.hpp"
 #include "hybrid/hybrid_graphics_interface.hpp"
 #include "hybrid/hybrid_grid.hpp"
+#include "hybrid/hybrid_grid_cell.hpp"
 #include "hybrid/hybrid_set.decl.hpp"
 #include "hybrid/hybrid_set.hpp"
 #include "hybrid/hybrid_set_interface.hpp"

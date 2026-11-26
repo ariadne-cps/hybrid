@@ -48,6 +48,42 @@
 
 namespace Ariadne {
 
+template<class DS, class HBS>
+HybridSpaceSetConstIterator<DS, HBS>::
+    HybridSpaceSetConstIterator(const Map<DiscreteLocation, DS>& map, const HybridSpace& spc, Bool at_end)
+    : HybridSpaceSetConstIterator(map.begin(), map.end(), spc, at_end) {}
+
+template<class DS, class HBS>
+HybridSpaceSetConstIterator<DS, HBS>::
+    HybridSpaceSetConstIterator(
+        typename Map<DiscreteLocation, DS>::ConstIterator first_iter,
+        typename Map<DiscreteLocation, DS>::ConstIterator last_iter,
+        const HybridSpace& spc, Bool at_end)
+    : _loc_begin(first_iter),
+      _loc_end(last_iter),
+      _loc_iter(at_end ? _loc_end : _loc_begin),
+      hspc(spc) {
+    if (_loc_iter != _loc_end) {
+        _bs_iter = _loc_iter->second.begin();
+        this->increment_loc();
+    }
+}
+
+template<class DS, class HBS>
+inline Void
+    HybridSpaceSetConstIterator<DS, HBS>::increment_loc() {
+    while (*_bs_iter == _loc_iter->second.end()) {
+        ++_loc_iter;
+        if (_loc_iter == _loc_end) {
+            return;
+        }
+        _bs_iter = _loc_iter->second.begin();
+    }
+}
+
+template<>
+String class_name<GridCell>() { return "GridCell"; }
+
 HybridPaving::HybridPaving(const HybridGrid &grid)
     : HybridPaving(grid, [](const Grid &g) { return Paving(new BinaryTreePaving(g)); }) {}
 
@@ -327,5 +363,8 @@ Paving& HybridPaving::_provide_location(const DiscreteLocation& q) {
                              "HybridPaving location does not belong to grid");
     return _values[q];
 }
+
+template class HybridSpaceSetConstIterator<BinaryTreePaving, HybridGridCell>;
+template class HybridSpaceSetConstIterator<Paving, HybridGridCell>;
 
 } // namespace Ariadne

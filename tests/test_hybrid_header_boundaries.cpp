@@ -36,6 +36,19 @@
 #error Hybrid set interface must not import concrete paving/grid.hpp
 #endif
 
+// Generic named hybrid sets must remain independent from concrete paving.
+#include "hybrid/hybrid_set.hpp"
+
+#ifdef ARIADNE_HYBRID_GRID_HPP
+#error Generic hybrid set header must not import HybridGrid
+#endif
+#ifdef ARIADNE_GRID_HPP
+#error Generic hybrid set header must not import concrete Grid
+#endif
+#ifdef ARIADNE_GRID_CELL_HPP
+#error Generic hybrid set header must not import concrete GridCell
+#endif
+
 // Expression-defined Hybrid sets may use expression-set, but must not force
 // concrete gridding, paving or tree backends into symbolic-only consumers.
 #include "hybrid/hybrid_expression_set.hpp"
@@ -53,9 +66,10 @@ static_assert(std::is_abstract_v<Ariadne::HybridSetInterfaceBase>);
 static_assert(std::is_abstract_v<Ariadne::EffectiveHybridSetInterface>);
 static_assert(std::is_abstract_v<Ariadne::ValidatedHybridSetInterface>);
 static_assert(std::is_base_of_v<Ariadne::EffectiveHybridSetInterface, Ariadne::HybridBoxSet>);
+static_assert(std::is_base_of_v<Ariadne::HybridBasicSet<Ariadne::GridCell>, Ariadne::HybridGridCell>);
+static_assert(std::is_base_of_v<Ariadne::ValidatedHybridLocatedSetInterface, Ariadne::HybridValidatedConstrainedImageSet>);
 
-// The generic Hybrid set still exposes GridCell, but not tree/ROBDD backends.
-#include "hybrid/hybrid_set.hpp"
+// Generic hybrid sets do not expose tree/ROBDD backends.
 
 #ifdef ARIADNE_PAVING_BINARY_TREE_PAVING_HPP
 #error Hybrid set header must not import the binary tree paving backend
@@ -63,6 +77,10 @@ static_assert(std::is_base_of_v<Ariadne::EffectiveHybridSetInterface, Ariadne::H
 #ifdef ARIADNE_PAVING_ROBDD_PAVING_HPP
 #error Hybrid set header must not import the ROBDD paving backend
 #endif
+
+// Import the concrete value types explicitly, without pulling the backends.
+#include "hybrid/hybrid_grid_cell.hpp"
+#include "hybrid/hybrid_validated_constrained_image_set.hpp"
 
 // HybridPaving selects concrete backends in its implementation, not its API.
 #include "hybrid/hybrid_paving.hpp"
