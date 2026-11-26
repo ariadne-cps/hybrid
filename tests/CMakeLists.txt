@@ -14,6 +14,8 @@ set(UNIT_TESTS
     test_hybrid_box_set
     test_hybrid_header_boundaries
     test_hybrid_grid_cell_header
+    test_hybrid_grid_header
+    test_hybrid_paving_header
     test_hybrid_validated_constrained_image_header
     test_hybrid_drawing_adapters
 )

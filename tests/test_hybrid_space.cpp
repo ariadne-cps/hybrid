@@ -34,6 +34,7 @@
 #include "hybrid/hybrid_grid.hpp"
 #include "hybrid/hybrid_space.hpp"
 #include "logging/test_runner.hpp"
+#include "paving/grid.hpp"
 
 #include "ariadne-testing.hpp"
 
@@ -119,6 +120,7 @@ class TestHybridSpace : public Ariadne::Testing::ContextFixture {
         const Map<Identifier, ExactDouble> custom_values{{x.name(), 2.0_x}, {y.name(), 3.0_x}};
         HybridGrid custom_grid(hspc, HybridScalings(custom_values));
         ARIADNE_TESTING_EXPECT_EQUAL(custom_grid[q].dimension(), 2u);
+        ARIADNE_TESTING_EXPECT_EQUAL(custom_grid.grid(q).lengths(), custom_grid[q].lengths());
         ARIADNE_TESTING_EXPECT_EQUAL(custom_grid[q].lengths(),
                                      Grid(Vector<ExactDouble>{2.0_x, 3.0_x}).lengths());
         // A derived auxiliary grid may have a different dimension and

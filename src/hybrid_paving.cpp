@@ -105,6 +105,21 @@ HybridPaving::HybridPaving(const HybridGrid &grid, std::shared_ptr<RobddManager>
           return Paving(new RobddPaving(manager, g));
       }) {}
 
+HybridPaving HybridPaving::with_grid(const HybridGrid &grid) const {
+    return HybridPaving(grid, _factory);
+}
+
+OutputStream &operator<<(OutputStream &os, const HybridPaving &p) {
+    return os << "HybridPaving(" << p._values << ")";
+}
+
+HybridPaving inner_approximation(
+    const EffectiveHybridSetInterface &set, const HybridGrid &grid, Nat fineness) {
+    HybridPaving result(grid);
+    result.adjoin_inner_approximation(set, fineness);
+    return result;
+}
+
 Void HybridPaving::clear() {
     for (HybridPaving::LocationsIterator _loc_iter = this->locations_begin(); _loc_iter != this->locations_end(); ++_loc_iter) {
         _loc_iter->second.clear();

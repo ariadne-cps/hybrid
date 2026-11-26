@@ -33,10 +33,11 @@
 
 #include "hybrid/hybrid_scalings.hpp"
 #include "hybrid/hybrid_space.hpp"
-#include "paving/grid.hpp"
 #include "symbolic/space.hpp"
 
 namespace Ariadne {
+
+class Grid;
 
 typedef Vector<FloatDP> ExactFloatVector;
 /** @brief HybridPaving represents location-dependent grids in hybrid spaces. */
@@ -65,7 +66,7 @@ class HybridGrid {
     //! The variable scalings used.
     HybridScalings& scalings() { return this->_scalings; }
     //! The grid in location \a loc.
-    Grid grid(const DiscreteLocation& loc) const { return this->operator[](loc); }
+    Grid grid(const DiscreteLocation& loc) const;
 
     /** @brief Materialize a concrete grid using explicit ordered coordinates.
      *  @details The scaling policy does not depend on paving; HybridGrid owns
@@ -84,10 +85,6 @@ class HybridGrid {
     //!
     friend OutputStream& operator<<(OutputStream& os, const HybridGrid& hgrid);
 };
-
-inline OutputStream& operator<<(OutputStream& os, const HybridGrid& hgrid) {
-    return os << "HybridGrid( space=" << hgrid._space << ", scalings=" << hgrid._scalings << " )";
-}
 
 } // namespace Ariadne
 

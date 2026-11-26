@@ -32,6 +32,7 @@
 #include "hybrid/hybrid_paving.hpp"
 #include "hybrid/hybrid_set.hpp"
 #include "hybrid/hybrid_space.hpp"
+#include "paving/grid.hpp"
 #include "pybind11.hpp"
 
 #include "function-utilities.hpp"

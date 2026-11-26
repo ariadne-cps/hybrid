@@ -28,6 +28,7 @@
 
 #include "algebra/vector.hpp"
 #include "hybrid/hybrid_grid.hpp"
+#include "paving/grid.hpp"
 
 namespace Ariadne {
 
@@ -43,6 +44,14 @@ Grid HybridGrid::make_grid(const HybridScalings& scalings,
 Grid HybridGrid::operator[](const DiscreteLocation& loc) const {
     ARIADNE_PRECONDITION(this->_space.has_location(loc));
     return make_grid(this->_scalings, loc, this->_space[loc]);
+}
+
+Grid HybridGrid::grid(const DiscreteLocation& loc) const {
+    return this->operator[](loc);
+}
+
+OutputStream& operator<<(OutputStream& os, const HybridGrid& hgrid) {
+    return os << "HybridGrid( space=" << hgrid._space << ", scalings=" << hgrid._scalings << " )";
 }
 
 } // namespace Ariadne

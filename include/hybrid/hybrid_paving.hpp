@@ -39,7 +39,6 @@
 #include "geometry/box.hpp"
 #include "geometry/declarations.hpp"
 #include "geometry/point.hpp"
-#include "hybrid/hybrid_expression_set.hpp"
 #include "hybrid/hybrid_graphics_interface.hpp"
 #include "hybrid/hybrid_grid.hpp"
 #include "hybrid/hybrid_grid_cell.hpp"
@@ -57,7 +56,6 @@
 #include "utility/macros.hpp"
 #include "utility/stlio.hpp"
 
-#include "expression-set/expression_set.hpp"
 
 namespace Ariadne {
 
@@ -79,9 +77,7 @@ class HybridPaving : public HybridDrawableInterface {
     // Create another hybrid paving on a different hybrid grid while
     // preserving the selected backend factory and shared ROBDD manager.
     /** @brief Perform the hybrid-system operation. */
-    HybridPaving with_grid(const HybridGrid &grid) const {
-        return HybridPaving(grid, _factory);
-    }
+    HybridPaving with_grid(const HybridGrid &grid) const;
     HybridGrid grid() const { return _hgrid; }
     HybridSpace space() const { return _hgrid.space(); }
     RealSpace space(DiscreteLocation q) const { return _hgrid.space(q); }
@@ -156,9 +152,7 @@ class HybridPaving : public HybridDrawableInterface {
     friend Bool subset(const HybridPaving &, const HybridPaving &);
     /** @brief Perform the hybrid-system operation. */
     friend Bool intersect(const HybridPaving &, const HybridPaving &);
-    friend OutputStream &operator<<(OutputStream &os, const HybridPaving &p) {
-        return os << "HybridPaving(" << p._values << ")";
-    }
+    friend OutputStream &operator<<(OutputStream &os, const HybridPaving &p);
 
   private:
     /** @brief Perform the hybrid-system operation. */
@@ -168,13 +162,7 @@ class HybridPaving : public HybridDrawableInterface {
     Factory _factory;
 };
 
-inline HybridPaving inner_approximation(
-    const EffectiveHybridSetInterface &set, const HybridGrid &grid, Nat fineness) {
-    /** @brief Perform the hybrid-system operation. */
-    HybridPaving result(grid);
-    /** @brief Perform the hybrid-system operation. */
-    result.adjoin_inner_approximation(set, fineness);
-    return result;
-}
+HybridPaving inner_approximation(
+    const EffectiveHybridSetInterface &set, const HybridGrid &grid, Nat fineness);
 } // namespace Ariadne
 #endif // ARIADNE_HYBRID_PAVING_HPP
