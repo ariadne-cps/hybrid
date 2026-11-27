@@ -26,15 +26,13 @@
  *  @brief Exercise test hybrid space behavior.
  */
 
-// Behavioral coverage for hybrid spaces, location lookup and grids.
+// Behavioral coverage for hybrid spaces and location lookup.
 #include <memory>
 #include <sstream>
 #include <string>
 
-#include "hybrid/hybrid_grid.hpp"
 #include "hybrid/hybrid_space.hpp"
 #include "logging/test_runner.hpp"
-#include "paving/grid.hpp"
 
 #include "ariadne-testing.hpp"
 
@@ -91,58 +89,10 @@ class TestHybridSpace : public Ariadne::Testing::ContextFixture {
         output << polymorphic;
         ARIADNE_TESTING_PROVE(output.str().find("HybridSpace") != std::string::npos);
     }
-
-    Void test_grid_and_scalings() {
-        DiscreteLocation q(1), missing(2);
-        RealVariable x("x"), y("y");
-        RealSpace spc({x, y});
-        MonolithicHybridSpace m;
-        m.new_location(q, spc);
-        HybridSpace hspc(m);
-
-        HybridGrid unit(hspc);
-        ARIADNE_TESTING_PROVE(unit.has_location(q));
-        ARIADNE_TESTING_PROVE(!unit.has_location(missing));
-        ARIADNE_TESTING_PROVE(unit.space().has_location(q));
-        ARIADNE_TESTING_EXPECT_EQUAL(unit.space(q).dimension(), 2u);
-        ARIADNE_TESTING_EXPECT_EQUAL(unit.scalings().scaling(q, x), 1.0_x);
-        ARIADNE_TESTING_EXPECT_EQUAL(unit[q].dimension(), 2u);
-        ARIADNE_TESTING_EXPECT_EQUAL(unit.grid(q).dimension(), 2u);
-
-        SimpleHybridScalings policy;
-        HybridScalings scalings(policy);
-        HybridGrid scaled(hspc, scalings);
-        ARIADNE_TESTING_EXPECT_EQUAL(scaled.grid(q).dimension(), 2u);
-        ARIADNE_TESTING_EXPECT_EQUAL(scaled.grid(q).lengths(), unit.grid(q).lengths());
-        ARIADNE_TESTING_EXPECT_EQUAL(scaled.space(q).dimension(), 2u);
-        // Distinct scaling factors and coordinate orders are materialized by
-        // HybridGrid, not by the underlying HybridScalings policy.
-        const Map<Identifier, ExactDouble> custom_values{{x.name(), 2.0_x}, {y.name(), 3.0_x}};
-        HybridGrid custom_grid(hspc, HybridScalings(custom_values));
-        ARIADNE_TESTING_EXPECT_EQUAL(custom_grid[q].dimension(), 2u);
-        ARIADNE_TESTING_EXPECT_EQUAL(custom_grid.grid(q).lengths(), custom_grid[q].lengths());
-        ARIADNE_TESTING_EXPECT_EQUAL(custom_grid[q].lengths(),
-                                     Grid(Vector<ExactDouble>{2.0_x, 3.0_x}).lengths());
-        // A derived auxiliary grid may have a different dimension and
-        // ordering than the location's state grid. The same scaling policy
-        // must be applied by variable name, not by state coordinate index.
-        const RealSpace auxiliary_order({y, x});
-        const Grid auxiliary_grid =
-            HybridGrid::make_grid(custom_grid.scalings(), q, auxiliary_order);
-        ARIADNE_TESTING_EXPECT_EQUAL(auxiliary_grid.lengths(),
-                                     Grid(Vector<ExactDouble>{3.0_x, 2.0_x}).lengths());
-        ARIADNE_TESTING_EXPECT_EXCEPTION(static_cast<void>(custom_grid[missing]));
-        std::unique_ptr<HybridGrid> cloned_grid(scaled.clone());
-        ARIADNE_TESTING_EXPECT_EQUAL(cloned_grid->grid(q).dimension(), 2u);
-        std::ostringstream output;
-        output << scaled;
-        ARIADNE_TESTING_PROVE(output.str().find("HybridGrid") != std::string::npos);
-    }
 };
 
 int main(int argc, char** argv) {
     ARIADNE_TESTING_SUITE("test_hybrid_space");
     ARIADNE_TESTING_ADD_TEST(TestHybridSpace, test_location_spaces);
-    ARIADNE_TESTING_ADD_TEST(TestHybridSpace, test_grid_and_scalings);
     return Ariadne::Testing::run_logging_suite(ariadne_test_suite, argc, argv);
 }

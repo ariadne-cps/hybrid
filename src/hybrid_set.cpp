@@ -27,11 +27,11 @@
  */
 
 #include "hybrid/hybrid_set.hpp"
-#include "hybrid/hybrid_validated_constrained_image_set.hpp"
 
 #include "function/functional.hpp"
 #include "hybrid/hybrid_expression_set.hpp"
 #include "hybrid/hybrid_space.hpp"
+#include "hybrid/hybrid_validated_constrained_image_set.hpp"
 #include "numeric/casts.hpp"
 #include "numeric/real.hpp"
 #include "numeric/rounding.hpp"

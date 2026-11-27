@@ -42,7 +42,6 @@
 #include "hybrid/hybrid_set.decl.hpp"
 #include "symbolic/space.hpp"
 
-
 namespace Ariadne {
 
 /** @brief HybridSetInterfaceBase represents interfaces for hybrid-space sets. */

@@ -26,8 +26,9 @@
  *  @brief Check concrete constrained hybrid image header self-sufficiency.
  */
 
-#include "hybrid/hybrid_validated_constrained_image_set.hpp"
 #include <type_traits>
+
+#include "hybrid/hybrid_validated_constrained_image_set.hpp"
 
 static_assert(std::is_base_of_v<Ariadne::ValidatedHybridLocatedSetInterface, Ariadne::HybridValidatedConstrainedImageSet>);
 #ifdef ARIADNE_PAVING_BINARY_TREE_PAVING_HPP

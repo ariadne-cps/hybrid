@@ -31,7 +31,6 @@
 #include "drawing/geometry_draw.hpp"
 #include "hybrid/hybrid_expression_set.hpp"
 #include "hybrid/hybrid_graphics.hpp"
-#include "hybrid/hybrid_paving.hpp"
 #include "hybrid/hybrid_set.hpp"
 
 namespace Ariadne {
@@ -51,20 +50,6 @@ Void HybridBoundedConstraintSet::draw(CanvasInterface& c, const Set<DiscreteLoca
             RealSpace space(List<RealVariable>(variables.begin(), variables.end()));
             Ariadne::draw(c, projection(space, p), this->euclidean_set(loc, space));
         }
-    }
-}
-
-template<class EBS>
-Void HybridBasicSet<EBS>::adjoin_outer_approximation_to(HybridPaving& paving, Nat fineness) const {
-    ARIADNE_PRECONDITION_MSG(this->space() == paving.space(this->location()), "HybridSet's state variables " << this->space() << " do not match " << paving.space(this->location()) << " in location " << this->location());
-    if constexpr (std::is_same_v<EBS, ExactBoxType>) {
-        // Explicitly use the effective compact-set interface rather than
-        // relying on a backend-specific exact-box overload.
-        paving[this->location()].adjoin_outer_approximation(
-            ExactBoxSetType(this->euclidean_set()), fineness);
-    } else {
-        paving[this->location()].adjoin_outer_approximation(
-            this->euclidean_set(), fineness);
     }
 }
 

@@ -29,8 +29,9 @@
 #ifndef ARIADNE_HYBRID_VALIDATED_CONSTRAINED_IMAGE_SET_HPP
 #define ARIADNE_HYBRID_VALIDATED_CONSTRAINED_IMAGE_SET_HPP
 
-#include "expression-set/expression_set.hpp"
 #include "hybrid/hybrid_set.hpp"
+
+#include "expression-set/expression_set.hpp"
 
 namespace Ariadne {
 

@@ -39,9 +39,6 @@
 // Generic named hybrid sets must remain independent from concrete paving.
 #include "hybrid/hybrid_set.hpp"
 
-#ifdef ARIADNE_HYBRID_GRID_HPP
-#error Generic hybrid set header must not import HybridGrid
-#endif
 #ifdef ARIADNE_GRID_HPP
 #error Generic hybrid set header must not import concrete Grid
 #endif
@@ -76,20 +73,7 @@ static_assert(std::is_base_of_v<Ariadne::EffectiveHybridSetInterface, Ariadne::H
 #endif
 
 // Import the concrete value types explicitly, without pulling the backends.
-#include "hybrid/hybrid_grid_cell.hpp"
 #include "hybrid/hybrid_validated_constrained_image_set.hpp"
-
-static_assert(std::is_base_of_v<Ariadne::HybridBasicSet<Ariadne::GridCell>, Ariadne::HybridGridCell>);
 static_assert(std::is_base_of_v<Ariadne::ValidatedHybridLocatedSetInterface, Ariadne::HybridValidatedConstrainedImageSet>);
-
-// HybridPaving selects concrete backends in its implementation, not its API.
-#include "hybrid/hybrid_paving.hpp"
-
-#ifdef ARIADNE_PAVING_BINARY_TREE_PAVING_HPP
-#error HybridPaving header must not import the binary tree paving backend
-#endif
-#ifdef ARIADNE_PAVING_ROBDD_PAVING_HPP
-#error HybridPaving header must not import the ROBDD paving backend
-#endif
 
 int main() { return 0; }

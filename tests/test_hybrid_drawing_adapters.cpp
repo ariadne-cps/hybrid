@@ -31,7 +31,6 @@
 #include "hybrid/hybrid_bounded_constraint_set.hpp"
 #include "hybrid/hybrid_expression_set.hpp"
 #include "hybrid/hybrid_graphics.hpp"
-#include "hybrid/hybrid_paving.hpp"
 #include "hybrid/hybrid_set.hpp"
 #include "hybrid/hybrid_validated_constrained_image_set.hpp"
 #include "logging/test_runner.hpp"
@@ -264,50 +263,7 @@ class TestHybridDrawingAdapters : public Ariadne::Testing::ContextFixture {
                                                      {0, 1}
         })));
         check_location_filter(image, loc, axes);
-        MonolithicHybridSpace hspace;
-        hspace.new_location(loc, space);
-        HybridPaving paving{HybridGrid(hspace)};
-        HybridExactBoxes exact_boxes;
-        exact_boxes.insert(loc, space, ExactBoxType({
-                                           {0, 1},
-                                           {0, 1}
-        }));
-        paving.adjoin_outer_approximation(exact_boxes, 1u);
-        check_location_filter(paving, loc, axes);
-        HybridPaving empty_paving{HybridGrid(hspace)};
-        empty_paving.draw(empty, {}, axes);
-        ARIADNE_TESTING_EXPECT_EQUAL(empty.boundaries + empty.primitives, 0u);
     }
-    Void test_outer_approximation_adapters() {
-        DiscreteLocation loc(1);
-        RealVariable x("x"), y("y"), z("z");
-        RealSpace space({x, y});
-        MonolithicHybridSpace hspace;
-        hspace.new_location(loc, space);
-        HybridPaving paving{HybridGrid(hspace)};
-        HybridExactBox exact(loc, space, ExactBoxType({
-                                             {0, 1},
-                                             {0, 1}
-        }));
-        HybridUpperBox upper(loc, space, UpperBoxType({
-                                             {0, 1},
-                                             {0, 1}
-        }));
-        const HybridBasicSet<ExactBoxType>& exact_base = exact;
-        const HybridBasicSet<UpperBoxType>& upper_base = upper;
-        exact_base.adjoin_outer_approximation_to(paving, 1u);
-        const SizeType initial = paving.size();
-        ARIADNE_TESTING_PROVE(initial > 0u);
-        upper_base.adjoin_outer_approximation_to(paving, 1u);
-        ARIADNE_TESTING_EXPECT_EQUAL(paving.size(), initial);
-        MonolithicHybridSpace other_space;
-        other_space.new_location(loc, RealSpace({x, z}));
-        HybridPaving mismatched{HybridGrid(other_space)};
-        ARIADNE_TESTING_EXPECT_EXCEPTION(exact_base.adjoin_outer_approximation_to(mismatched, 1u));
-        ARIADNE_TESTING_EXPECT_EXCEPTION(upper_base.adjoin_outer_approximation_to(mismatched, 1u));
-        ARIADNE_TESTING_PROVE(mismatched.is_empty());
-    }
-
     Void test_figure_write_backend() {
         DiscreteLocation loc(1);
         RealVariable x("x"), y("y");
@@ -397,6 +353,5 @@ int main(int argc, char** argv) {
     ARIADNE_TESTING_ADD_TEST(TestHybridDrawingAdapters, test_figure_paint);
     ARIADNE_TESTING_ADD_TEST(TestHybridDrawingAdapters, test_figure_write_backend);
     ARIADNE_TESTING_ADD_TEST(TestHybridDrawingAdapters, test_remaining_drawable_adapters);
-    ARIADNE_TESTING_ADD_TEST(TestHybridDrawingAdapters, test_outer_approximation_adapters);
     return Ariadne::Testing::run_logging_suite(ariadne_test_suite, argc, argv);
 }

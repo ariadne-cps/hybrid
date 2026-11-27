@@ -29,7 +29,6 @@
 #include "drawing/drawing_command_line_interface.hpp"
 #include "foundation/logical.hpp"
 #include "hybrid/hybrid_graphics.hpp"
-#include "hybrid/hybrid_paving.hpp"
 #include "hybrid/hybrid_set.hpp"
 #include "logging/test_runner.hpp"
 #include "numeric/real.hpp"

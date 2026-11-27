@@ -31,9 +31,7 @@
 #include <sstream>
 #include <string>
 
-#include "hybrid/hybrid_paving.hpp"
 #include "hybrid/hybrid_set.hpp"
-#include "hybrid/hybrid_grid_cell.hpp"
 #include "hybrid/hybrid_validated_constrained_image_set.hpp"
 #include "logging/test_runner.hpp"
 
@@ -272,25 +270,10 @@ class TestHybridPrimitives : public Ariadne::Testing::ContextFixture {
         ARIADNE_TESTING_EXPECT_EQUAL(list.size(), 3u);
     }
 
-    Void test_cell_and_curve_descriptions() {
+    Void test_curve_description() {
         DiscreteLocation loc(1);
         RealVariable x("x"), y("y");
         RealSpace space({x, y});
-        MonolithicHybridSpace hspace;
-        hspace.new_location(loc, space);
-        HybridPaving paving{HybridGrid(hspace)};
-        HybridExactBoxes boxes;
-        boxes.insert(loc, space, ExactBoxType({
-                                     {0, 1},
-                                     {0, 1}
-        }));
-        paving.adjoin_outer_approximation(boxes, 1u);
-        HybridGridCell cell = *paving.begin();
-        ARIADNE_TESTING_EXPECT_EQUAL(cell.dimension(), 2u);
-        ARIADNE_TESTING_PROVE(cell.box().location() == loc);
-        std::ostringstream cell_text;
-        cell_text << cell;
-        ARIADNE_TESTING_PROVE(cell_text.str().find("GridCell") != std::string::npos);
         InterpolatedCurve curve(Point<FloatDPApproximation>({0.0_x, 0.0_x}, dp),
                                 Point<FloatDPApproximation>({1.0_x, 1.0_x}, dp));
         HybridBasicSet<InterpolatedCurve> path(loc, space, curve);
@@ -308,7 +291,7 @@ int main(int argc, char** argv) {
     ARIADNE_TESTING_ADD_TEST(TestHybridPrimitives, test_boxes_upper);
     ARIADNE_TESTING_ADD_TEST(TestHybridPrimitives, test_real_box_enclosures);
     ARIADNE_TESTING_ADD_TEST(TestHybridPrimitives, test_validated_image);
-    ARIADNE_TESTING_ADD_TEST(TestHybridPrimitives, test_cell_and_curve_descriptions);
+    ARIADNE_TESTING_ADD_TEST(TestHybridPrimitives, test_curve_description);
     ARIADNE_TESTING_ADD_TEST(TestHybridPrimitives, test_equality_and_list_iteration);
     return Ariadne::Testing::run_logging_suite(ariadne_test_suite, argc, argv);
 }

@@ -93,8 +93,6 @@ using HybridUpperBoxesType = HybridUpperBoxes;
 
 template<class EBS>
 class HybridListSet;
-/** @brief HybridPaving represents declarations of hybrid set abstractions. */
-class HybridPaving;
 
 } // namespace Ariadne
 

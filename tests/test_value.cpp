@@ -75,25 +75,25 @@ class TestHybridValue : public Ariadne::Testing::ContextFixture {
         spaces.new_location(q2, space);
         Nat materializations = 0u;
         Hybrid<int> family(HybridSpace(spaces),
-            [&](const DiscreteLocation&, const RealSpace& sp) {
-                ++materializations;
-                return static_cast<int>(sp.dimension());
-            });
+                           [&](const DiscreteLocation&, const RealSpace& sp) {
+                               ++materializations;
+                               return static_cast<int>(sp.dimension());
+                           });
         family[q1] = 23;
         ARIADNE_TESTING_EXPECT_EQUAL(materializations, 1u);
         const Hybrid<int>& read_only = family;
         with_location(read_only, q1,
-            [&](const RealSpace& selected, const int& value) {
-                ARIADNE_TESTING_PROVE(selected == space);
-                ARIADNE_TESTING_EXPECT_EQUAL(value, 23);
-                ++callbacks;
-            });
+                      [&](const RealSpace& selected, const int& value) {
+                          ARIADNE_TESTING_PROVE(selected == space);
+                          ARIADNE_TESTING_EXPECT_EQUAL(value, 23);
+                          ++callbacks;
+                      });
         with_location(read_only, q1, space,
-            [&](const RealSpace& selected, const int& value) {
-                ARIADNE_TESTING_PROVE(selected == space);
-                ARIADNE_TESTING_EXPECT_EQUAL(value, 23);
-                ++callbacks;
-            });
+                      [&](const RealSpace& selected, const int& value) {
+                          ARIADNE_TESTING_PROVE(selected == space);
+                          ARIADNE_TESTING_EXPECT_EQUAL(value, 23);
+                          ++callbacks;
+                      });
         ARIADNE_TESTING_EXPECT_EQUAL(callbacks, 3u);
         ARIADNE_TESTING_PROVE(not read_only.has_value(q2));
         ARIADNE_TESTING_EXPECT_EQUAL(materializations, 1u);

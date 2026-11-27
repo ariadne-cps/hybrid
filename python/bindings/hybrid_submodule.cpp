@@ -28,11 +28,8 @@
 
 #include "hybrid/discrete_location.hpp"
 #include "hybrid/hybrid_graphics_interface.hpp"
-#include "hybrid/hybrid_grid.hpp"
-#include "hybrid/hybrid_paving.hpp"
 #include "hybrid/hybrid_set.hpp"
 #include "hybrid/hybrid_space.hpp"
-#include "paving/grid.hpp"
 #include "pybind11.hpp"
 
 #include "function-utilities.hpp"
@@ -72,13 +69,6 @@ void hybrid_submodule(pybind11::module &module) {
     space_class.def("__str__", &__cstr__<HybridSpace>);
     space_class.def("__repr__", &__cstr__<HybridSpace>);
 
-    pybind11::class_<HybridGrid> grid_class(module, "HybridGrid");
-    grid_class.def(pybind11::init<const HybridSpace &>());
-    grid_class.def("has_location", &HybridGrid::has_location);
-    grid_class.def("grid", &HybridGrid::grid);
-    grid_class.def("__str__", &__cstr__<HybridGrid>);
-    grid_class.def("__repr__", &__cstr__<HybridGrid>);
-
     pybind11::class_<HybridDrawableInterface> drawable_class(module, "HybridDrawableInterface");
 
     pybind11::class_<HybridRealBox, pybind11::bases<HybridDrawableInterface>>
@@ -90,14 +80,4 @@ void hybrid_submodule(pybind11::module &module) {
     box_class.def("euclidean_set", [](const HybridRealBox &b) { return b.euclidean_set(); });
     box_class.def("__str__", &__cstr__<HybridRealBox>);
     box_class.def("__repr__", &__cstr__<HybridRealBox>);
-
-    pybind11::class_<HybridPaving, pybind11::bases<HybridDrawableInterface>>
-        paving_class(module, "HybridPaving");
-    paving_class.def(pybind11::init<const HybridGrid &>());
-    paving_class.def("has_location", &HybridPaving::has_location);
-    paving_class.def("is_empty", &HybridPaving::is_empty);
-    paving_class.def("size", &HybridPaving::size);
-    paving_class.def("clear", &HybridPaving::clear);
-    paving_class.def("__str__", &__cstr__<HybridPaving>);
-    paving_class.def("__repr__", &__cstr__<HybridPaving>);
 }
