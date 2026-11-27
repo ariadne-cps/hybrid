@@ -45,14 +45,6 @@
 using namespace std;
 using namespace Ariadne;
 
-// LogicalValue::operator== implements multi-valued logic, not enum identity.
-// Check the represented values when testing the exact logical outcome.
-namespace {
-bool same_logical_value(LogicalValue actual, LogicalValue expected) {
-    return static_cast<ComparableEnumerationType>(actual) == static_cast<ComparableEnumerationType>(expected);
-}
-} // namespace
-
 class TestHybridSet : public Ariadne::Testing::ContextFixture {
   public:
     using ContextFixture::ContextFixture;
