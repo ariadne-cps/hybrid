@@ -3,8 +3,6 @@
 
 from pyariadne_hybrid import (
     DiscreteLocation,
-    HybridGrid,
-    HybridPaving,
     HybridRealBox,
     HybridSpace,
     MonolithicHybridSpace,
@@ -65,17 +63,8 @@ def tutorial_hybrid():
     show("box", box)
     show("box dimension", box.dimension())
 
-    section("Grids and paving")
-    grid = HybridGrid(space)
-    paving = HybridPaving(grid)
-    assert grid.has_location(moving)
-    assert paving.has_location(moving)
-    assert paving.is_empty()
-    show("grid", grid)
-    show("empty paving", paving)
-
     section("Which layer provides what?")
-    print("Hybrid: discrete locations, spaces, sets, grids and pavings.")
+    print("Hybrid: discrete locations, spaces and hybrid sets (grids and pavings live in Analysis).")
     print("System: dynamical systems and automata (not used here).")
     print("Evolution: simulation and enclosure algorithms (not used here).")
     print("Analysis: reachability and safety analysis (not used here).")

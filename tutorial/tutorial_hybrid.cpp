@@ -89,25 +89,8 @@ int main() {
     assert(box.location() == moving);
     assert(box.dimension() == 2u);
 
-    section("Grids and paving");
-    HybridGrid grid(space);
-    HybridPaving paving(grid);
-    assert(grid.has_location(moving));
-    assert(paving.is_empty());
-    show("empty paving", paving);
-
-    // Approximate a bounded hybrid set in the moving location.
-    // This is set geometry, not a simulation or reachability computation.
-    HybridBoundedConstraintSet initial(moving, {0 <= x <= 1, -1 <= velocity <= 1});
-    paving.adjoin_outer_approximation(initial, 4u);
-    assert(paving.nontrivial_location(moving));
-    assert(paving.size() > 0u);
-    show("bounded hybrid set", initial);
-    show("outer paving", paving);
-    show("paving cells", paving.size());
-
     section("Which layer provides what?");
-    cout << "Hybrid: discrete locations, spaces, sets, grids and pavings.\n"
+    cout << "Hybrid: discrete locations, spaces and hybrid sets (grids and pavings live in Analysis).\n"
          << "System: dynamical systems and automata (not used here).\n"
          << "Evolution: simulation and enclosure algorithms (not used here).\n"
          << "Analysis: reachability and safety analysis (not used here).\n";
