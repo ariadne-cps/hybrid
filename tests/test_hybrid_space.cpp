@@ -26,12 +26,11 @@
  *  @brief Exercise test hybrid space behavior.
  */
 
-// Behavioral coverage for hybrid spaces, location lookup and grids.
+// Behavioral coverage for hybrid spaces and location lookup.
 #include <memory>
 #include <sstream>
 #include <string>
 
-#include "hybrid/hybrid_grid.hpp"
 #include "hybrid/hybrid_space.hpp"
 #include "logging/test_runner.hpp"
 
@@ -90,40 +89,10 @@ class TestHybridSpace : public Ariadne::Testing::ContextFixture {
         output << polymorphic;
         ARIADNE_TESTING_PROVE(output.str().find("HybridSpace") != std::string::npos);
     }
-
-    Void test_grid_and_scalings() {
-        DiscreteLocation q(1), missing(2);
-        RealVariable x("x"), y("y");
-        RealSpace spc({x, y});
-        MonolithicHybridSpace m;
-        m.new_location(q, spc);
-        HybridSpace hspc(m);
-
-        HybridGrid unit(hspc);
-        ARIADNE_TESTING_PROVE(unit.has_location(q));
-        ARIADNE_TESTING_PROVE(!unit.has_location(missing));
-        ARIADNE_TESTING_PROVE(unit.space().has_location(q));
-        ARIADNE_TESTING_EXPECT_EQUAL(unit.space(q).dimension(), 2u);
-        ARIADNE_TESTING_EXPECT_EQUAL(unit.scalings().scaling(q, x), 1.0_x);
-        ARIADNE_TESTING_EXPECT_EQUAL(unit[q].dimension(), 2u);
-        ARIADNE_TESTING_EXPECT_EQUAL(unit.grid(q).dimension(), 2u);
-
-        SimpleHybridScalings policy;
-        HybridScalings scalings(policy);
-        HybridGrid scaled(hspc, scalings);
-        ARIADNE_TESTING_EXPECT_EQUAL(scaled.grid(q).dimension(), 2u);
-        ARIADNE_TESTING_EXPECT_EQUAL(scaled.space(q).dimension(), 2u);
-        std::unique_ptr<HybridGrid> cloned_grid(scaled.clone());
-        ARIADNE_TESTING_EXPECT_EQUAL(cloned_grid->grid(q).dimension(), 2u);
-        std::ostringstream output;
-        output << scaled;
-        ARIADNE_TESTING_PROVE(output.str().find("HybridGrid") != std::string::npos);
-    }
 };
 
 int main(int argc, char** argv) {
     ARIADNE_TESTING_SUITE("test_hybrid_space");
     ARIADNE_TESTING_ADD_TEST(TestHybridSpace, test_location_spaces);
-    ARIADNE_TESTING_ADD_TEST(TestHybridSpace, test_grid_and_scalings);
     return Ariadne::Testing::run_logging_suite(ariadne_test_suite, argc, argv);
 }

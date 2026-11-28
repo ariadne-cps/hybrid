@@ -32,6 +32,7 @@
 
 #include "hybrid/hybrid_bounded_constraint_set.hpp"
 #include "hybrid/hybrid_constraint_set.hpp"
+#include "hybrid/hybrid_expression_set.hpp"
 #include "hybrid/hybrid_set.hpp"
 #include "logging/test_runner.hpp"
 

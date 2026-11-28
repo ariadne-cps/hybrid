@@ -2,8 +2,6 @@
 
 from pyariadne_hybrid import (
     DiscreteLocation,
-    HybridGrid,
-    HybridPaving,
     HybridRealBox,
     HybridSpace,
     MonolithicHybridSpace,
@@ -29,7 +27,7 @@ def test_discrete_locations():
     assert str(first)
 
 
-def test_space_grid_and_paving():
+def test_space():
     x = RealVariable("x")
     location = DiscreteLocation(1)
     real_space = RealSpace([x])
@@ -41,14 +39,6 @@ def test_space_grid_and_paving():
 
     space = HybridSpace(monolithic)
     assert space.has_location(location)
-
-    grid = HybridGrid(space)
-    assert grid.has_location(location)
-    paving = HybridPaving(grid)
-    assert paving.has_location(location)
-    assert paving.is_empty()
-    assert paving.size() == 0
-    paving.clear()
 
 
 def test_hybrid_real_box():

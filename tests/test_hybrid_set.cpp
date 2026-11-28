@@ -31,12 +31,11 @@
 
 #include "algebra/matrix.hpp"
 #include "algebra/vector.hpp"
+#include "drawing/box_draw.hpp"
 #include "function/function.hpp"
 #include "hybrid/hybrid_bounded_constraint_set.hpp"
 #include "hybrid/hybrid_constraint_set.hpp"
-#include "hybrid/hybrid_paving.hpp"
 #include "hybrid/hybrid_set.hpp"
-#include "labelled/figure.hpp"
 #include "logging/test_runner.hpp"
 #include "numeric/rational.hpp"
 #include "set/function_set.hpp"
@@ -45,14 +44,6 @@
 
 using namespace std;
 using namespace Ariadne;
-
-// LogicalValue::operator== implements multi-valued logic, not enum identity.
-// Check the represented values when testing the exact logical outcome.
-namespace {
-bool same_logical_value(LogicalValue actual, LogicalValue expected) {
-    return static_cast<ComparableEnumerationType>(actual) == static_cast<ComparableEnumerationType>(expected);
-}
-} // namespace
 
 class TestHybridSet : public Ariadne::Testing::ContextFixture {
   public:
@@ -126,43 +117,14 @@ class TestHybridSet : public Ariadne::Testing::ContextFixture {
         ARIADNE_TESTING_PROVE(loc_iter == hls.locations_end());
     }
 
-    // ValidatedLowerKleenean(false) maps to UNLIKELY rather than FALSE:
-    // such lower predicates cannot prove the negation with not possibly().
-    // A location absent from the paving is disjoint from every box there.
-    // In particular, checking separation must never dereference map::end().
-    Void test_hybrid_paving_separation() {
-        DiscreteLocation loc(123);
-        RealVariable x("x");
-        RealSpace state_space({x});
-        MonolithicHybridSpace hybrid_space;
-        hybrid_space.new_location(loc, state_space);
-        HybridPaving paving{HybridGrid(hybrid_space)};
-        HybridExactBox box(loc, state_space, ExactBoxType({
-                                                 {0, 1}
-        }));
-        ARIADNE_TESTING_PROVE(definitely(paving.separated(box)));
-        ARIADNE_TESTING_PROVE(same_logical_value(paving.overlaps(box).repr(), LogicalValue::UNLIKELY));
-        ARIADNE_TESTING_PROVE(same_logical_value(paving.covers(box).repr(), LogicalValue::UNLIKELY));
-
-        // A present but empty Euclidean paving is separated as well.
-        paving[loc];
-        ARIADNE_TESTING_PROVE(definitely(paving.separated(box)));
-        ARIADNE_TESTING_PROVE(same_logical_value(paving.overlaps(box).repr(), LogicalValue::UNLIKELY));
-        ARIADNE_TESTING_PROVE(same_logical_value(paving.covers(box).repr(), LogicalValue::UNLIKELY));
-    }
-
-    // Isolate the bounding-box paving from hybrid evolution.
-    Void test_hybrid_initial_outer_approximation() {
+    Void test_hybrid_initial_interface_views() {
         DiscreteLocation loc;
         RealVariable x("x"), v("v");
         RealSpace state_space({x, v});
-        MonolithicHybridSpace hybrid_space;
-        hybrid_space.new_location(loc, state_space);
         Dyadic height = 2;
         Dyadic radius = 1 / pow(two, 6);
         HybridBoundedConstraintSet initial(loc,
                                            {height - radius <= x <= height + radius, -radius <= v <= radius});
-        // Probe the effective Euclidean interface before the paving call.
         const auto euclidean = initial.euclidean_set(loc, state_space);
         ARIADNE_TESTING_EXPECT_EQUAL(euclidean.dimension(), 2u);
         ARIADNE_TESTING_NOTE(euclidean.bounding_box());
@@ -185,43 +147,12 @@ class TestHybridSet : public Ariadne::Testing::ContextFixture {
         ARIADNE_TESTING_PROVE(same(from_compact.bounding_box(), euclidean.bounding_box()));
         ARIADNE_TESTING_EXPECT_EQUAL(as_located.euclidean_set(loc, state_space).dimension(), 2u);
         ARIADNE_TESTING_EXPECT_EQUAL(as_full.euclidean_set(loc, state_space).dimension(), 2u);
-        HybridPaving paving{HybridGrid(hybrid_space)};
-        paving.adjoin_outer_approximation(initial, 4u);
-        ARIADNE_TESTING_PROVE(paving.nontrivial_location(loc));
-        ARIADNE_TESTING_PROVE(paving.size() > 0u);
-        // The domain is a RealBox; use an outward enclosure before
-        // converting to an exact box for the paving containment check.
-        const HybridUpperBoxes bounds = initial.bounding_box();
-        ExactBoxType initial_box = cast_exact_box(bounds.euclidean_set(loc, state_space));
-        ARIADNE_TESTING_PROVE(paving.euclidean_set(loc).superset(initial_box));
-    }
-
-    Void test_compile_incorrect_hybrid_paving() {
-        Grid g;
-        BinaryTreePaving gts;
-        MonolithicHybridSpace hspc;
-        DiscreteLocation loc;
-        HybridGrid hg(hspc);
-        HybridPaving hgts(hg);
-        Figure fig(hgts[loc].bounding_box(), Projection2d(2, 0, 1));
-        hg.has_location(loc);
-        g = hg[loc];
-
-        hgts.has_location(loc);
-        // HybridPaving exposes the selected backend as a polymorphic
-        // Paving. Build a tree view only for this legacy Figure draw check.
-        const Paving& slice = hgts[loc];
-        BinaryTreePaving drawable(slice.grid());
-        for (const auto& cell: slice)
-            drawable.adjoin(cell);
-        draw(fig, drawable);
     }
 };
 
 int main(int argc, char** argv) {
     ARIADNE_TESTING_SUITE("test_hybrid_set");
     ARIADNE_TESTING_ADD_TEST(TestHybridSet, test_hybrid_list_set);
-    ARIADNE_TESTING_ADD_TEST(TestHybridSet, test_hybrid_paving_separation);
-    ARIADNE_TESTING_ADD_TEST(TestHybridSet, test_hybrid_initial_outer_approximation);
+    ARIADNE_TESTING_ADD_TEST(TestHybridSet, test_hybrid_initial_interface_views);
     return Ariadne::Testing::run_logging_suite(ariadne_test_suite, argc, argv);
 }

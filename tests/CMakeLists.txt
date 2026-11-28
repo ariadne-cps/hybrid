@@ -1,16 +1,16 @@
 include(CTest)
 set(UNIT_TESTS
     test_hybrid_set
+    test_value
     test_hybrid_set_interface
     test_hybrid_primitives
-    test_hybrid_scalings_header
     test_discrete_location
     test_hybrid_space
     test_hybrid_constraints
-    test_hybrid_paving_operations
-    test_hybrid_augmented_paving
     test_hybrid_graphics_configuration
     test_hybrid_box_set
+    test_hybrid_header_boundaries
+    test_hybrid_validated_constrained_image_header
     test_hybrid_drawing_adapters
 )
 foreach(TEST IN LISTS UNIT_TESTS)

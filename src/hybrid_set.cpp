@@ -31,10 +31,10 @@
 #include "function/functional.hpp"
 #include "hybrid/hybrid_expression_set.hpp"
 #include "hybrid/hybrid_space.hpp"
+#include "hybrid/hybrid_validated_constrained_image_set.hpp"
 #include "numeric/casts.hpp"
 #include "numeric/real.hpp"
 #include "numeric/rounding.hpp"
-#include "paving/paving_interface.hpp"
 #include "set/function_set.hpp"
 #include "symbolic/assignment.hpp"
 
@@ -240,31 +240,6 @@ HybridBoundedConstraintSet intersection(const HybridBoxesSet& hbxs, const Hybrid
     return res;
 }
 
-template<class DS, class HBS>
-HybridSpaceSetConstIterator<DS, HBS>::
-    HybridSpaceSetConstIterator(const Map<DiscreteLocation, DS>& map, const HybridSpace& spc, Bool end)
-    : _loc_begin(map.begin()),
-      _loc_end(map.end()),
-      _loc_iter(end ? _loc_end : _loc_begin),
-      hspc(spc) {
-    if (_loc_iter != _loc_end) {
-        _bs_iter = _loc_iter->second.begin();
-        this->increment_loc();
-    }
-}
-
-template<class DS, class HBS>
-inline Void
-    HybridSpaceSetConstIterator<DS, HBS>::increment_loc() {
-    while (*_bs_iter == _loc_iter->second.end()) {
-        ++_loc_iter;
-        if (_loc_iter == _loc_end) {
-            return;
-        }
-        _bs_iter = _loc_iter->second.begin();
-    }
-}
-
 Vector<FloatDPApproximation> evaluate(const ApproximateVectorMultivariateFunction& f, const Vector<FloatDPApproximation>& v);
 
 template<>
@@ -276,14 +251,8 @@ String class_name<ExactBoxType>() { return "ExactFloatDPBox"; }
 template<>
 String class_name<UpperBoxType>() { return "UpperFloatDPBox"; }
 
-template<>
-String class_name<GridCell>() { return "GridCell"; }
-
 // Instantiations of mathematical hybrid points.
 template class HybridPoint<FloatDPApproximation>;
 template class HybridPoint<Real>;
-
-template class HybridSpaceSetConstIterator<BinaryTreePaving, HybridGridCell>;
-template class HybridSpaceSetConstIterator<Paving, HybridGridCell>;
 
 } // namespace Ariadne
